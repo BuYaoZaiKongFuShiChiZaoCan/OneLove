@@ -79,10 +79,5 @@
   ],
   "env": {
     "NODE_ENV": "production"
-  },
-  "functions": {
-    "OneLove-backend/server.js": {
-      "maxDuration": 30
-    }
   }
 } 
