@@ -1,4 +1,9 @@
 {
+  "name": "onelove-app",
+  "version": "1.0.0",
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "express-validator": "^7.2.1",
