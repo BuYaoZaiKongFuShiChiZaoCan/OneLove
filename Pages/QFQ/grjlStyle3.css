@@ -1,0 +1,121 @@
+/* 基本设置 */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    line-height: 1.6;
+    padding: 20px;
+}
+
+/* 返回首页链接样式 */
+a {
+    display: inline-block;
+    margin: 20px 100px;
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+a:hover {
+    background-color: #0056b3;
+}
+
+/* 切换样式下拉菜单 */
+label {
+    margin-right: 10px;
+}
+
+select {
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* 表格样式 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+}
+
+ol,
+ul {
+    transition: all 1s;
+    position: relative;
+}
+
+th {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    text-align: left;
+}
+
+td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* 详细信息样式 */
+details summary {
+    cursor: pointer;
+    color: #007bff;
+}
+
+details span {
+    display: block;
+    margin-top: 5px;
+    color: #555;
+}
+
+ol li img,
+ul li img {
+    filter: none !important;
+    pointer-events: none;
+    /* 禁止元素交互、其中包括hover等其它交互属性 */
+    background: aliceblue;
+    opacity: 0;
+    height: 60vh;
+    position: fixed;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    z-index: 9;
+    transition: opacity 0.7s ease-in-out;
+    /* 仅对opacity进行过渡 */
+    margin-right: 5%;
+    box-shadow: 5px 10px 20px 0px gray;
+}
+
+li:hover img {
+    opacity: 1;
+}
+
+/* 图片样式 */
+img {
+    max-width: 100%;
+    height: auto;
+    margin-top: 5px;
+}
+
+/* 列表样式 */
+ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+li {
+    margin-bottom: 10px;
+}

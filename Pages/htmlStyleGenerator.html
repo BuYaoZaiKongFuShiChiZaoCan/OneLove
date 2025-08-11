@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML、CSS生成器</title>
+    <style>
+        html,
+        body {
+            height: 100vh;
+        }
+
+        body {
+            margin: 0;
+            color: #fff;
+            background: #112;
+            display: flex;
+            flex-direction: row;
+        }
+
+        * {
+            margin: 0;
+        }
+
+        h1 {
+            line-height: 150%;
+            margin: 0 20px;
+        }
+
+        header {
+            width: 20%;
+            height: 100%;
+            border-right: 1px solid #999;
+        }
+
+        header>h2 {
+            margin: 10px;
+        }
+
+        header h2:hover::after {
+            content: '#';
+        }
+
+        header>div {
+            margin: 10px 20px;
+        }
+
+        header>div:nth-of-type(2) {
+            margin: 10px 40px;
+        }
+
+        footer {
+            width: 80%;
+            height: 100%;
+        }
+
+        #neiRon>div {
+            margin: 30px;
+        }
+
+        #neiRon>div>div {
+            margin: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h2 onclick="htmlsc()">HTML</h2>
+        <script>
+            function htmlsc() {
+                if (document.getElementById('htmlsc').style.display == 'none') {
+                    document.getElementById('htmlsc').style.display = 'block';
+                } else {
+                    document.getElementById('htmlsc').style.display = 'none'
+                }
+            }
+        </script>
+        <div id="htmlsc" style="display: none;">
+            <span onclick="htmlInput()">输入(input)</span>
+            <script>
+                function htmlInput() {
+                    document.getElementById('daoHang').innerHTML = '<h1>HTML --> input(输入)</h1>';
+                    // 选项
+                    document.getElementById('xuanXiang').innerHTML = '<div style="margin: 5px;">\
+                        type：\
+                            <select id="type" style="width: 150px;" onchange="shuaXin()">\
+                                <option>none</option>\
+                                <option>text</option>\
+                                <option></option>\
+                            </select>\
+                        </div>\
+                        ：\
+                            <select id="type" style="width: 150px;" onchange="shuaXin()">\
+                                <option mytype="none">没有</option>\
+                                <option mytype="text">文本</option>\
+                                <option></option>\
+                            </select>\
+                        </div>\
+                    ';
+                }
+                // 代码
+                function shuaXin() {
+                    var type = document.getElementById('type').value;
+                    document.getElementById('daima').innerHTML = '<input type="' + type + '">';
+                }
+                htmlInput();
+                shuaXin();
+            </script>
+        </div>
+    </header>
+    <footer id="shuChu">
+        <div style="height: 9%; border-bottom: 1px solid #fff;" id="daoHang"></div>
+        <div id="neiRon">
+            <div id="one">
+                <div id>选项</div>
+                <div id="xuanXiang" style="background: #444; min-height: 48px; padding: 1%;"></div>
+            </div>
+            <div id="two">
+                <div>代码</div>
+                <div id="daiMa" style="background: #333; padding: 1%; min-height: 48px;">
+                    <xmp id="daima"></xmp>
+                </div>
+            </div>
+            <div id="three">
+                <div  onclick="yunx()">效果展示：点击此处预览</div>
+                <div id="yuLan" style="background: #333; min-height: 48px; padding: 1%;"></div>
+            </div>
+            <script>
+                function yunx() {
+                    document.getElementById('yuLan').innerHTML =  document.getElementById('daima').innerHTML;
+                }
+            </script>
+        </div>
+    </footer>
+</body>
+
+</html>

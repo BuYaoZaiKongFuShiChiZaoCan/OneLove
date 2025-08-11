@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>支持我们</title>
+        <style>
+            ::-webkit-scrollbar {
+                display: none;
+            }
+
+            body {
+                margin: 0;
+            }
+
+            body>a {
+                display: block;
+                padding: 2em 4em;
+                color: black;
+                box-shadow: none;
+                text-decoration: none;
+            }
+
+            body>a:hover {
+                color: blueviolet;
+                text-decoration: underline;
+            }
+
+            .content {
+                display: flex;
+                align-items: center;
+                justify-content: space-around;
+            }
+
+            .content>* {
+                width: 35%;
+                margin: 50px;
+                overflow: hidden;
+                border-radius: 20px;
+                box-shadow: 0 0 10px 5px slateblue, 0 0 5px 2px slateblue inset;
+            }
+
+            .content .weixin img {
+                width: 100%;
+            }
+
+            .content .zhifubao {
+                display: flex;
+                align-items: center;
+                flex-direction: column;
+                padding: 20px;
+            }
+
+            img {
+                vertical-align: bottom;
+            }
+
+            .zhifubao img {
+                max-width: 49%;
+                max-height: 60vh;
+            }
+        </style>
+    </head>
+    <body>
+        <a href="../index.html">回首页</a>
+        <div class="content">
+            <div class="weixin">
+                <img src="./img/GiveMoneyIncentives_wx_赞赏码.png" alt="">
+            </div>
+            <div class="zhifubao">
+                <div>
+                    <img src="./img/GiveMoneyIncentives_zfb_one.jpg" alt="">
+                    <img src="./img/GiveMoneyIncentives_zfb_two.jpg" alt="">
+                </div>
+                <p>
+                    1. 用支付宝扫第一个二维码领红包
+                    <br />
+                    2. 扫第二个二维码将刚才领到的金额支付[支付时显示支付金额为0元为正常，因为金额用红包代替了]
+                </p>
+            </div>
+        </div>
+    </body>
+</html>

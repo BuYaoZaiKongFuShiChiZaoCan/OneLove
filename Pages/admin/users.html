@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理 - OneLove 管理中心</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            transition: transform 0.2s ease;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .controls {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 45px 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-box i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #718096;
+        }
+
+        .filter-select {
+            padding: 12px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+        }
+
+        .users-table {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+            gap: 15px;
+            font-weight: 600;
+        }
+
+        .user-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+            gap: 15px;
+            padding: 20px;
+            border-bottom: 1px solid #e2e8f0;
+            align-items: center;
+            transition: background-color 0.3s ease;
+        }
+
+        .user-row:hover {
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+
+        .user-row:last-child {
+            border-bottom: none;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .status-active {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+
+        .status-inactive {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .role-badge {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        .role-admin {
+            background: #bee3f8;
+            color: #2b6cb0;
+        }
+
+        .role-user {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+        }
+
+        .empty-state i {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .table-header, .user-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .search-box {
+                min-width: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 页面头部 -->
+        <div class="header">
+            <h1>
+                <i class="fas fa-users"></i>
+                用户管理
+            </h1>
+            <a href="/Pages/admin/dashboard.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                返回仪表板
+            </a>
+        </div>
+
+        <!-- 控制栏 -->
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索用户名或邮箱...">
+                <i class="fas fa-search"></i>
+            </div>
+            <select class="filter-select" id="statusFilter">
+                <option value="">所有状态</option>
+                <option value="active">活跃</option>
+                <option value="inactive">禁用</option>
+            </select>
+            <select class="filter-select" id="roleFilter">
+                <option value="">所有角色</option>
+                <option value="admin">管理员</option>
+                <option value="user">普通用户</option>
+            </select>
+            <button class="btn" onclick="refreshUsers()">
+                <i class="fas fa-sync-alt"></i>
+                刷新
+            </button>
+        </div>
+
+        <!-- 用户列表 -->
+        <div class="users-table">
+            <div class="table-header">
+                <div>用户</div>
+                <div>邮箱</div>
+                <div>角色</div>
+                <div>状态</div>
+                <div>注册时间</div>
+                <div>最后登录</div>
+                <div>操作</div>
+            </div>
+            <div id="usersList">
+                <div class="loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    加载用户列表...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin + '/api';
+        let allUsers = [];
+        let filteredUsers = [];
+
+        // 获取认证令牌
+        function getAuthToken() {
+            return sessionStorage.getItem('token');
+        }
+
+        // 检查管理员权限
+        async function checkAdminAuth() {
+            const authToken = getAuthToken();
+            
+            if (!authToken) {
+                window.location.href = '/Pages/login.html';
+                return false;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    window.location.href = '/Pages/login.html';
+                    return false;
+                }
+
+                const data = await response.json();
+                const user = data.data.user;
+                
+                if (user.role !== 'admin') {
+                    alert('需要管理员权限才能访问此页面');
+                    window.location.href = '/Pages/admin/dashboard.html';
+                    return false;
+                }
+
+                return true;
+            } catch (error) {
+                console.error('权限检查失败:', error);
+                window.location.href = '/Pages/login.html';
+                return false;
+            }
+        }
+
+        // 加载用户列表
+        async function loadUsers() {
+            try {
+                const authToken = getAuthToken();
+                const response = await fetch(`${API_BASE}/admin/users`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('获取用户列表失败');
+                }
+
+                const data = await response.json();
+                allUsers = data.data || [];
+                filteredUsers = [...allUsers];
+                displayUsers();
+            } catch (error) {
+                console.error('加载用户列表失败:', error);
+                document.getElementById('usersList').innerHTML = `
+                    <div class="error">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        加载用户列表失败: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // 显示用户列表
+        function displayUsers() {
+            const usersList = document.getElementById('usersList');
+            
+            if (filteredUsers.length === 0) {
+                usersList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <h3>暂无用户数据</h3>
+                        <p>没有找到符合条件的用户</p>
+                    </div>
+                `;
+                return;
+            }
+
+            usersList.innerHTML = filteredUsers.map(user => `
+                <div class="user-row">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="user-avatar">
+                            ${user.username ? user.username.charAt(0).toUpperCase() : 'U'}
+                        </div>
+                        <div>
+                            <div style="font-weight: 600;">${user.username || '未知用户'}</div>
+                            <div style="font-size: 12px; color: #718096;">ID: ${user._id || user.id}</div>
+                        </div>
+                    </div>
+                    <div>${user.email || '未设置邮箱'}</div>
+                    <div>
+                        <span class="role-badge role-${user.role || 'user'}">
+                            ${user.role === 'admin' ? '管理员' : '普通用户'}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="status-badge status-${user.isActive ? 'active' : 'inactive'}">
+                            ${user.isActive ? '活跃' : '禁用'}
+                        </span>
+                    </div>
+                    <div>${formatDate(user.createdAt)}</div>
+                    <div>${user.lastLogin ? formatDate(user.lastLogin) : '从未登录'}</div>
+                    <div class="action-buttons">
+                        <button class="action-btn btn" onclick="editUser('${user._id || user.id}')" title="编辑用户信息">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn ${user.isActive ? 'btn-danger' : 'btn-success'}" 
+                                onclick="toggleUserStatus('${user._id || user.id}', ${user.isActive})" 
+                                title="${user.isActive ? '禁用用户' : '启用用户'}">
+                            <i class="fas fa-${user.isActive ? 'ban' : 'check'}"></i>
+                        </button>
+                        <button class="action-btn btn" onclick="changeUserRole('${user._id || user.id}', '${user.role}')" 
+                                title="${user.role === 'admin' ? '降级为普通用户' : '提升为管理员'}">
+                            <i class="fas fa-user-shield"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 搜索和过滤
+        function filterUsers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const roleFilter = document.getElementById('roleFilter').value;
+
+            filteredUsers = allUsers.filter(user => {
+                const matchesSearch = !searchTerm || 
+                    (user.username && user.username.toLowerCase().includes(searchTerm)) ||
+                    (user.email && user.email.toLowerCase().includes(searchTerm));
+                
+                const matchesStatus = !statusFilter || 
+                    (statusFilter === 'active' && user.isActive) ||
+                    (statusFilter === 'inactive' && !user.isActive);
+                
+                const matchesRole = !roleFilter || user.role === roleFilter;
+
+                return matchesSearch && matchesStatus && matchesRole;
+            });
+
+            displayUsers();
+        }
+
+        // 刷新用户列表
+        function refreshUsers() {
+            loadUsers();
+        }
+
+        // 切换用户状态
+        async function toggleUserStatus(userId, currentStatus) {
+            const newStatus = !currentStatus;
+            const action = newStatus ? '启用' : '禁用';
+            
+            if (!confirm(`确定要${action}此用户吗？`)) {
+                return;
+            }
+
+            try {
+                const authToken = getAuthToken();
+                const response = await fetch(`${API_BASE}/admin/users/${userId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ isActive: newStatus })
+                });
+
+                if (!response.ok) {
+                    throw new Error('操作失败');
+                }
+
+                alert(`用户已${action}`);
+                loadUsers();
+            } catch (error) {
+                console.error('切换用户状态失败:', error);
+                alert(`操作失败: ${error.message}`);
+            }
+        }
+
+        // 更改用户角色
+        async function changeUserRole(userId, currentRole) {
+            const newRole = currentRole === 'admin' ? 'user' : 'admin';
+            const action = newRole === 'admin' ? '提升为管理员' : '降级为普通用户';
+            
+            if (!confirm(`确定要${action}吗？`)) {
+                return;
+            }
+
+            try {
+                const authToken = getAuthToken();
+                const response = await fetch(`${API_BASE}/admin/users/${userId}/role`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ role: newRole })
+                });
+
+                if (!response.ok) {
+                    throw new Error('操作失败');
+                }
+
+                alert(`用户角色已更改`);
+                loadUsers();
+            } catch (error) {
+                console.error('更改用户角色失败:', error);
+                alert(`操作失败: ${error.message}`);
+            }
+        }
+
+        // 编辑用户（占位符）
+        function editUser(userId) {
+            alert('用户编辑功能开发中...');
+        }
+
+        // 格式化日期
+        function formatDate(dateString) {
+            if (!dateString) return '未知';
+            const date = new Date(dateString);
+            return date.toLocaleString('zh-CN');
+        }
+
+        // 页面初始化
+        async function init() {
+            const hasAuth = await checkAdminAuth();
+            if (hasAuth) {
+                loadUsers();
+                
+                // 绑定搜索和过滤事件
+                document.getElementById('searchInput').addEventListener('input', filterUsers);
+                document.getElementById('statusFilter').addEventListener('change', filterUsers);
+                document.getElementById('roleFilter').addEventListener('change', filterUsers);
+            }
+        }
+
+        // 启动应用
+        setTimeout(() => {
+            init();
+        }, 100);
+    </script>
+</body>
+</html> 

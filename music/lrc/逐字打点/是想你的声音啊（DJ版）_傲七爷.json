@@ -1,0 +1,1571 @@
+{
+    "lyrics": {
+        "lyricType": "krc",
+        "sentences": [
+            {
+                "text": "你快听 滴答滴滴答滴",
+                "startMs": 0,
+                "endMs": 4150,
+                "words": [
+                    {
+                        "startMs": 320,
+                        "endMs": 630,
+                        "text": "你"
+                    },
+                    {
+                        "startMs": 760,
+                        "endMs": 1070,
+                        "text": "快"
+                    },
+                    {
+                        "startMs": 1240,
+                        "endMs": 1550,
+                        "text": "听 "
+                    },
+                    {
+                        "startMs": 2440,
+                        "endMs": 2700,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 2700,
+                        "endMs": 2940,
+                        "text": "答"
+                    },
+                    {
+                        "startMs": 2940,
+                        "endMs": 3230,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 3360,
+                        "endMs": 3640,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 3640,
+                        "endMs": 3880,
+                        "text": "答"
+                    },
+                    {
+                        "startMs": 3880,
+                        "endMs": 4150,
+                        "text": "滴"
+                    }
+                ]
+            },
+            {
+                "text": "滴答滴是雨滴的声音",
+                "startMs": 4280,
+                "endMs": 6750,
+                "words": [
+                    {
+                        "startMs": 4280,
+                        "endMs": 4560,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 4560,
+                        "endMs": 4800,
+                        "text": "答"
+                    },
+                    {
+                        "startMs": 4800,
+                        "endMs": 5070,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 5200,
+                        "endMs": 5500,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 5500,
+                        "endMs": 5660,
+                        "text": "雨"
+                    },
+                    {
+                        "startMs": 5660,
+                        "endMs": 5830,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 5960,
+                        "endMs": 6270,
+                        "text": "的"
+                    },
+                    {
+                        "startMs": 6360,
+                        "endMs": 6560,
+                        "text": "声"
+                    },
+                    {
+                        "startMs": 6560,
+                        "endMs": 6750,
+                        "text": "音"
+                    }
+                ]
+            },
+            {
+                "text": "你快听 是我在是我在",
+                "startMs": 7840,
+                "endMs": 11670,
+                "words": [
+                    {
+                        "startMs": 7840,
+                        "endMs": 8150,
+                        "text": "你"
+                    },
+                    {
+                        "startMs": 8280,
+                        "endMs": 8590,
+                        "text": "快"
+                    },
+                    {
+                        "startMs": 8720,
+                        "endMs": 9030,
+                        "text": "听 "
+                    },
+                    {
+                        "startMs": 9920,
+                        "endMs": 10200,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 10200,
+                        "endMs": 10440,
+                        "text": "我"
+                    },
+                    {
+                        "startMs": 10440,
+                        "endMs": 10710,
+                        "text": "在"
+                    },
+                    {
+                        "startMs": 10840,
+                        "endMs": 11120,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 11120,
+                        "endMs": 11380,
+                        "text": "我"
+                    },
+                    {
+                        "startMs": 11380,
+                        "endMs": 11670,
+                        "text": "在"
+                    }
+                ]
+            },
+            {
+                "text": "是我在哼你最爱听的旋律",
+                "startMs": 11760,
+                "endMs": 14510,
+                "words": [
+                    {
+                        "startMs": 11760,
+                        "endMs": 12040,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 12040,
+                        "endMs": 12260,
+                        "text": "我"
+                    },
+                    {
+                        "startMs": 12260,
+                        "endMs": 12500,
+                        "text": "在"
+                    },
+                    {
+                        "startMs": 12500,
+                        "endMs": 12760,
+                        "text": "哼"
+                    },
+                    {
+                        "startMs": 12760,
+                        "endMs": 12980,
+                        "text": "你"
+                    },
+                    {
+                        "startMs": 12980,
+                        "endMs": 13180,
+                        "text": "最"
+                    },
+                    {
+                        "startMs": 13180,
+                        "endMs": 13430,
+                        "text": "爱"
+                    },
+                    {
+                        "startMs": 13440,
+                        "endMs": 13750,
+                        "text": "听"
+                    },
+                    {
+                        "startMs": 13880,
+                        "endMs": 14160,
+                        "text": "的"
+                    },
+                    {
+                        "startMs": 14160,
+                        "endMs": 14320,
+                        "text": "旋"
+                    },
+                    {
+                        "startMs": 14320,
+                        "endMs": 14510,
+                        "text": "律"
+                    }
+                ]
+            },
+            {
+                "text": "你快听 滴答滴滴答滴",
+                "startMs": 15280,
+                "endMs": 19150,
+                "words": [
+                    {
+                        "startMs": 15280,
+                        "endMs": 15590,
+                        "text": "你"
+                    },
+                    {
+                        "startMs": 15760,
+                        "endMs": 16070,
+                        "text": "快"
+                    },
+                    {
+                        "startMs": 16240,
+                        "endMs": 16550,
+                        "text": "听 "
+                    },
+                    {
+                        "startMs": 17400,
+                        "endMs": 17680,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 17680,
+                        "endMs": 17920,
+                        "text": "答"
+                    },
+                    {
+                        "startMs": 17920,
+                        "endMs": 18190,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 18360,
+                        "endMs": 18640,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 18640,
+                        "endMs": 18880,
+                        "text": "答"
+                    },
+                    {
+                        "startMs": 18880,
+                        "endMs": 19150,
+                        "text": "滴"
+                    }
+                ]
+            },
+            {
+                "text": "滴答滴是雨滴的声音",
+                "startMs": 19280,
+                "endMs": 21710,
+                "words": [
+                    {
+                        "startMs": 19280,
+                        "endMs": 19560,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 19560,
+                        "endMs": 19800,
+                        "text": "答"
+                    },
+                    {
+                        "startMs": 19800,
+                        "endMs": 20070,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 20200,
+                        "endMs": 20500,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 20500,
+                        "endMs": 20660,
+                        "text": "雨"
+                    },
+                    {
+                        "startMs": 20660,
+                        "endMs": 20830,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 20920,
+                        "endMs": 21230,
+                        "text": "的"
+                    },
+                    {
+                        "startMs": 21320,
+                        "endMs": 21520,
+                        "text": "声"
+                    },
+                    {
+                        "startMs": 21520,
+                        "endMs": 21710,
+                        "text": "音"
+                    }
+                ]
+            },
+            {
+                "text": "你快听 是我在是我在",
+                "startMs": 22840,
+                "endMs": 26670,
+                "words": [
+                    {
+                        "startMs": 22840,
+                        "endMs": 23150,
+                        "text": "你"
+                    },
+                    {
+                        "startMs": 23240,
+                        "endMs": 23550,
+                        "text": "快"
+                    },
+                    {
+                        "startMs": 23760,
+                        "endMs": 24070,
+                        "text": "听 "
+                    },
+                    {
+                        "startMs": 24920,
+                        "endMs": 25200,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 25200,
+                        "endMs": 25440,
+                        "text": "我"
+                    },
+                    {
+                        "startMs": 25440,
+                        "endMs": 25710,
+                        "text": "在"
+                    },
+                    {
+                        "startMs": 25840,
+                        "endMs": 26120,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 26120,
+                        "endMs": 26380,
+                        "text": "我"
+                    },
+                    {
+                        "startMs": 26380,
+                        "endMs": 26670,
+                        "text": "在"
+                    }
+                ]
+            },
+            {
+                "text": "是我在哼你最爱听的旋律",
+                "startMs": 26760,
+                "endMs": 29470,
+                "words": [
+                    {
+                        "startMs": 26760,
+                        "endMs": 27040,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 27040,
+                        "endMs": 27260,
+                        "text": "我"
+                    },
+                    {
+                        "startMs": 27260,
+                        "endMs": 27500,
+                        "text": "在"
+                    },
+                    {
+                        "startMs": 27500,
+                        "endMs": 27760,
+                        "text": "哼"
+                    },
+                    {
+                        "startMs": 27760,
+                        "endMs": 28000,
+                        "text": "你"
+                    },
+                    {
+                        "startMs": 28000,
+                        "endMs": 28200,
+                        "text": "最"
+                    },
+                    {
+                        "startMs": 28200,
+                        "endMs": 28430,
+                        "text": "爱"
+                    },
+                    {
+                        "startMs": 28440,
+                        "endMs": 28750,
+                        "text": "听"
+                    },
+                    {
+                        "startMs": 28840,
+                        "endMs": 29140,
+                        "text": "的"
+                    },
+                    {
+                        "startMs": 29140,
+                        "endMs": 29300,
+                        "text": "旋"
+                    },
+                    {
+                        "startMs": 29300,
+                        "endMs": 29470,
+                        "text": "律"
+                    }
+                ]
+            },
+            {
+                "text": "你快听 滴答滴滴答滴",
+                "startMs": 30320,
+                "endMs": 34150,
+                "words": [
+                    {
+                        "startMs": 30320,
+                        "endMs": 30630,
+                        "text": "你"
+                    },
+                    {
+                        "startMs": 30760,
+                        "endMs": 31070,
+                        "text": "快"
+                    },
+                    {
+                        "startMs": 31280,
+                        "endMs": 31590,
+                        "text": "听 "
+                    },
+                    {
+                        "startMs": 32440,
+                        "endMs": 32720,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 32720,
+                        "endMs": 32960,
+                        "text": "答"
+                    },
+                    {
+                        "startMs": 32960,
+                        "endMs": 33230,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 33360,
+                        "endMs": 33640,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 33640,
+                        "endMs": 33880,
+                        "text": "答"
+                    },
+                    {
+                        "startMs": 33880,
+                        "endMs": 34150,
+                        "text": "滴"
+                    }
+                ]
+            },
+            {
+                "text": "滴答滴窗外又在下雨",
+                "startMs": 34280,
+                "endMs": 37030,
+                "words": [
+                    {
+                        "startMs": 34280,
+                        "endMs": 34560,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 34560,
+                        "endMs": 34820,
+                        "text": "答"
+                    },
+                    {
+                        "startMs": 34820,
+                        "endMs": 35110,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 35200,
+                        "endMs": 35500,
+                        "text": "窗"
+                    },
+                    {
+                        "startMs": 35500,
+                        "endMs": 35740,
+                        "text": "外"
+                    },
+                    {
+                        "startMs": 35740,
+                        "endMs": 35960,
+                        "text": "又"
+                    },
+                    {
+                        "startMs": 35960,
+                        "endMs": 36230,
+                        "text": "在"
+                    },
+                    {
+                        "startMs": 36360,
+                        "endMs": 36670,
+                        "text": "下"
+                    },
+                    {
+                        "startMs": 36720,
+                        "endMs": 37030,
+                        "text": "雨"
+                    }
+                ]
+            },
+            {
+                "text": "难道这不是你最爱的天气",
+                "startMs": 37800,
+                "endMs": 42310,
+                "words": [
+                    {
+                        "startMs": 37800,
+                        "endMs": 37980,
+                        "text": "难"
+                    },
+                    {
+                        "startMs": 37980,
+                        "endMs": 38150,
+                        "text": "道"
+                    },
+                    {
+                        "startMs": 38800,
+                        "endMs": 39110,
+                        "text": "这"
+                    },
+                    {
+                        "startMs": 39920,
+                        "endMs": 40180,
+                        "text": "不"
+                    },
+                    {
+                        "startMs": 40180,
+                        "endMs": 40400,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 40400,
+                        "endMs": 40640,
+                        "text": "你"
+                    },
+                    {
+                        "startMs": 40640,
+                        "endMs": 40910,
+                        "text": "最"
+                    },
+                    {
+                        "startMs": 41000,
+                        "endMs": 41310,
+                        "text": "爱"
+                    },
+                    {
+                        "startMs": 41400,
+                        "endMs": 41710,
+                        "text": "的"
+                    },
+                    {
+                        "startMs": 41960,
+                        "endMs": 42140,
+                        "text": "天"
+                    },
+                    {
+                        "startMs": 42140,
+                        "endMs": 42310,
+                        "text": "气"
+                    }
+                ]
+            },
+            {
+                "text": "该继续猜测",
+                "startMs": 45800,
+                "endMs": 46910,
+                "words": [
+                    {
+                        "startMs": 45800,
+                        "endMs": 46080,
+                        "text": "该"
+                    },
+                    {
+                        "startMs": 46080,
+                        "endMs": 46220,
+                        "text": "继"
+                    },
+                    {
+                        "startMs": 46220,
+                        "endMs": 46390,
+                        "text": "续"
+                    },
+                    {
+                        "startMs": 46560,
+                        "endMs": 46740,
+                        "text": "猜"
+                    },
+                    {
+                        "startMs": 46740,
+                        "endMs": 46910,
+                        "text": "测"
+                    }
+                ]
+            },
+            {
+                "text": "直接就开口吗",
+                "startMs": 47400,
+                "endMs": 49150,
+                "words": [
+                    {
+                        "startMs": 47400,
+                        "endMs": 47680,
+                        "text": "直"
+                    },
+                    {
+                        "startMs": 47680,
+                        "endMs": 47920,
+                        "text": "接"
+                    },
+                    {
+                        "startMs": 47920,
+                        "endMs": 48160,
+                        "text": "就"
+                    },
+                    {
+                        "startMs": 48160,
+                        "endMs": 48300,
+                        "text": "开"
+                    },
+                    {
+                        "startMs": 48300,
+                        "endMs": 48470,
+                        "text": "口"
+                    },
+                    {
+                        "startMs": 48840,
+                        "endMs": 49150,
+                        "text": "吗"
+                    }
+                ]
+            },
+            {
+                "text": "纠结如何说破",
+                "startMs": 49760,
+                "endMs": 51990,
+                "words": [
+                    {
+                        "startMs": 49760,
+                        "endMs": 50060,
+                        "text": "纠"
+                    },
+                    {
+                        "startMs": 50060,
+                        "endMs": 50350,
+                        "text": "结"
+                    },
+                    {
+                        "startMs": 50400,
+                        "endMs": 50600,
+                        "text": "如"
+                    },
+                    {
+                        "startMs": 50600,
+                        "endMs": 50790,
+                        "text": "何"
+                    },
+                    {
+                        "startMs": 51320,
+                        "endMs": 51630,
+                        "text": "说"
+                    },
+                    {
+                        "startMs": 51680,
+                        "endMs": 51990,
+                        "text": "破"
+                    }
+                ]
+            },
+            {
+                "text": "可越想了解的",
+                "startMs": 53040,
+                "endMs": 54830,
+                "words": [
+                    {
+                        "startMs": 53040,
+                        "endMs": 53300,
+                        "text": "可"
+                    },
+                    {
+                        "startMs": 53300,
+                        "endMs": 53520,
+                        "text": "越"
+                    },
+                    {
+                        "startMs": 53520,
+                        "endMs": 53780,
+                        "text": "想"
+                    },
+                    {
+                        "startMs": 53780,
+                        "endMs": 53940,
+                        "text": "了"
+                    },
+                    {
+                        "startMs": 53940,
+                        "endMs": 54110,
+                        "text": "解"
+                    },
+                    {
+                        "startMs": 54520,
+                        "endMs": 54830,
+                        "text": "的"
+                    }
+                ]
+            },
+            {
+                "text": "越是无法琢磨",
+                "startMs": 55280,
+                "endMs": 57150,
+                "words": [
+                    {
+                        "startMs": 55280,
+                        "endMs": 55590,
+                        "text": "越"
+                    },
+                    {
+                        "startMs": 55600,
+                        "endMs": 55910,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 56040,
+                        "endMs": 56220,
+                        "text": "无"
+                    },
+                    {
+                        "startMs": 56220,
+                        "endMs": 56390,
+                        "text": "法"
+                    },
+                    {
+                        "startMs": 56760,
+                        "endMs": 56960,
+                        "text": "琢"
+                    },
+                    {
+                        "startMs": 56960,
+                        "endMs": 57150,
+                        "text": "磨"
+                    }
+                ]
+            },
+            {
+                "text": "爱就是爱着",
+                "startMs": 60280,
+                "endMs": 62270,
+                "words": [
+                    {
+                        "startMs": 60280,
+                        "endMs": 60590,
+                        "text": "爱"
+                    },
+                    {
+                        "startMs": 60760,
+                        "endMs": 61070,
+                        "text": "就"
+                    },
+                    {
+                        "startMs": 61200,
+                        "endMs": 61500,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 61500,
+                        "endMs": 61790,
+                        "text": "爱"
+                    },
+                    {
+                        "startMs": 61960,
+                        "endMs": 62270,
+                        "text": "着"
+                    }
+                ]
+            },
+            {
+                "text": "不爱就不爱了",
+                "startMs": 62440,
+                "endMs": 64150,
+                "words": [
+                    {
+                        "startMs": 62440,
+                        "endMs": 62700,
+                        "text": "不"
+                    },
+                    {
+                        "startMs": 62700,
+                        "endMs": 62940,
+                        "text": "爱"
+                    },
+                    {
+                        "startMs": 62940,
+                        "endMs": 63200,
+                        "text": "就"
+                    },
+                    {
+                        "startMs": 63200,
+                        "endMs": 63440,
+                        "text": "不"
+                    },
+                    {
+                        "startMs": 63440,
+                        "endMs": 63710,
+                        "text": "爱"
+                    },
+                    {
+                        "startMs": 63840,
+                        "endMs": 64150,
+                        "text": "了"
+                    }
+                ]
+            },
+            {
+                "text": "请全部藏好它",
+                "startMs": 64720,
+                "endMs": 66990,
+                "words": [
+                    {
+                        "startMs": 64720,
+                        "endMs": 65020,
+                        "text": "请"
+                    },
+                    {
+                        "startMs": 65020,
+                        "endMs": 65310,
+                        "text": "全"
+                    },
+                    {
+                        "startMs": 65400,
+                        "endMs": 65710,
+                        "text": "部"
+                    },
+                    {
+                        "startMs": 65760,
+                        "endMs": 66070,
+                        "text": "藏"
+                    },
+                    {
+                        "startMs": 66360,
+                        "endMs": 66670,
+                        "text": "好"
+                    },
+                    {
+                        "startMs": 66680,
+                        "endMs": 66990,
+                        "text": "它"
+                    }
+                ]
+            },
+            {
+                "text": "可越想忘记的",
+                "startMs": 68000,
+                "endMs": 69950,
+                "words": [
+                    {
+                        "startMs": 68000,
+                        "endMs": 68280,
+                        "text": "可"
+                    },
+                    {
+                        "startMs": 68280,
+                        "endMs": 68520,
+                        "text": "越"
+                    },
+                    {
+                        "startMs": 68520,
+                        "endMs": 68760,
+                        "text": "想"
+                    },
+                    {
+                        "startMs": 68760,
+                        "endMs": 68900,
+                        "text": "忘"
+                    },
+                    {
+                        "startMs": 68900,
+                        "endMs": 69070,
+                        "text": "记"
+                    },
+                    {
+                        "startMs": 69640,
+                        "endMs": 69950,
+                        "text": "的"
+                    }
+                ]
+            },
+            {
+                "text": "反而记得深刻",
+                "startMs": 71720,
+                "endMs": 73150,
+                "words": [
+                    {
+                        "startMs": 71720,
+                        "endMs": 71960,
+                        "text": "反"
+                    },
+                    {
+                        "startMs": 71960,
+                        "endMs": 72120,
+                        "text": "而"
+                    },
+                    {
+                        "startMs": 72120,
+                        "endMs": 72350,
+                        "text": "记"
+                    },
+                    {
+                        "startMs": 72440,
+                        "endMs": 72750,
+                        "text": "得"
+                    },
+                    {
+                        "startMs": 72800,
+                        "endMs": 72980,
+                        "text": "深"
+                    },
+                    {
+                        "startMs": 72980,
+                        "endMs": 73150,
+                        "text": "刻"
+                    }
+                ]
+            },
+            {
+                "text": "你快听 滴答滴滴答滴",
+                "startMs": 77200,
+                "endMs": 81030,
+                "words": [
+                    {
+                        "startMs": 77200,
+                        "endMs": 77510,
+                        "text": "你"
+                    },
+                    {
+                        "startMs": 77640,
+                        "endMs": 77950,
+                        "text": "快"
+                    },
+                    {
+                        "startMs": 78120,
+                        "endMs": 78430,
+                        "text": "听 "
+                    },
+                    {
+                        "startMs": 79280,
+                        "endMs": 79560,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 79560,
+                        "endMs": 79820,
+                        "text": "答"
+                    },
+                    {
+                        "startMs": 79820,
+                        "endMs": 80110,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 80240,
+                        "endMs": 80500,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 80500,
+                        "endMs": 80740,
+                        "text": "答"
+                    },
+                    {
+                        "startMs": 80740,
+                        "endMs": 81030,
+                        "text": "滴"
+                    }
+                ]
+            },
+            {
+                "text": "滴答滴是雨滴的声音",
+                "startMs": 81120,
+                "endMs": 83630,
+                "words": [
+                    {
+                        "startMs": 81120,
+                        "endMs": 81300,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 81300,
+                        "endMs": 81470,
+                        "text": "答"
+                    },
+                    {
+                        "startMs": 81600,
+                        "endMs": 81910,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 82080,
+                        "endMs": 82360,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 82360,
+                        "endMs": 82500,
+                        "text": "雨"
+                    },
+                    {
+                        "startMs": 82500,
+                        "endMs": 82670,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 82800,
+                        "endMs": 83110,
+                        "text": "的"
+                    },
+                    {
+                        "startMs": 83240,
+                        "endMs": 83440,
+                        "text": "声"
+                    },
+                    {
+                        "startMs": 83440,
+                        "endMs": 83630,
+                        "text": "音"
+                    }
+                ]
+            },
+            {
+                "text": "你快听 是我在是我在",
+                "startMs": 84720,
+                "endMs": 88550,
+                "words": [
+                    {
+                        "startMs": 84720,
+                        "endMs": 85030,
+                        "text": "你"
+                    },
+                    {
+                        "startMs": 85160,
+                        "endMs": 85470,
+                        "text": "快"
+                    },
+                    {
+                        "startMs": 85600,
+                        "endMs": 85910,
+                        "text": "听 "
+                    },
+                    {
+                        "startMs": 86800,
+                        "endMs": 87080,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 87080,
+                        "endMs": 87320,
+                        "text": "我"
+                    },
+                    {
+                        "startMs": 87320,
+                        "endMs": 87590,
+                        "text": "在"
+                    },
+                    {
+                        "startMs": 87720,
+                        "endMs": 88000,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 88000,
+                        "endMs": 88260,
+                        "text": "我"
+                    },
+                    {
+                        "startMs": 88260,
+                        "endMs": 88550,
+                        "text": "在"
+                    }
+                ]
+            },
+            {
+                "text": "是我在哼你最爱听的旋律",
+                "startMs": 88600,
+                "endMs": 91350,
+                "words": [
+                    {
+                        "startMs": 88600,
+                        "endMs": 88900,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 88900,
+                        "endMs": 89140,
+                        "text": "我"
+                    },
+                    {
+                        "startMs": 89140,
+                        "endMs": 89380,
+                        "text": "在"
+                    },
+                    {
+                        "startMs": 89380,
+                        "endMs": 89620,
+                        "text": "哼"
+                    },
+                    {
+                        "startMs": 89620,
+                        "endMs": 89870,
+                        "text": "你"
+                    },
+                    {
+                        "startMs": 89880,
+                        "endMs": 90100,
+                        "text": "最"
+                    },
+                    {
+                        "startMs": 90100,
+                        "endMs": 90310,
+                        "text": "爱"
+                    },
+                    {
+                        "startMs": 90320,
+                        "endMs": 90630,
+                        "text": "听"
+                    },
+                    {
+                        "startMs": 90760,
+                        "endMs": 91040,
+                        "text": "的"
+                    },
+                    {
+                        "startMs": 91040,
+                        "endMs": 91180,
+                        "text": "旋"
+                    },
+                    {
+                        "startMs": 91180,
+                        "endMs": 91350,
+                        "text": "律"
+                    }
+                ]
+            },
+            {
+                "text": "你快听 滴答滴滴答滴",
+                "startMs": 92160,
+                "endMs": 96030,
+                "words": [
+                    {
+                        "startMs": 92160,
+                        "endMs": 92470,
+                        "text": "你"
+                    },
+                    {
+                        "startMs": 92640,
+                        "endMs": 92950,
+                        "text": "快"
+                    },
+                    {
+                        "startMs": 93160,
+                        "endMs": 93470,
+                        "text": "听 "
+                    },
+                    {
+                        "startMs": 94280,
+                        "endMs": 94560,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 94560,
+                        "endMs": 94800,
+                        "text": "答"
+                    },
+                    {
+                        "startMs": 94800,
+                        "endMs": 95070,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 95240,
+                        "endMs": 95520,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 95520,
+                        "endMs": 95760,
+                        "text": "答"
+                    },
+                    {
+                        "startMs": 95760,
+                        "endMs": 96030,
+                        "text": "滴"
+                    }
+                ]
+            },
+            {
+                "text": "滴答滴是雨滴的声音",
+                "startMs": 96160,
+                "endMs": 98590,
+                "words": [
+                    {
+                        "startMs": 96160,
+                        "endMs": 96440,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 96440,
+                        "endMs": 96680,
+                        "text": "答"
+                    },
+                    {
+                        "startMs": 96680,
+                        "endMs": 96950,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 97080,
+                        "endMs": 97380,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 97380,
+                        "endMs": 97540,
+                        "text": "雨"
+                    },
+                    {
+                        "startMs": 97540,
+                        "endMs": 97710,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 97800,
+                        "endMs": 98110,
+                        "text": "的"
+                    },
+                    {
+                        "startMs": 98200,
+                        "endMs": 98400,
+                        "text": "声"
+                    },
+                    {
+                        "startMs": 98400,
+                        "endMs": 98590,
+                        "text": "音"
+                    }
+                ]
+            },
+            {
+                "text": "你快听 是我在是我在",
+                "startMs": 99720,
+                "endMs": 103510,
+                "words": [
+                    {
+                        "startMs": 99720,
+                        "endMs": 100030,
+                        "text": "你"
+                    },
+                    {
+                        "startMs": 100120,
+                        "endMs": 100430,
+                        "text": "快"
+                    },
+                    {
+                        "startMs": 100640,
+                        "endMs": 100950,
+                        "text": "听 "
+                    },
+                    {
+                        "startMs": 101800,
+                        "endMs": 102080,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 102080,
+                        "endMs": 102320,
+                        "text": "我"
+                    },
+                    {
+                        "startMs": 102320,
+                        "endMs": 102590,
+                        "text": "在"
+                    },
+                    {
+                        "startMs": 102720,
+                        "endMs": 103000,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 103000,
+                        "endMs": 103240,
+                        "text": "我"
+                    },
+                    {
+                        "startMs": 103240,
+                        "endMs": 103510,
+                        "text": "在"
+                    }
+                ]
+            },
+            {
+                "text": "是我在哼你最爱听的旋律",
+                "startMs": 103640,
+                "endMs": 106350,
+                "words": [
+                    {
+                        "startMs": 103640,
+                        "endMs": 103920,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 103920,
+                        "endMs": 104140,
+                        "text": "我"
+                    },
+                    {
+                        "startMs": 104140,
+                        "endMs": 104360,
+                        "text": "在"
+                    },
+                    {
+                        "startMs": 104360,
+                        "endMs": 104620,
+                        "text": "哼"
+                    },
+                    {
+                        "startMs": 104620,
+                        "endMs": 104880,
+                        "text": "你"
+                    },
+                    {
+                        "startMs": 104880,
+                        "endMs": 105080,
+                        "text": "最"
+                    },
+                    {
+                        "startMs": 105080,
+                        "endMs": 105310,
+                        "text": "爱"
+                    },
+                    {
+                        "startMs": 105320,
+                        "endMs": 105630,
+                        "text": "听"
+                    },
+                    {
+                        "startMs": 105720,
+                        "endMs": 106020,
+                        "text": "的"
+                    },
+                    {
+                        "startMs": 106020,
+                        "endMs": 106180,
+                        "text": "旋"
+                    },
+                    {
+                        "startMs": 106180,
+                        "endMs": 106350,
+                        "text": "律"
+                    }
+                ]
+            },
+            {
+                "text": "你快听 滴答滴滴答滴",
+                "startMs": 107200,
+                "endMs": 110990,
+                "words": [
+                    {
+                        "startMs": 107200,
+                        "endMs": 107510,
+                        "text": "你"
+                    },
+                    {
+                        "startMs": 107640,
+                        "endMs": 107950,
+                        "text": "快"
+                    },
+                    {
+                        "startMs": 108160,
+                        "endMs": 108470,
+                        "text": "听 "
+                    },
+                    {
+                        "startMs": 109320,
+                        "endMs": 109600,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 109600,
+                        "endMs": 109840,
+                        "text": "答"
+                    },
+                    {
+                        "startMs": 109840,
+                        "endMs": 110110,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 110240,
+                        "endMs": 110520,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 110520,
+                        "endMs": 110740,
+                        "text": "答"
+                    },
+                    {
+                        "startMs": 110740,
+                        "endMs": 110990,
+                        "text": "滴"
+                    }
+                ]
+            },
+            {
+                "text": "滴答滴窗外又在下雨",
+                "startMs": 111160,
+                "endMs": 113870,
+                "words": [
+                    {
+                        "startMs": 111160,
+                        "endMs": 111440,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 111440,
+                        "endMs": 111680,
+                        "text": "答"
+                    },
+                    {
+                        "startMs": 111680,
+                        "endMs": 111950,
+                        "text": "滴"
+                    },
+                    {
+                        "startMs": 112080,
+                        "endMs": 112380,
+                        "text": "窗"
+                    },
+                    {
+                        "startMs": 112380,
+                        "endMs": 112620,
+                        "text": "外"
+                    },
+                    {
+                        "startMs": 112620,
+                        "endMs": 112860,
+                        "text": "又"
+                    },
+                    {
+                        "startMs": 112860,
+                        "endMs": 113150,
+                        "text": "在"
+                    },
+                    {
+                        "startMs": 113240,
+                        "endMs": 113550,
+                        "text": "下"
+                    },
+                    {
+                        "startMs": 113560,
+                        "endMs": 113870,
+                        "text": "雨"
+                    }
+                ]
+            },
+            {
+                "text": "难道这不是你最爱的天气",
+                "startMs": 114680,
+                "endMs": 9007199254740991,
+                "words": [
+                    {
+                        "startMs": 114680,
+                        "endMs": 114860,
+                        "text": "难"
+                    },
+                    {
+                        "startMs": 114860,
+                        "endMs": 115030,
+                        "text": "道"
+                    },
+                    {
+                        "startMs": 115640,
+                        "endMs": 115950,
+                        "text": "这"
+                    },
+                    {
+                        "startMs": 116800,
+                        "endMs": 117060,
+                        "text": "不"
+                    },
+                    {
+                        "startMs": 117060,
+                        "endMs": 117280,
+                        "text": "是"
+                    },
+                    {
+                        "startMs": 117280,
+                        "endMs": 117520,
+                        "text": "你"
+                    },
+                    {
+                        "startMs": 117520,
+                        "endMs": 117790,
+                        "text": "最"
+                    },
+                    {
+                        "startMs": 117880,
+                        "endMs": 118190,
+                        "text": "爱"
+                    },
+                    {
+                        "startMs": 118240,
+                        "endMs": 118550,
+                        "text": "的"
+                    },
+                    {
+                        "startMs": 118840,
+                        "endMs": 119020,
+                        "text": "天"
+                    },
+                    {
+                        "startMs": 119020,
+                        "endMs": 121190,
+                        "text": "气"
+                    }
+                ]
+            }
+        ]
+    }
+}

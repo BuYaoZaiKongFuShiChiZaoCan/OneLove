@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>壹比零-Lrc歌词制作-逐行打点</title>
+        <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+        <link rel="stylesheet" href="./style.css">
+    </head>
+    <body>
+        <header>
+            <img src="/images/logo.png" alt="" height="60px">
+            <h1>Lrc歌词制作工具-逐行打点</h1>
+            <div>tips：准备好<strong>歌词文本</strong>和<strong>音乐文件</strong>就可以开始了</div>
+        </header>
+        <div id="音乐显示">
+            <audio src="" controls></audio><!-- 将来对音乐显示加一个音频高低频显示和界面的优化 -->
+        </div>
+        <main>
+            <div id="获取音乐" class="max">
+                <div class="buZhou" id="stepOne">步骤1</div>
+                <div class="content">
+                    <label for="musicFile">请选择音乐文件:</label>
+                    <input type="file" name="musicFile" accept="audio/*" id="musicFile">
+                </div>
+            </div>
+            <div id="歌词编辑" class="min">
+                <div class="buZhou" id="stepTwo">步骤2</div>
+                <div class="content">
+                    <span>【会自动删除空行如需使用空行请使用随机一行文本代替在打点过程中删除行内文本即可】</span>
+                    <label for="loadText">从文本文件加载歌词：</label>
+                    <input type="file" name="loadText" id="loadText" accept="text/plain">
+                    <textarea name="" id="lrcContent" cols="30" rows="10" placeholder="示例：
+许嵩(Vae) - 天龙八部之宿敌
+作词：许嵩
+作曲：许嵩
+会在何处见到你 莫非前尘已注定
+飞过时空的距离 却囿于刀剑光影
+三月春花渐次醒 迢迢年华谁老去
+是劫是缘随我心 除了你万敌不侵
+【这里需要空行使用随机一个文字代替，在稍后打点时删除行内容即可】
+当恩怨各一半 我怎么圈揽
+看灯笼血红染 寻仇已太晚
+月下门童喟叹 昨夜太平长安
+当天上星河转 我命已定盘
+待绝笔墨痕干 宿敌已来犯
+我借你的孤单 今生恐怕难还"></textarea>
+                    <button id="editOver">完成编辑</button>
+                </div>
+            </div>
+            <div id="歌词预览" class="min">
+                <div class="buZhou" id="stepThree">步骤3</div>
+                <div class="content">
+                    <details open>
+                        <summary>元数据</summary>
+                        <div id="metaMessage">
+                            <div class="Ti">
+                                <label for="Ti">歌曲：</label>
+                                <input type="text" name="Ti" id="Ti" required>
+                            </div>
+                            <div class="Ar">
+                                <label for="Ar" title="主要艺人、合作艺人">艺人：</label>
+                                <input type="text" name="Ar" id="Ar">
+                            </div>
+                            <div class="Le">
+                                <label for="Le">长度：</label>
+                                <input type="text" name="Le" id="Le">
+                            </div>
+                            <div class="Al">
+                                <label for="Al">专辑：</label>
+                                <input type="text" name="Al" id="Al">
+                            </div>
+                            <div class="Tr">
+                                <label for="Tr">音轨：</label>
+                                <input type="text" name="Tr" id="Tr">
+                            </div>
+                            <div class="Ge">
+                                <label for="Ge">流派：</label>
+                                <input type="text" name="Ge" id="Ge">
+                            </div>
+                            <div class="Co">
+                                <label for="Co">作曲家：</label>
+                                <input type="text" name="Co" id="Co">
+                            </div>
+                            <div class="Ye">
+                                <label for="Ye">发行年份：</label>
+                                <input type="text" name="Ye" id="Ye">
+                            </div>
+                            <div class="LRC">
+                                <label for="LRC">歌词：</label>
+                                <input type="text" name="LRC" id="LRC">
+                            </div>
+                            <div class="En">
+                                <label for="En">编码器：</label>
+                                <input type="text" name="En" id="En">
+                            </div>
+                            <div class="Bi">
+                                <label for="Bi">比特率：</label>
+                                <input type="text" name="Bi" id="Bi">
+                            </div>
+                            <div class="La">
+                                <label for="La">语言：</label>
+                                <input type="text" name="La" id="La">
+                            </div>
+                            <div class="Pu">
+                                <label for="Pu">出版商：</label>
+                                <input type="text" name="Pu" id="Pu">
+                            </div>
+                            <div class="To">
+                                <label for="To">原始艺术家：</label>
+                                <input type="text" name="To" id="To">
+                            </div>
+                            <div class="So">
+                                <label for="So">来源：</label>
+                                <input type="text" name="So" id="So">
+                            </div>
+                            <div class="Cp">
+                                <label for="Cp">版权信息：</label>
+                                <input type="text" name="Cp" id="Cp">
+                            </div>
+                            <div class="St">
+                                <label for="St">音频流信息：</label>
+                                <input type="text" name="St" id="St">
+                            </div>
+                            <div class="Re">
+                                <label for="Re">录制日期：</label>
+                                <input type="text" name="Re" id="Re">
+                            </div>
+                            <div class="Mood">
+                                <label for="Mood">音乐情绪：</label>
+                                <input type="text" name="Mood" id="Mood">
+                            </div>
+                            <div class="Tempo">
+                                <label for="Tempo">音乐节奏：</label>
+                                <input type="text" name="Tempo" id="Tempo">
+                            </div>
+                            <div class="ISRC">
+                                <label for="ISRC">国际标准录音编码：</label>
+                                <input type="text" name="ISRC" id="ISRC">
+                            </div>
+                            <!-- 不常用 -->
+                            <div class="Eq">
+                                <label for="Eq">均衡器设置：</label>
+                                <input type="text" name="Eq" id="Eq">
+                            </div>
+                            <div class="Rv">
+                                <label for="Rv">混响设置：</label>
+                                <input type="text" name="Rv" id="Rv">
+                            </div>
+                            <div class="Dl">
+                                <label for="Dl">延迟设置：</label>
+                                <input type="text" name="Dl" id="Dl">
+                            </div>
+                            <div class="Vo">
+                                <label for="Vo">音量设置：</label>
+                                <input type="text" name="Vo" id="Vo">
+                            </div>
+                        </div>
+                    </details>
+                    <div class="lrcHead">
+                        <span>序号</span>
+                        <span>歌词</span>
+                        <span>时间（分:秒.毫秒）</span>
+                    </div>
+                    <ol id="lrcList"></ol>
+                    <button id="lastItem">上一条</button>
+                    <button id="tag">开始</button>
+                </div>
+            </div>
+            <div id="导出歌词" class="min">
+                <div class="buZhou" id="stepFour">步骤4</div>
+                <div class="content">
+                    <dl>
+                        <dt>
+                            <span>左侧空格</span>
+                            <span><input type="number" name="" title="[0~1]" id="leftSpace" max="1" min="0" value="1"></span>
+                        </dt>
+                        <dt>
+                            <span>小数点后显示几位</span>
+                            <span><input type="number" name="" title="[0~4]" id="decimalPlaces" max="4" min="0" value="2"></span>
+                        </dt>
+                        <dt>
+                            <span>输出预览</span>
+                            <span id="LrcPreview"></span>
+                        </dt>
+                    </dl>
+                    <span id="Export">导出</span>
+                </div>
+            </div>
+        </main>
+        <footer>
+            <span>&copy;版权所有</span>
+        </footer>
+    </body>
+    <script src="./js/script.js"></script>
+</html>

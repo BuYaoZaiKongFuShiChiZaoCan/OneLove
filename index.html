@@ -1,0 +1,2082 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+	<meta http-equiv="content-language" content="zh-CN" />
+	<meta name="theme-color" content="#ECF4FF" />
+	<!-- 暂时注释掉CSP配置 -->
+	<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: http: data: blob:; frame-src 'self' http://localhost:3000 https:;" />
+	<title>一比零</title>
+
+	<!-- 添加canonical标签 -->
+	<link rel="canonical" href="https://qaiji.netlify.app/" />
+
+	<!-- 添加sitemap引用 -->
+	<link rel="sitemap" type="application/xml" title="Sitemap" href="./sitemap.xml" />
+
+	<!-- 添加DNS预解析 -->
+	<link rel="dns-prefetch" href="//unpkg.com" />
+	<link rel="dns-prefetch" href="//qaiji.netlify.app" />
+
+	<!-- loading加载 -->
+	<link rel='stylesheet' href='https://unpkg.com/nprogress@0.2.0/nprogress.css' />
+	<script src='https://unpkg.com/nprogress@0.2.0/nprogress.js'></script>
+	<!-- 为了兼容各类网站托管，统一使用相对位置引入文件 -->
+	<link rel="stylesheet" href="./styles/style.css" />
+	<link rel="stylesheet" href="./styles/font-awesome_5.10.2_css_all.min.css" />
+	<link rel="stylesheet" href="./styles/max.css" />
+	<link rel="stylesheet" href="./styles/mediaKeyframes.css" />
+	<link rel="shortcut icon" href="./images/favicon.ico" type="image/x-icon" />
+	<!-- 字体图标 -->
+	<script src="./font/icon_font/iconfont.js">
+		/* 阿里 */
+	</script>
+	<!-- SEO开始 -->
+	<!-- 基础SEO -->
+	<meta name="description" content="一比零官网 - 专注资源分享、笔记整理、音乐播放、工具集合的综合性平台。提供优质内容分享，连接每一个求知者。祁富强个人网站。" />
+	<meta name="keywords" content="一比零,壹比零,oneLove,1:0,Q愛记,Q爱记,祁富强,慕枭渊,官网,笔记,下载,download,资源,分享,sPro,音乐,一言,丝光椋鸟,花椒,知识分享平台,在线工具,Re01精品" />
+	<meta name="author" content="祁富强 (慕枭渊) 一比零,丝光椋鸟,花椒" />
+	<meta name="robots" content="index,follow,archive" />
+	<meta name="language" content="zh-CN" />
+	<meta name="copyright" content="©IO.com" />
+	<meta name="generator" content="一比零" />
+
+	<!-- Open Graph / Facebook -->
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://qaiji.netlify.app/" />
+	<meta property="og:title" content="一比零官网 - 专注分享的平台 | 祁富强" />
+	<meta property="og:description" content="一比零官网 - 专注资源分享、笔记整理、音乐播放、工具集合的综合性平台。提供优质内容分享，连接每一个求知者。" />
+	<meta property="og:image" content="https://qaiji.netlify.app/images/logo.png" />
+	<meta property="og:site_name" content="一比零" />
+	<meta property="og:locale" content="zh_CN" />
+
+	<!-- Twitter -->
+	<meta property="twitter:card" content="summary_large_image" />
+	<meta property="twitter:url" content="https://qaiji.netlify.app/" />
+	<meta property="twitter:title" content="一比零官网 - 专注分享的平台 | 祁富强" />
+	<meta property="twitter:description" content="一比零官网 - 专注资源分享、笔记整理、音乐播放、工具集合的综合性平台。" />
+	<meta property="twitter:image" content="https://qaiji.netlify.app/images/logo.png" />
+
+	<!-- 其他重要meta标签 -->
+	<meta name="format-detection" content="telephone=no" />
+	<meta name="msapplication-TileColor" content="#ECF4FF" />
+	<meta name="mobile-web-app-capable" content="yes" />
+	<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+	<meta name="apple-mobile-web-app-title" content="一比零" />
+
+	<!-- 结构化数据 -->
+	<script type="application/ld+json">
+	{
+		"@context": "https://schema.org", // 告诉搜索引擎使用schema.org标签
+		"@type": "WebSite", // 声明这是一个网站
+		"name": "一比零", // 网站名称
+		"alternateName": [
+			"壹比零",
+			"oneLove", 
+			"1:0",
+			"OneLove",
+			"一比零官网",
+			"壹比零官网"
+		], // 网站别名
+		"url": "https://qaiji.netlify.app/", // 网站URL
+		"description": "专注资源分享、笔记整理、音乐播放、工具集合的综合性平台", // 网站描述
+		"author": {
+			"@type": "Person", // 声明这是一个个人
+			"name": "祁富强", // 个人名称
+			"alternateName": "慕枭渊" // 个人别名
+		},
+		"publisher": {
+			"@type": "Organization",
+			"name": "一比零", // 组织名称
+			"alternateName": [
+				"壹比零",
+				"一比零",
+				"oneLove",
+				"1:0"
+			]
+		},
+		"potentialAction": {
+			"@type": "SearchAction",
+			"target": "https://qaiji.netlify.app/?q={search_term_string}", // 搜索目标URL
+			"query-input": "required name=search_term_string" // 搜索查询输入
+		}
+	}
+	</script>
+	<!-- SEO结束 -->
+	<!-- PWA开始 manifest清单、告诉浏览器安装一些应用信息 -->
+	<link rel="manifest" href="./scripts/manifest.json" />
+</head>
+
+<body>
+	<script>
+		// 页面开始加载 - 立即启动NProgress
+		if (typeof NProgress !== 'undefined') {
+			// 配置NProgress，确保它使用body作为父元素
+			NProgress.configure({
+				parent: 'body',
+				showSpinner: false
+			});
+			NProgress.start();
+		}
+		// DOM开始解析
+		if (typeof NProgress !== 'undefined' && document.body && document.body.style) {
+			NProgress.set(0.1);
+		}
+	</script>
+	<!-- 头部 -->
+	<header id="header">
+		<div id="menuButton">
+			<span></span><span></span><span></span>
+		</div>
+		<div id="logoButton" role="link" data-href="https://qaiji.netlify.app">
+			<img src="./images/logo.png" alt="一比零官网Logo" />
+			<span>一比零</span>
+		</div>
+
+		<script>
+			let ran;
+			let one = document.getElementById("menuButton") ? document.getElementById("menuButton").style : null;
+			let two = document.getElementById("logoButton") ? document.getElementById("logoButton").style : null;
+
+			function os() {
+				// 取可见宽度
+				let clientWidth = document.documentElement.clientWidth;
+				// 窗口大于600像素时
+				if (clientWidth > 600) {
+					if (one) one.display = "none";
+					if (two) two.display = "flex";
+				} else {
+					if (one) one.display = "flex";
+					if (two) two.display = "none";
+				}
+			}
+
+			// 窗口大小改变
+			window.onresize = function () {
+				clearTimeout(ran);
+				ran = setTimeout(os, 200);
+			};
+
+			os(); // 初始化调用一次os函数
+
+			if (window.logoButton) {
+				window.logoButton.addEventListener("click", function () {
+					let url = this.dataset.href;
+					if (url) {
+						// 判断是否支持window.open
+						if (window.open) {
+							window.open(url);
+						} else {
+							// 不支持window.open
+							window.location.href = url;
+						}
+					} else {
+						alert("链接地址错误！");
+					}
+				});
+			}
+
+			// 头部初始化完成
+			if (typeof NProgress !== 'undefined' && document.body && document.body.style) {
+				NProgress.set(0.15);
+			}
+		</script>
+		<!-- 以下四项分类来自于一个YouTube的博主，当然也仅此包括了线上的一些内容，人又没有生活在电脑里，所以仅线上还是远远不够，因此将在线上扩展线下业务，如：体验经济、外卖等 -->
+		<nav>
+			<ul>
+				<li>
+					<span>实时信息 资讯</span>
+					<div class="list">
+						<dl>
+							<dt>
+								<div class="title">敬请期待...</div>
+								<div class="content"></div>
+							</dt>
+							<dt>
+								<div class="title">导航</div>
+								<div class="content">
+									<a href="https://www.chinanews.com.cn/">
+										<img src="https://www.chinanews.com.cn/favicon.ico" alt="" />
+										中国新闻网
+									</a>
+									<a href="https://news.cctv.com/">
+										<img src="https://news.cctv.com/favicon.ico" alt="" />
+										中国新闻_央视网
+									</a>
+								</div>
+							</dt>
+						</dl>
+					</div>
+				</li>
+				<!-- 实时资讯End 一般就是一些文章一般资讯都是有时间期限的，比如短期类的近期热榜、稍微长一点的、更长期的游戏的玩法信息一般在软件教程但如果在这里出现有效期应该和游戏挂钩、对于永久性的等等可能需要手动去过期。以及真实性、来源。灵活性 -->
+				<li>
+					<span>知识 技能学习</span>
+					<div class="list">
+						<dl>
+							<dt>
+								<div class="title">教程</div>
+								<div class="content">
+									<span>
+										<a href="./biJI/摆钟的工作原理.mhtml" target="_blank">摆钟的工作原理</a>
+									</span>
+									<span>
+										<a href="https://www.51zxw.net/Show.aspx?cid=729&id=78077" target="_blank">Adobe PR教学</a>
+									</span>
+									<span>
+										<a href="./biJI/C盘全面清理教程！彻底清理所有垃圾！.mhtml" target="_blank">C盘全面清理教程！彻底清理所有垃圾！</a>
+									</span>
+								</div>
+							</dt>
+							<dt>
+								<div class="title">知识概念</div>
+								<div class="content">
+									<span>Null</span>
+								</div>
+							</dt>
+						</dl>
+					</div>
+				</li>
+				<!-- 概念、教程文章End -->
+				<!-- 工具
+					工具没有品牌观、哪家好用用哪家	
+					使用痛点
+				 		1. 使用时不知道有没有这个工具、该不该使用、应该怎样使用、使用困难等问题对此提出生活状态个性化解决方案，通过实时监测个人状态信息，通过提醒功能合理提醒可用方案解决工具
+						2. 工具使用便捷：使用B/S架构在线化系统、操作简单易上手、启动快速、使用流畅、合理快捷键设计（额外公司提供标准键盘人体工学优化 + 个性化人体工学外设配置，对不同场景、人群进行合理个性化定制）、无臃肿功能
+						3. 工具安全性：
+							(1) 个人隐私信息泄露、使用记录，提倡以本地化加密处理为主，网络保持用户私人隐私信息不外泄、以本公司官方协议为主，非安全、未知不采用原则
+							(2) 工具本身是否安全，工具以官网出品、合理了解计算机、编程语言底层逻辑、了解并处理过多种漏洞、木马、病毒等问题程序员开发，以实际问题开发为主
+						4. 信息丢失：官方系统使用在线化云端系统多端同步、私人电脑额外分配企业版化展示功能，便于企业管理 + 私人信息用户可选本地化存储、云端存储两种方式、数据传输、存储加密处理
+						5. 工具使用后是否有使用反馈、评价、建议、总结以论坛、工单方式整合
+				-->
+				<li>
+					<span>实用工具 软件</span>
+					<div class="list">
+						<dl>
+							<dt>
+								<div class="title">官方工具</div>
+								<div class="content">
+									<a href="./pages/cinema/index.html">观影院</a>
+									<a href="./pages/lrcLyricMaker/lrcLyricMaker.html">Lrc歌词制作</a>
+									<a href="http://lriswww.gitee.io/l-ai-ji/">简爱</a>
+									<a href="http://qaiji.gitee.io/school-yearbook/">同学录</a>
+									<a href="./pages/videoParser.html">视频解析</a>
+									<a href="./pages/htmlStyleGenerator.html">HTML样式生成器（开发中）</a>
+									<a href="JavaScript:;">[拍摄]证件照</a>
+									<a href="JavaScript:;">音频转文字（开发中）</a>
+									<a href="JavaScript:;">音乐解密</a>
+									<a href="JavaScript:;">[图片类]ICO制作</a>
+									<a href="JavaScript:;">[图片类]图片压缩</a>
+									<a href="JavaScript:;">二维码/条码</a>
+									<a href="JavaScript:;">[文本类]中文简体繁体转换</a>
+								</div>
+							</dt>
+							<dt>
+								<div class="title">站外导航</div>
+								<div class="content">
+									<a href="https://www.redpandacompress.com/zh/">
+										<img src="./images/nav/Redpanda.ico" loading="lazy" />
+										Redpanda 视频压缩
+									</a>
+									<a href="https://online-video-cutter.com/">
+										<img src="./images/nav/apple-touch-icon.png" alt="" loading="lazy" />
+										Video Trimmer - 视频音频等文件在线编辑器
+									</a>
+									<a href="https://www.capcut.cn/">
+										<img src="./images/nav/剪映官网.ico" alt="" loading="lazy" />
+										剪映官网
+									</a>
+									<a href="https://tool.lu/">
+										<img src="./images/nav/在线工具-你的工具箱.ico" alt="" loading="lazy" />
+										在线工具-你的工具箱
+									</a>
+									<a href="https://gitee.com/">
+										<img src="./images/nav/Gitee.ico" alt="" loading="lazy" />
+										Gitee
+									</a>
+									<a href="https://github.com/">
+										<img src="./images/nav/GitHub.svg" alt="" loading="lazy" />
+										GitHub
+									</a>
+									<a href="https://www.zhihu.com/">
+										<img src="./images/nav/知乎.ico" alt="" loading="lazy" />
+										知乎
+									</a>
+									<a href="https://mail.163.com/">
+										<img src="./images/nav/163邮箱.ico" alt="" loading="lazy" />
+										163邮箱
+									</a>
+									<a href="http://email.qq.com/">
+										<img src="./images/nav/QQ邮箱.png" alt="" loading="lazy" />
+										QQ邮箱
+									</a>
+									<a href="https://www.midorg.com/">
+										<img src="./images/nav/元岛.ico" alt="" loading="lazy" />
+										元岛
+									</a>
+									<a href="https://web.baimiaoapp.com/">
+										<img src="./images/nav/白猫.png" alt="" loading="lazy" />
+										白猫在线识别
+									</a>
+									<a href="https://docs.qq.com/">
+										<img src="./images/nav/腾讯文档.ico" alt="" loading="lazy" />
+										腾讯文档
+									</a>
+									<a href="https://tv.cctv.com/">
+										<img src="./images/nav/CCTV央视网.jpg" alt="" loading="lazy" />
+										CCTV央视网
+									</a>
+									<a href="https://www.csdn.net/">
+										<img src="./images/nav/csdn.ico" alt="" loading="lazy" />
+										CSDN
+									</a>
+									<a href="https://www.wetools.com/">
+										<img src="./images/nav/微工具.ico" alt="" loading="lazy" />
+										微工具
+									</a>
+									<a href="https://www.iqiyi.com/">
+										<img src="./images/nav/爱奇艺.ico" alt="" loading="lazy" />
+										爱奇艺
+									</a>
+									<a href="https://www.kugou.com/">
+										<img src="./images/nav/酷狗音乐.ico" alt="" loading="lazy" />
+										酷狗音乐
+									</a>
+									<a href="https://wx.qq.com/">
+										<img src="./images/nav/微信.ico" alt="" loading="lazy" />
+										微信网页版
+									</a>
+									<a href="https://szfilehelper.weixin.qq.com/">
+										<img src="./images/nav/微信.ico" alt="" loading="lazy" />
+										微信文件传输助手网页版
+									</a>
+									<a href="https://fanyi.youdao.com/index.html#/">
+										<img src="./images/nav/有道翻译.ico" alt="" loading="lazy" />
+										有道翻译
+									</a>
+									<a href="https://www.shodan.io/">
+										<img src="./images/nav/Shodan.png" alt="" loading="lazy" />
+										Shodan
+									</a>
+									<a href="https://www.baidu.com">
+										<img src="./images/nav/百度.ico" alt="" loading="lazy" />
+										百度
+									</a>
+									<a href="https://youku.com/">
+										<img src="./images/nav/优酷.png" alt="" loading="lazy" />
+										优酷
+									</a>
+									<a href="https://www.runoob.com/">
+										<img src="./images/nav/菜鸟教程.ico" alt="" loading="lazy" />
+										菜鸟教程
+									</a>
+									<a href="https://www.yikm.net/">
+										<img src="./images/nav/小霸王.ico" alt="" loading="lazy" />
+										小霸王游戏机
+									</a>
+									<a href="https://www.bilibili.com/">
+										<img src="./images/nav/哔哩哔哩.ico" alt="" loading="lazy" />
+										哔哩哔哩
+									</a>
+									<a href="https://www.w3.org/zh-hans/">
+										<img src="./images/nav/W3C.ico" alt="" loading="lazy" />
+										w3C
+									</a>
+									<a href="https://tikolu.net/emojimix/">
+										<img src="./images/nav/emoji合成.ico" alt="" loading="lazy" />
+										emoji合成
+									</a>
+									<a href="https://codingfantasy.com/">
+										<img src="./images/nav/玩游戏学Flex.ico" alt="" loading="lazy" />
+										玩游戏学Flex
+									</a>
+								</div>
+								<div class="content">
+									<h3>Adobe</h3>
+									<label for="edition">PhotoShop</label>
+									<select name="editions" id="edition">
+										<!-- https://www.bilibili.com/read/cv12899581/ 各历史版本介绍 -->
+										<optgroup label="初期">
+											<!-- label不可选，值就是显示的内容 -->
+											<option value="1.0">1.0 (1990)</option>
+											<option value="2.5">2.5 (1992)</option>
+											<option value="3.0">3.0 (1994)</option>
+											<option value="4.0">4.0 (1996)</option>
+											<option value="5.0">5.0 (1998)</option>
+											<option value="6.0">6.0 (2000)</option>
+											<option value="7.0">7.0 (2002)</option>
+										</optgroup>
+										<optgroup label="CS">
+											<option value="CS">CS (2003)</option>
+											<option value="CS2">CS2 (2005)</option>
+											<option value="CS3">CS3 (2007)</option>
+											<option value="CS4">CS4 (2008)</option>
+											<option value="CS5">CS5 (2010)</option>
+											<option value="CS6">CS6 (2012)</option>
+										</optgroup>
+										<optgroup label="CC">
+											<option value="2014">CC 2014</option>
+											<option value="2015">CC 2015</option>
+											<option value="2016">CC 2016</option>
+											<option value="2017">CC 2017</option>
+											<option value="2018">CC 2018</option>
+											<option value="2019">CC 2019</option>
+										</optgroup>
+										<optgroup label="20">
+											<option value="2020">2020</option>
+											<option value="2021">2021</option>
+											<option value="2022">2022</option>
+											<option value="2023">2023</option>
+										</optgroup>
+										<optgroup label="Beta">
+											<option value="" selected>2024 Ai</option>
+											<!-- selected设置为下拉列表默认值 -->
+										</optgroup>
+										<optgroup label="上次更新：23.10.1"></optgroup>
+									</select>
+									<span>Creative Cloud</span>
+								</div>
+							</dt>
+						</dl>
+					</div>
+				</li>
+				<!-- 工具、软件End -->
+				<li>
+					<span>软件素材 文件</span>
+					<div class="list">
+						<dl>
+							<dt>
+								<div class="title">1</div>
+								<div class="content"></div>
+							</dt>
+							<dt>
+								<div class="title">导航</div>
+								<div class="content">
+									<span>1</span>
+									<span>2</span>
+								</div>
+							</dt>
+						</dl>
+					</div>
+				</li>
+				<!-- 视频、音频、图片、文档、软件插件End -->
+				<!-- 知道know sth.[资讯、知识技能]
+				 	学习learn sth.[知识技能、素材文件、工具软件]
+					创作create sth.[知识技能、素材文件、工具软件]
+					完工do sth.[工具]
+				-->
+			</ul>
+		</nav>
+		<div>
+			<form action="https://www.bing.com/search?q=">
+				<!-- target="_blank" -->
+				<img src="./images/logoBing.png" alt="" />
+				<label for="input" style="position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;						">搜索关键词</label><!-- 即使使用了 placeholder，也应提供一个隐藏的 label 提升无障碍体验。 -->
+				<input type="text" name="q" placeholder="Bing [ Alt + K ]" id="input" /><!-- 自动获得焦点autofocus 暂时不用type search了，改起来没必要，因为清除事件兼容不是很好 -->
+				<button type="reset" class="icon" id="clear" width="35px">X</button>
+				<button title="搜索" type="submit">
+					<img src="./images/soSuo.png" alt="" />
+				</button>
+				<ul id="searchSuggest"></ul>
+			</form>
+			<div class="profile-container">
+				<img src="./images/toXiang.jpg" id="profilePicture" alt="ProfilePicture" />
+				<div class="profile-dropdown" id="profileDropdown">
+					<div class="dropdown-header">
+						<img src="./images/toXiang.jpg" alt="头像" class="dropdown-avatar" id="dropdownAvatar" />
+						<span class="dropdown-username" id="dropdownUsername">用户</span>
+					</div>
+					<div class="dropdown-content">
+						<div id="userDropdownInfo" style="display: none;">
+							<a href="javascript:;" class="dropdown-item" id="dropdownLogoutBtn">
+								<i class="fas fa-sign-out-alt"></i>
+								退出登录
+							</a>
+						</div>
+						<div id="authDropdownButtons" style="display: none;">
+							<a href="Pages/login.html" class="dropdown-item">
+								<i class="fas fa-sign-in-alt"></i>
+								登录
+							</a>
+							<a href="Pages/register.html" class="dropdown-item">
+								<i class="fas fa-user-plus"></i>
+								注册
+							</a>
+						</div>
+						<div class="dropdown-divider"></div>
+						<div id="personalCenterBtn">
+							<a href="javascript:;" class="dropdown-item" onclick="showPersonalCenter()">
+								<i class="fas fa-user-circle"></i>
+								个人中心
+							</a>
+						</div>
+						<div class="dropdown-divider"></div>
+						<div id="testButtonContainer" style="display: none;">
+							<div class="dropdown-item test-button-container">
+								<i class="fas fa-clock"></i>
+								<span id="testButtonText">测试休息提醒</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</header>
+	<script>
+		// 头部加载完成
+		if (typeof NProgress !== 'undefined' && document.body && document.body.style) {
+			NProgress.set(0.2);
+		}
+	</script>
+	<!-- 侧边：屏幕小于600px点击右上角按钮事件 -->
+	<div id="sideMenu" style="display: none; transform: translateX(-1000px)">
+		<img src="./images/logo.png" alt="" loading="lazy" /><!-- eager立即加载（默认） -->
+		<span>壹比零</span>
+		<audio src="./time/秒针.mp3" id="seconds" preload="auto"></audio>
+		<span id="secondPaused">秒针声音：关(默认)</span>
+		<span>忍一时风平浪静、退一步越想越气</span>
+		
+		<!-- 个人中心集成 -->
+		<div class="side-menu-dashboard" id="sideMenuDashboard">
+			<!-- 用户信息区域 -->
+			<div class="side-menu-user-section">
+				<div class="side-menu-user-info" id="sideMenuUserInfo" style="display: none;">
+					<div class="user-avatar">
+						<img src="./images/toXiang.jpg" alt="头像" id="sideMenuAvatar" />
+					</div>
+					<div class="user-name" id="sideMenuUsername">用户</div>
+					<div class="user-email" id="sideMenuEmail">加载中...</div>
+					<div class="user-role" id="sideMenuRole">用户</div>
+					<button class="side-menu-logout-btn" id="sideMenuLogoutBtn">
+						<i class="fas fa-sign-out-alt"></i> 退出登录
+					</button>
+				</div>
+				<div class="side-menu-auth-buttons" id="sideMenuAuthButtons" style="display: none;">
+					<a href="Pages/login.html" class="side-menu-link">
+						<i class="fas fa-sign-in-alt"></i> 登录
+					</a>
+					<a href="Pages/register.html" class="side-menu-link">
+						<i class="fas fa-user-plus"></i> 注册
+					</a>
+				</div>
+			</div>
+		
+		<!-- 数据统计区域 -->
+		<div class="side-menu-stats" id="sideMenuStats" style="display: none;">
+			<h3><i class="fas fa-chart-bar"></i> 数据统计</h3>
+			<div class="stats-grid">
+				<div class="stat-card">
+					<div class="stat-number" id="totalData">0</div>
+					<div class="stat-label">总数据</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-number" id="passwordCount">0</div>
+					<div class="stat-label">密码</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-number" id="phoneCount">0</div>
+					<div class="stat-label">电话</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-number" id="noteCount">0</div>
+					<div class="stat-label">笔记</div>
+				</div>
+			</div>
+		</div>
+		
+		<!-- 快速操作区域 -->
+		<div class="side-menu-actions" id="sideMenuActions" style="display: none;">
+			<h3><i class="fas fa-tools"></i> 快速操作</h3>
+			<div class="action-buttons">
+				<a href="#" class="btn-action" id="addPasswordBtn">
+					<i class="fas fa-key"></i> 添加密码
+				</a>
+				<a href="#" class="btn-action" id="addPhoneBtn">
+					<i class="fas fa-phone"></i> 添加电话
+				</a>
+				<a href="#" class="btn-action" id="addNoteBtn">
+					<i class="fas fa-sticky-note"></i> 添加笔记
+				</a>
+				<button class="btn-action" onclick="showRestReminder()">
+					<i class="fas fa-clock"></i> 休息提醒
+				</button>
+				<button class="btn-action" onclick="window.location.href='Pages/Tools/'">
+					<i class="fas fa-tools"></i> 工具集合
+				</button>
+				<button class="btn-action" onclick="window.location.href='Pages/About/About.html'">
+					<i class="fas fa-info-circle"></i> 关于我们
+				</button>
+					<a href="Pages/admin/dashboard.html" class="btn-action" id="adminPanelBtn" style="display: none;">
+						<i class="fas fa-tachometer-alt"></i> 管理中心
+					</a>
+			</div>
+		</div>
+	</div>
+		
+		<div>
+			<b>快捷键</b><br /><kbd>?/</kbd> 播放 暂停<br /><kbd>.&lt;</kbd>
+			下一首<br /><kbd>,&gt;</kbd> 上一首<br /><kbd>←</kbd> 后退5秒<br /><kbd>→</kbd>
+			前进5秒
+		</div>
+	</div>
+	<!-- 中间部分main：中间的内容都写在main里 竖轴三栏式 -->
+	<main id="main-body">
+		<div id="time">
+			<img src="./images/time/BZ1.png" class="img-one" alt="" />
+			<img src="./images/time/BZ2.png" class="img-two" alt="" />
+			<img src="./images/time/BZ3.png" class="img-three" alt="" />
+			<!--绘制秒、分、时针-->
+			<div id="second"></div>
+			<div id="min"></div>
+			<div id="hour"></div>
+			<div id="clockPanel">
+				<span id="hourText">18</span><span>:</span><span id="minuteText">00</span>&nbsp;<span id="secondText">00</span><br />
+				<span id="dateText">2022-10-04 星期二</span>
+			</div>
+			<script src="./scripts/time.js"></script>
+		</div>
+		<script>
+			// 时钟组件加载完成
+			if (typeof NProgress !== 'undefined' && document.body && document.body.style) {
+				NProgress.set(0.25);
+			}
+		</script>
+		<div id="Center">
+			<div id="importantInput">
+				<input type="text" id="content" placeholder="最重要的事?" />
+				<span id="mainButton">√</span>
+			</div>
+			<script src="./scripts/maxImportant.js"></script>
+
+			<div id="audioMvPanel"></div>
+		</div>
+		<script>
+			// 中心组件加载完成
+			if (typeof NProgress !== 'undefined' && document.body && document.body.style) {
+				NProgress.set(0.3);
+			}
+		</script>
+		<div id="sidePanel">
+			<!-- 第一块 -->
+			<div id="cbOne">
+				<h2>扫榻相迎</h2>
+				<span>设备访问次数：</span><span id="visitCount"></span>
+			</div>
+			<!-- 第二块 -->
+			<!-- 引入jQuery -->
+			<script src="./scripts/visitCount.js"></script>
+			<script src="./scripts/jquery.min.js"></script>
+			<script>
+				// jQuery和访问量脚本加载完成
+				if (typeof NProgress !== 'undefined' && document.body && document.body.style) {
+					NProgress.set(0.35);
+				}
+			</script>
+			<!-- 第三块 -->
+			<div id="cbThree">
+				<h2>雅乐</h2>
+				<div class="music-container" id="music-container">
+					<!-- 音乐信息 -->
+					<div class="music-info">
+						<!-- 音乐标题 -->
+						<marquee id="title" scrollamount="2" scrolldelay="30">宿敌_田人</marquee>
+						<!-- scrollamount滚动速度（像素）、scrolldelay停留时间：mm（毫秒） -->
+						<!-- 音乐播放进度条 -->
+						<div class="progress-container" id="progress-container">
+							<div class="progress" id="progress"></div>
+						</div>
+						<div class="setTime"></div>
+					</div>
+					<!-- 默认第一首音乐 -->
+					<audio src="" id="audio" preload="auto"></audio>
+					<!-- 音乐封面 -->
+					<div class="img-container">
+						<img src="" alt="" id="music-cover" />
+						<img src="./music/audio/play.png" alt="" id="playBgImg" /><!-- 后来居上原则，这个图片需要在封面后面写才能显示 -->
+					</div>
+					<!-- 播放控制 -->
+					<div class="navigation">
+						<button id="prev" class="action-btn">
+							<i class="fas fa-backward" title=".或&gt;"></i>
+						</button>
+						<button id="play" class="action-btn action-btn-big">
+							<i class="fas fa-play" id="playIcon" title="?或/播放/暂停"></i>
+						</button>
+						<button id="next" class="action-btn">
+							<i class="fas fa-forward" title=",或&lt;"></i>
+						</button>
+					</div>
+				</div>
+				<script>
+					// 音乐播放器UI加载完成
+					if (typeof NProgress !== 'undefined' && document.body && document.body.style) {
+						NProgress.set(0.4);
+					}
+				</script>
+				<div class="container"
+					 id="lyricPanel" title="点击最大化查看歌词">
+					<ul id="lrc"></ul>
+				</div>
+				<!-- 音乐列表 -->
+				<div id="musicList">
+					<h2 id="playlistPanel" title="点击最大化查看歌词列表">
+						<div>播放列表</div>
+						<span id="playlistLength" title="点击定位到当前播放的音乐"></span>
+						<img src="./images/list-circle-outline.svg" alt="" />
+					</h2>
+				</div>
+				<!-- 提示 -->
+				<div id="tipBox">
+					<div>
+						<kbd>?/</kbd> 播放 暂停<br /><kbd>.&lt;</kbd> 下一首<br /><kbd>,&gt;</kbd>
+						上一首<br /><kbd>←</kbd> 后退5秒<br /><kbd>→</kbd> 前进5秒
+					</div>
+					<div id="tipClose">
+						<span>《</span>
+					</div>
+				</div>
+				<script>
+					// 音乐组件完整加载
+					if (typeof NProgress !== 'undefined' && document.body && document.body.style) {
+						NProgress.set(0.45);
+					}
+				</script>
+				<script>
+					let fwllocal = window.localStorage.getItem("fwllocal");
+					function tipBox() {
+						const tipBoxElement = document.getElementById("tipBox");
+						if (tipBoxElement) {
+							tipBoxElement.style.right = "0";
+							tipBoxElement.style.transform = "scale3d(1.2, 1.2, 1.6)";
+							setTimeout(() => {
+								if (tipBoxElement) {
+									tipBoxElement.style.transform = "scale3d(1, 1, 1)";
+									tipBoxElement.style.right = "-150px";
+								}
+							}, 5000);
+						}
+					}
+					// 获取
+					// 判断fwllocal为空就是第一次进入
+					if (fwllocal == null || fwllocal <= 2) {
+						// 前两次打开
+						setTimeout(() => {
+							tipBox();
+						}, 0);
+					} else {
+						window.localStorage.setItem("fwllocal", fwllocal);
+					}
+				</script>
+			</div>
+			<!-- 第四块 -->
+			<div id="cbFour">
+				<h2>雅言</h2>
+				<!-- 引入动画库 -->
+				<!-- <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.9"></script> -->
+				<script src="./scripts/typed/node_modules/typed.js/dist/typed.umd.js"></script>
+				<div id="typedText">
+					<div class="element"></div>
+				</div>
+				<script src="./scripts/yiYan.js"></script>
+			</div>
+			<script>
+				// 一言组件加载完成
+				if (typeof NProgress !== 'undefined' && document.body && document.body.style) {
+					NProgress.set(0.5);
+				}
+			</script>
+			<div id="cbFive">
+				<h2>我</h2>
+				<iframe src="./pages/Tools/loveMeDailySign/index.html" frameborder="0"></iframe><!-- scrolling="no" -->
+			</div>
+		</div>
+	</main>
+	<script>
+		// 主要内容区域加载完成
+		if (typeof NProgress !== 'undefined' && document.body && document.body.style) {
+			NProgress.set(0.618);
+		}
+	</script>
+	<!-- 页脚，定位，向下滚动隐藏 -->
+	<footer>
+		<div footer>
+			<svg fill="#133c55" xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" viewBox="0 -0.5 1024 182" preserveAspectRatio="none">
+				<path style="opacity: 0.12" d="M0 182.086h1024V41.593c-28.058-21.504-60.109-37.581-97.075-37.581-112.845 0-198.144 93.798-289.792 93.798S437.658 6.777 351.846 6.777s-142.234 82.125-238.49 82.125c-63.078 0-75.776-31.744-113.357-53.658L0 182.086z"></path>
+				<path style="opacity: 0.18" d="M1024 181.062v-75.878c-39.731 15.872-80.794 27.341-117.658 25.805-110.387-4.506-191.795-109.773-325.53-116.224-109.158-5.12-344.166 120.115-429.466 166.298H1024v-.001z"></path>
+				<path style="opacity: 0.24" d="M0 182.086h1024V90.028C966.451 59.103 907.059 16.3 824.115 15.071 690.278 13.023 665.19 102.93 482.099 102.93S202.138-1.62 74.24.019C46.49.326 21.811 4.217 0 9.849v172.237z"></path>
+				<path style="opacity: 0.3" d="M0 182.086h1024V80.505c-37.171 19.558-80.691 35.328-139.571 36.25-151.142 2.355-141.619-28.57-298.496-29.184s-138.854 47.002-305.459 43.725C132.813 128.428 91.238 44.563 0 28.179v153.907z"></path>
+				<path d="M0 182.086h1024v-77.312c-49.05 20.07-120.525 42.394-193.229 42.086-128.922-.512-159.846-72.294-255.795-72.294-89.088 0-134.656 80.179-245.043 82.022S169.063 99.346 49.971 97.401C32.768 97.094 16.077 99.244 0 103.135v78.951z"></path>
+			</svg>
+		</div>
+		<div>
+			<a href="JavaScript:;">备案是不阔能备案滴</a>
+			<a href="http://www.beian.gov.cn/portal/index.do">
+				<img id="gaIcon" src="./images/gongAnBei.png" alt="" />
+				<span>公安备12345678901234号</span>
+			</a>
+			<a href="http://beian.miit.gov.cn/publish/query/indexFirst.action">陇ICP备12345678号</a>
+			<span>&copy;2019~<span id="footerYear">2021</span> 壹比零</span>
+			<a href="./pages/GiveMoneyIncentives.html">赞赏</a>
+			<a href="./pages/About/About.html" data-src="./pages/QFQ/personalResume.html">关于我</a>
+			<a href="./pages/contactMe.html">
+				<!-- <img src="./images/footer/客服中心.png" alt=""> -->
+				联系我们
+			</a>
+			<a href="./pages/About/About.html#lastUpdate">历史更新</a>
+			<a href="./pages/About/About.html#特别鸣谢">特别鸣谢</a>
+			<a href="JavaScript:;" content="无障碍">
+				<img src="./images/footer/无障碍.png" alt="" />
+				<img src="./images/footer/残疾人辅助工具.png" alt="" title="无障碍优化" />
+			</a>
+		</div>
+		<script src="./scripts/footer.js"></script>
+		<script>
+			// 页脚加载完成
+			if (typeof NProgress !== 'undefined' && document.body && document.body.style) {
+				NProgress.set(0.65);
+			}
+		</script>
+	</footer>
+	<!-- 最大化-蒙版 -->
+	<dialog id="dog" onclose="delMaxScreeen()"></dialog>
+	<script>
+		// 对话框组件加载完成
+		if (typeof NProgress !== 'undefined' && document.body && document.body.style) {
+			NProgress.set(0.7);
+		}
+	</script>
+
+
+	<!-- 时钟 -->
+	<script src="./scripts/header.js"></script>
+	<script src="./scripts/clockAudio.js"></script>
+	<script>
+		// 头部相关脚本加载完成
+		if (typeof NProgress !== 'undefined' && document.body && document.body.style) {
+			NProgress.set(0.75);
+		}
+	</script>
+	<!-- 灰色 -->
+	<script src="./scripts/qingmingFestival.js"></script>
+	<!-- 搜索提示内容 -->
+	<script src="./scripts/searchItem.js"></script>
+	<!-- 键盘事件 -->
+	<script src="./scripts/key.js"></script>
+	<script>
+		// 基础功能脚本加载完成
+		if (typeof NProgress !== 'undefined' && document.body && document.body.style) {
+			NProgress.set(0.8);
+		}
+	</script>
+	<!-- 音乐 -->
+	<script src="./scripts/audioList.js"></script>
+	<script src="./scripts/audio.js"></script>
+	<script src="./scripts/audioLrcSetOffset.js"></script>
+	<script src="./scripts/audioMv.js"></script>
+	<script>
+		// 音乐相关脚本加载完成
+		if (typeof NProgress !== 'undefined' && document.body && document.body.style) {
+			NProgress.set(0.85);
+		}
+	</script>
+	<!-- 窗口 -->
+	<script src="./scripts/window.on.js"></script>
+	<!-- 彩蛋 -->
+	<script async src="./scripts/caiDan.js"></script>
+	<!-- 脚本独立运行，无依赖	❌ 不必要，可考虑  -->
+	<!-- 最大化窗口 -->
+	<script src="./scripts/maxScreen.js" defer></script>
+	<!-- Click on the pop-up text -->
+	<script src="./scripts/clickOnPopupText.js" defer></script>
+	<script>
+		// 扩展功能脚本加载完成
+		if (typeof NProgress !== 'undefined' && document.body && document.body.style) {
+			NProgress.set(0.9);
+		}
+	</script>
+	<!-- 标题整蛊 -->
+	<script type="text/javascript">
+		/*自动刷新页面，避免无法访问*/
+		var OriginTitile = document.title; // 记录原来的标题
+		var titleTime;
+		document.addEventListener("visibilitychange", function () {
+			if (document.hidden) {
+				document.title = "404啦！!!!∑(ﾟДﾟノ)ノ ";
+				clearTimeout(titleTime);
+			} else {
+				document.title = "哈哈，骗你的！ヾ(ﾟ∀ﾟゞ)";
+				titleTime = setTimeout(function () {
+					document.title = OriginTitile;
+				}, 2000);
+			}
+		});
+	</script>
+	<!-- PWA -->
+	<script>
+		/* 如果浏览器支持加载完成后就开启PWA功能 */
+		if ("serviceWorker" in navigator) {
+			window.addEventListener("load", function () {
+				// 使用简单版本的 Service Worker，避免缓存错误
+				navigator.serviceWorker.register("./scripts/sw-simple.js")
+					.then(function (registration) {
+						console.log('Service Worker 注册成功:', registration.scope);
+					})
+					.catch(function (error) {
+						console.log('Service Worker 注册失败:', error);
+					});
+			});
+		}
+	</script>
+	<script>
+		// 页面完全加载完成
+		window.addEventListener('load', function () {
+			if (typeof NProgress !== 'undefined') {
+				NProgress.set(0.95);
+				// 延迟一点时间再完成，确保所有异步资源都加载完毕
+				setTimeout(() => {
+					NProgress.done(); // 结束加载动画
+				}, 200);
+			}
+		});
+	</script>
+
+	<!-- 45分钟休息提醒功能 -->
+	<script>
+		// 休息提醒功能
+		(function () {
+			let restTimer = null;
+			let breakTimer = null;
+			let isInBreak = false;
+			let cancelCount = 0; // 取消次数累计
+			let baseRestTime = 180; // 基础休息时间3分钟
+			let accumulatedTime = 0; // 累计工作时长（秒）
+			let lastStartTime = null; // 上次开始工作的时间
+
+			// 获取屏幕亮度建议
+			function getBrightnessSuggestion() {
+				const now = new Date();
+				const hour = now.getHours();
+				const isDaytime = hour >= 6 && hour <= 18;
+				const isIndoor = !navigator.geolocation; // 简化判断，实际可基于位置
+
+				let suggestion = '';
+				let brightness = '';
+
+				if (isDaytime) {
+					if (isIndoor) {
+						brightness = '40-60%';
+						suggestion = '室内白天，建议屏幕亮度40-60%';
+					} else {
+						brightness = '60-80%';
+						suggestion = '室外白天，建议屏幕亮度60-80%';
+					}
+				} else {
+					if (isIndoor) {
+						brightness = '20-40%';
+						suggestion = '室内夜晚，建议屏幕亮度20-40%';
+					} else {
+						brightness = '30-50%';
+						suggestion = '室外夜晚，建议屏幕亮度30-50%';
+					}
+				}
+
+				return { brightness, suggestion };
+			}
+
+			// 创建蒙层元素
+			function createOverlay(restTime = 180) {
+				const overlay = document.createElement('div');
+				overlay.id = 'restOverlay';
+				overlay.style.cssText = `
+					position: fixed;
+					top: 0;
+					left: 0;
+					width: 100%;
+					height: 100%;
+					background-color: rgba(50, 200, 50, 0.8);
+					z-index: 9999;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					align-items: center;
+					color: white;
+					font-family: Arial, sans-serif;
+					font-size: 20px;
+					font-weight: bold;
+					padding: 20px;
+					text-align: center;
+				`;
+
+				// 禁止图标
+				const icon = document.createElement('div');
+				icon.innerHTML = '🚫';
+				icon.style.cssText = `
+					font-size: 80px;
+					margin-bottom: 20px;
+				`;
+
+				// 主标题
+				const title = document.createElement('div');
+				const restTimeMinutes = (restTime / 60).toFixed(1);
+				title.textContent = `休息时间！请保护眼睛健康 (${restTimeMinutes}分钟)`;
+				title.style.cssText = `
+					font-size: 24px;
+					margin-bottom: 15px;
+					font-weight: bold;
+				`;
+
+				// 远眺建议+其他
+				const distanceAdvice = document.createElement('div');
+				distanceAdvice.innerHTML = `
+					<div style="margin-bottom: 10px;">
+						<strong>远眺建议：</strong><br>
+						• 25cm以内：对眼伤害极大<br>
+						• 33cm以内：避免长时间近距离用眼<br>
+						• 5米距离：缓解眼疲劳<br>
+						• 20米以外：最佳护眼距离<br>
+						<strong>其他建议：</strong><br>
+						• 按摩耳垂眼穴，有眼睛热热的感觉最好<br>
+						• 不要往下看，造成眼皮松弛，请平视<br>
+						• 不要低头，造成颈椎病，请抬头<br>
+						• 正常眨眼3秒一次，长时间看手机约7秒<br>
+						• 20分钟20秒20英尺（约6米）远眺。30min休5<br>
+						• 不要翘二郎腿，造成腰椎病，X型腿<br>
+						• 屏幕越大，距离越远越好，最好投屏<br>
+						• 充分户外活动，每天至少2小时<br>
+						• 如无必要必要滴眼药水<br>
+					</div>
+				`;
+				distanceAdvice.style.cssText = `
+					font-size: 16px;
+					line-height: 1.4;
+					margin-bottom: 15px;
+					background-color: rgba(255, 255, 255, 0.1);
+					padding: 10px;
+					border-radius: 8px;
+				`;
+
+				// 屏幕亮度建议
+				const brightnessInfo = getBrightnessSuggestion();
+				const brightnessAdvice = document.createElement('div');
+				brightnessAdvice.innerHTML = `
+					<div style="margin-bottom: 10px;">
+						<strong>屏幕亮度建议：</strong><br>
+						${brightnessInfo.suggestion}<br>
+						<small>当前建议亮度：${brightnessInfo.brightness}</small>
+					</div>
+				`;
+				brightnessAdvice.style.cssText = `
+					font-size: 16px;
+					line-height: 1.4;
+					margin-bottom: 15px;
+					background-color: rgba(255, 255, 255, 0.1);
+					padding: 10px;
+					border-radius: 8px;
+				`;
+
+				// 倒计时
+				const countdown = document.createElement('div');
+				countdown.id = 'restCountdown';
+				countdown.style.cssText = `
+					font-size: 18px;
+					opacity: 0.8;
+					margin-top: 10px;
+				`;
+
+				// 减少时间按钮
+				const reduceTimeBtn = document.createElement('button');
+				reduceTimeBtn.innerHTML = '⏰ 减少20%时间';
+				reduceTimeBtn.style.cssText = `
+					background: linear-gradient(135deg, #ff4757, #ff6b35);
+					color: white;
+					border: none;
+					border-radius: 8px;
+					padding: 10px 20px;
+					font-size: 16px;
+					font-weight: 600;
+					margin-top: 15px;
+					cursor: pointer;
+					transition: all 0.3s ease;
+				`;
+				reduceTimeBtn.onclick = reduceRestTime;
+
+				// 音效提示
+				const soundHint = document.createElement('div');
+				soundHint.innerHTML = `
+					💡 每30秒播放钟表报时音效<br>
+					🔔 剩余30秒时播放老式时钟音效<br>
+					🎵 休息期间自动播放音乐，结束后暂停
+				`;
+				soundHint.style.cssText = `
+					font-size: 14px;
+					opacity: 0.7;
+					margin-top: 8px;
+					font-style: italic;
+					line-height: 1.4;
+				`;
+
+				overlay.appendChild(icon);
+				overlay.appendChild(title);
+				overlay.appendChild(distanceAdvice);
+				overlay.appendChild(brightnessAdvice);
+				overlay.appendChild(countdown);
+				overlay.appendChild(reduceTimeBtn);
+				overlay.appendChild(soundHint);
+
+				return overlay;
+			}
+
+			// 播放钟表报时音效
+			function playClockSound() {
+				try {
+					const audio = new Audio('./time/钟表报时音效.mp3');
+					audio.volume = 0.5; // 设置音量为50%
+					audio.preload = 'auto'; // 预加载音频
+
+					// 添加加载事件
+					audio.addEventListener('canplaythrough', function () {
+						audio.play().catch(error => {
+							console.warn('播放钟表报时音效失败:', error);
+						});
+					});
+
+					// 如果音频已经可以播放，直接播放
+					if (audio.readyState >= 2) {
+						audio.play().catch(error => {
+							console.warn('播放钟表报时音效失败:', error);
+						});
+					}
+
+				} catch (error) {
+					console.warn('创建音频对象失败:', error);
+				}
+			}
+
+			// 播放老式时钟八点报时音效
+			function playOldClockSound() {
+				try {
+					if (isLocalDevelopment()) {
+						console.log('🎵 尝试播放老式时钟八点报时音效');
+					}
+
+					const audio = new Audio('./time/老式时钟八点报时音效.mp3');
+					audio.volume = 0.6; // 设置音量为60%
+					audio.preload = 'auto';
+
+					// 添加错误处理
+					audio.addEventListener('error', function (e) {
+						if (isLocalDevelopment()) {
+							console.warn('❌ 老式时钟音效加载失败:', e);
+						}
+					});
+
+					audio.addEventListener('canplaythrough', function () {
+						audio.play().then(() => {
+							if (isLocalDevelopment()) {
+								console.log('✅ 老式时钟音效播放成功');
+							}
+						}).catch(error => {
+							if (isLocalDevelopment()) {
+								console.warn('❌ 播放老式时钟音效失败:', error);
+							}
+						});
+					});
+
+					if (audio.readyState >= 2) {
+						audio.play().then(() => {
+							if (isLocalDevelopment()) {
+								console.log('✅ 老式时钟音效播放成功');
+							}
+						}).catch(error => {
+							if (isLocalDevelopment()) {
+								console.warn('❌ 播放老式时钟音效失败:', error);
+							}
+						});
+					}
+
+				} catch (error) {
+					if (isLocalDevelopment()) {
+						console.warn('❌ 创建老式时钟音频对象失败:', error);
+					}
+				}
+			}
+
+			// 播放父页面音乐
+			function playParentMusic() {
+				try {
+					// 只在本地开发环境输出日志
+					if (isLocalDevelopment()) {
+						console.log('=== 开始尝试播放父页面音乐 ===');
+					}
+
+					// 直接使用 playSong() 函数播放音乐
+					if (typeof playSong === 'function') {
+						if (isLocalDevelopment()) {
+							console.log('✅ 使用 playSong() 函数播放音乐');
+						}
+						playSong();
+						if (isLocalDevelopment()) {
+							console.log('✅ playSong() 函数调用成功');
+						}
+					} else {
+						// 备用方案：直接使用页面中的音频元素
+						const audioElement = document.getElementById('audio');
+						if (audioElement && audioElement.src) {
+							if (isLocalDevelopment()) {
+								console.log('✅ 使用页面audio元素播放音乐（备用方案）');
+							}
+							audioElement.play().then(() => {
+								if (isLocalDevelopment()) {
+									console.log('✅ 页面audio元素播放成功');
+								}
+							}).catch(error => {
+								if (isLocalDevelopment()) {
+									console.warn('❌ 页面audio元素播放失败:', error);
+								}
+							});
+						} else {
+							if (isLocalDevelopment()) {
+								console.warn('❌ 未找到可用的播放方法');
+							}
+						}
+					}
+
+					if (isLocalDevelopment()) {
+						console.log('=== 音乐播放尝试完成 ===');
+					}
+				} catch (error) {
+					if (isLocalDevelopment()) {
+						console.warn('❌ 播放父页面音乐失败:', error);
+					}
+				}
+			}
+
+			// 暂停父页面音乐
+			function pauseParentMusic() {
+				try {
+					// 只在本地开发环境输出日志
+					if (isLocalDevelopment()) {
+						console.log('=== 开始尝试暂停父页面音乐 ===');
+					}
+
+					// 直接使用 pauseSong() 函数暂停音乐
+					if (typeof pauseSong === 'function') {
+						if (isLocalDevelopment()) {
+							console.log('✅ 使用 pauseSong() 函数暂停音乐');
+						}
+						pauseSong();
+						if (isLocalDevelopment()) {
+							console.log('✅ pauseSong() 函数调用成功');
+						}
+					} else {
+						// 备用方案：直接使用页面中的音频元素
+						const audioElement = document.getElementById('audio');
+						if (audioElement && audioElement.src) {
+							if (isLocalDevelopment()) {
+								console.log('✅ 使用页面audio元素暂停音乐（备用方案）');
+							}
+							audioElement.pause();
+							if (isLocalDevelopment()) {
+								console.log('✅ 页面audio元素暂停成功');
+							}
+						} else {
+							if (isLocalDevelopment()) {
+								console.warn('❌ 未找到可用的暂停方法');
+							}
+						}
+					}
+
+					if (isLocalDevelopment()) {
+						console.log('=== 音乐暂停尝试完成 ===');
+					}
+				} catch (error) {
+					if (isLocalDevelopment()) {
+						console.warn('❌ 暂停父页面音乐失败:', error);
+					}
+				}
+			}
+
+			// 显示休息提醒
+			window.showRestReminder = function () {
+				if (isInBreak) return;
+
+				// 计算实际休息时间（基础时间 + 取消次数 * 0.618分钟）
+				const extraTime = Math.floor(cancelCount * 0.618 * 60); // 转换为秒
+				const actualRestTime = baseRestTime + extraTime;
+				const restTimeMinutes = (actualRestTime / 60).toFixed(1);
+
+				// 确认对话框
+				const brightnessInfo = getBrightnessSuggestion();
+				const confirmMessage = `工作时间到！\n\n护眼建议：\n• 远眺33cm、5米、20米以外\n• 休息${restTimeMinutes}分钟\n• ${brightnessInfo.suggestion}\n\n取消次数：${cancelCount}次\n额外时间：+${extraTime / 60}分钟\n\n确认开始休息吗？`;
+
+				const userConfirmed = confirm(confirmMessage);
+
+				if (userConfirmed) {
+					// 用户确认，开始休息
+					isInBreak = true;
+					cancelCount = 0; // 重置取消次数
+
+					// 开始播放父页面音乐
+					playParentMusic();
+
+					// 创建并显示蒙层
+					const overlay = createOverlay(actualRestTime);
+					document.body.appendChild(overlay);
+
+					// 倒计时
+					let timeLeft = actualRestTime;
+					window.currentRestTimeLeft = timeLeft; // 设置全局变量
+					const countdownElement = document.getElementById('restCountdown');
+					let lastPlayedSecond = -1; // 记录上次播放音效的秒数
+					let oldClockPlayed = false; // 记录是否已播放老式时钟音效
+
+					const countdownInterval = setInterval(() => {
+						// 检查是否有外部修改
+						if (window.currentRestTimeLeft !== undefined && window.currentRestTimeLeft !== timeLeft) {
+							timeLeft = window.currentRestTimeLeft;
+							window.currentRestTimeLeft = undefined; // 清除标记
+						} else {
+							timeLeft--;
+						}
+
+						const minutes = Math.floor(timeLeft / 60);
+						const seconds = timeLeft % 60;
+						countdownElement.textContent = `剩余时间: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+						// 每30秒播放一次钟表报时音效
+						if (timeLeft % 30 === 0 && timeLeft > 0 && timeLeft !== lastPlayedSecond) {
+							playClockSound();
+							lastPlayedSecond = timeLeft;
+							console.log(`播放钟表报时音效 - 剩余${minutes}:${seconds.toString().padStart(2, '0')}`);
+						}
+
+						// 最后一次播放老式时钟音效（剩余30秒时，或者如果总时间少于30秒则在剩余10秒时播放）
+						if ((timeLeft === 8 || (timeLeft <= 5 && timeLeft > 0)) && !oldClockPlayed) {
+							console.log(`🎵 触发老式时钟音效 - 剩余${timeLeft}秒，总时间${actualRestTime}秒`);
+							playOldClockSound();
+							oldClockPlayed = true; // 标记已播放
+							console.log('播放老式时钟八点报时音效 - 休息即将结束');
+						}
+
+						if (timeLeft <= 0) {
+							clearInterval(countdownInterval);
+							hideRestReminder();
+						}
+					}, 1000);
+
+					// 自动隐藏
+					breakTimer = setTimeout(() => {
+						hideRestReminder();
+					}, actualRestTime * 1000);
+
+				} else {
+					// 用户取消，累计取消次数
+					cancelCount++;
+					console.log(`用户取消休息，累计取消${cancelCount}次`);
+
+					// 继续累计工作时长
+					startAccumulatingTime();
+
+					// 重新开始计时
+					startRestTimer();
+				}
+			}
+
+			// 隐藏休息提醒
+			function hideRestReminder() {
+				isInBreak = false;
+				const overlay = document.getElementById('restOverlay');
+				if (overlay) {
+					overlay.remove();
+				}
+				if (breakTimer) {
+					clearTimeout(breakTimer);
+					breakTimer = null;
+				}
+
+				// 暂停父页面音乐
+				pauseParentMusic();
+
+				// 重置累计时长（休息结束后重新开始）
+				resetAccumulatedTime();
+
+				// 开始累计工作时长
+				startAccumulatingTime();
+
+				// 重新开始计时
+				startRestTimer();
+			}
+
+			// 开始计时（统一使用45分钟）
+			function startRestTimer() {
+				if (restTimer) {
+					clearTimeout(restTimer);
+				}
+
+				// 统一使用45分钟计时
+				const timerDuration = 2700000; // 45分钟 = 2700000毫秒
+				console.log('休息提醒：45分钟提醒一次');
+
+				restTimer = setTimeout(() => {
+					showRestReminder();
+				}, timerDuration);
+			}
+
+			// 检查是否为本地开发环境
+			function isLocalDevelopment() {
+				return window.location.hostname === '127.0.0.1' ||
+					window.location.hostname === 'localhost' ||
+					window.location.hostname === '0.0.0.0';
+			}
+
+			// 保存累计时长到localStorage
+			function saveAccumulatedTime() {
+				localStorage.setItem('restAccumulatedTime', accumulatedTime.toString());
+				localStorage.setItem('restLastStartTime', lastStartTime ? lastStartTime.getTime().toString() : '');
+			}
+
+			// 从localStorage加载累计时长
+			function loadAccumulatedTime() {
+				const savedTime = localStorage.getItem('restAccumulatedTime');
+				const savedStartTime = localStorage.getItem('restLastStartTime');
+
+				if (savedTime) {
+					accumulatedTime = parseInt(savedTime);
+				}
+
+				if (savedStartTime) {
+					lastStartTime = new Date(parseInt(savedStartTime));
+				}
+			}
+
+			// 开始累计工作时长
+			function startAccumulatingTime() {
+				lastStartTime = new Date();
+				saveAccumulatedTime();
+			}
+
+			// 停止累计工作时长
+			function stopAccumulatingTime() {
+				if (lastStartTime) {
+					const now = new Date();
+					const elapsed = Math.floor((now - lastStartTime) / 1000);
+					accumulatedTime += elapsed;
+					lastStartTime = null;
+					saveAccumulatedTime();
+
+					console.log(`累计工作时长：${Math.floor(accumulatedTime / 60)}分${accumulatedTime % 60}秒`);
+				}
+			}
+
+			// 重置累计时长
+			function resetAccumulatedTime() {
+				accumulatedTime = 0;
+				lastStartTime = null;
+				saveAccumulatedTime();
+				console.log('累计工作时长已重置');
+			}
+
+			// 检查是否需要立即休息
+			function checkImmediateRest() {
+				// 统一使用45分钟的工作时长阈值
+				const workThreshold = 2700; // 45分钟 = 2700秒
+
+				if (accumulatedTime >= workThreshold) {
+					console.log(`累计工作时长${Math.floor(accumulatedTime / 60)}分${accumulatedTime % 60}秒，超过阈值${workThreshold}秒，立即进入休息`);
+					return true;
+				}
+				return false;
+			}
+
+
+
+			// 减少休息时间（按百分比）
+			function reduceRestTime() {
+				if (!isInBreak) {
+					console.log('⏰ 当前不在休息状态，无法减少时间');
+					return;
+				}
+
+				// 获取当前剩余时间
+				const countdownElement = document.getElementById('restCountdown');
+				if (!countdownElement) {
+					console.log('⏰ 找不到倒计时元素，可能休息提醒未显示');
+					return;
+				}
+
+				// 解析当前剩余时间
+				const timeText = countdownElement.textContent;
+				const timeMatch = timeText.match(/剩余时间: (\d+):(\d+)/);
+
+				if (timeMatch) {
+					const currentMinutes = parseInt(timeMatch[1]);
+					const currentSeconds = parseInt(timeMatch[2]);
+					const currentTotalSeconds = currentMinutes * 60 + currentSeconds;
+
+					// 减少20%的时间
+					const reductionPercent = 0.2; // 20%
+					const reducedSeconds = Math.floor(currentTotalSeconds * reductionPercent);
+					const newTotalSeconds = currentTotalSeconds - reducedSeconds;
+
+					if (newTotalSeconds > 0) {
+						// 更新全局变量
+						window.currentRestTimeLeft = newTotalSeconds;
+
+						// 更新显示
+						const newMinutes = Math.floor(newTotalSeconds / 60);
+						const newSeconds = newTotalSeconds % 60;
+						countdownElement.textContent = `剩余时间: ${newMinutes}:${newSeconds.toString().padStart(2, '0')}`;
+
+						console.log(`⏰ 减少时间: ${currentMinutes}:${currentSeconds.toString().padStart(2, '0')} → ${newMinutes}:${newSeconds.toString().padStart(2, '0')} (减少${reducedSeconds}秒)`);
+						
+						// 显示成功提示
+						showToast('时间已减少20%', 'success');
+					} else {
+						// 时间不足，直接结束
+						hideRestReminder();
+						console.log('⏰ 时间不足，直接结束休息');
+						showToast('休息结束', 'info');
+					}
+				} else {
+					console.log('⏰ 无法解析当前剩余时间格式');
+					showToast('无法解析时间格式', 'error');
+				}
+			}
+
+			// 显示Toast提示
+			function showToast(message, type = 'info') {
+				// 创建toast元素
+				const toast = document.createElement('div');
+				toast.style.cssText = `
+					position: fixed;
+					top: 20px;
+					right: 20px;
+					padding: 12px 20px;
+					border-radius: 8px;
+					color: white;
+					font-weight: 600;
+					z-index: 10000;
+					transform: translateX(100%);
+					transition: transform 0.3s ease;
+					max-width: 300px;
+					word-wrap: break-word;
+				`;
+				
+				// 根据类型设置颜色
+				switch (type) {
+					case 'success':
+						toast.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+						break;
+					case 'error':
+						toast.style.background = 'linear-gradient(135deg, #dc3545, #e74c3c)';
+						break;
+					case 'warning':
+						toast.style.background = 'linear-gradient(135deg, #ffc107, #fd7e14)';
+						break;
+					default:
+						toast.style.background = 'linear-gradient(135deg, #17a2b8, #6f42c1)';
+				}
+				
+				toast.textContent = message;
+				document.body.appendChild(toast);
+				
+				// 显示动画
+				setTimeout(() => {
+					toast.style.transform = 'translateX(0)';
+				}, 100);
+				
+				// 自动隐藏
+				setTimeout(() => {
+					toast.style.transform = 'translateX(100%)';
+					setTimeout(() => {
+						if (toast.parentNode) {
+							toast.parentNode.removeChild(toast);
+						}
+					}, 300);
+				}, 3000);
+			}
+
+			// 用户认证功能
+			// 获取QQ头像
+			async function getQQAvatar(qqNumber) {
+				try {
+					const response = await fetch(`https://q1.qlogo.cn/g?b=qq&nk=${qqNumber}&s=100`);
+					if (response.ok) {
+						return `https://q1.qlogo.cn/g?b=qq&nk=${qqNumber}&s=100`;
+					}
+				} catch (error) {
+					console.error('获取QQ头像失败:', error);
+				}
+				return './images/toXiang.jpg'; // 默认头像
+			}
+			
+			function checkUserAuth() {
+				const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+				
+				// 下拉菜单元素
+				const userDropdownInfo = document.getElementById('userDropdownInfo');
+				const authDropdownButtons = document.getElementById('authDropdownButtons');
+				const dropdownUsername = document.getElementById('dropdownUsername');
+				const dropdownAvatar = document.getElementById('dropdownAvatar');
+				const testButtonContainer = document.getElementById('testButtonContainer');
+				
+				// SideMenu 元素
+				const sideMenuUserInfo = document.getElementById('sideMenuUserInfo');
+				const sideMenuAuthButtons = document.getElementById('sideMenuAuthButtons');
+				const sideMenuUsername = document.getElementById('sideMenuUsername');
+				const sideMenuStats = document.getElementById('sideMenuStats');
+				const sideMenuActions = document.getElementById('sideMenuActions');
+				const sideMenuDashboard = document.getElementById('sideMenuDashboard');
+				const sideMenuUserSection = document.querySelector('.side-menu-user-section');
+				
+				// 检查屏幕尺寸
+				const isMobile = window.innerWidth <= 600;
+
+				if (token) {
+					// 验证令牌有效性
+					fetch('/api/auth/me', {
+						headers: {
+							'Authorization': `Bearer ${token}`
+						}
+					})
+						.then(response => response.json())
+						.then(data => {
+							if (data.success) {
+								// 已登录，显示用户信息
+								dropdownUsername.textContent = data.data.user.username;
+								sideMenuUsername.textContent = data.data.user.username;
+								
+								// 更新SideMenu中的用户信息
+								const sideMenuEmail = document.getElementById('sideMenuEmail');
+								const sideMenuRole = document.getElementById('sideMenuRole');
+								if (sideMenuEmail) {
+									sideMenuEmail.textContent = data.data.user.email || '未设置邮箱';
+								}
+								if (sideMenuRole) {
+									sideMenuRole.textContent = data.data.user.role === 'admin' ? '管理员' : '用户';
+								}
+
+								// 如果是管理员，显示管理页面链接
+								if (data.data.user.role === 'admin') {
+									const adminPanelBtn = document.getElementById('adminPanelBtn');
+									if (adminPanelBtn) adminPanelBtn.style.display = 'inline-block';
+								}
+								
+								// 尝试获取QQ头像（如果用户名是QQ号）
+								const username = data.data.user.username;
+								if (/^\d{5,11}$/.test(username)) { // QQ号格式验证
+									getQQAvatar(username).then(avatarUrl => {
+										dropdownAvatar.src = avatarUrl;
+										// 同时更新右上角头像
+										const profilePicture = document.getElementById('profilePicture');
+										if (profilePicture) {
+											profilePicture.src = avatarUrl;
+										}
+										// 同时更新SideMenu中的头像
+										const sideMenuAvatar = document.getElementById('sideMenuAvatar');
+										if (sideMenuAvatar) {
+											sideMenuAvatar.src = avatarUrl;
+										}
+									});
+								}
+								
+								// 根据屏幕尺寸显示不同的个人中心
+								if (isMobile) {
+									// 手机端：SideMenu就是个人中心入口，始终显示
+									userDropdownInfo.style.display = 'none';
+									authDropdownButtons.style.display = 'none';
+									sideMenuUserInfo.style.display = 'flex';
+									sideMenuAuthButtons.style.display = 'none';
+									sideMenuStats.style.display = 'block';
+									sideMenuActions.style.display = 'block';
+								} else {
+									// PC端：显示下拉菜单，个人中心按钮始终显示
+									userDropdownInfo.style.display = 'block';
+									authDropdownButtons.style.display = 'none';
+									// PC端进入SideMenu时也显示用户信息
+									sideMenuUserInfo.style.display = 'flex';
+									sideMenuAuthButtons.style.display = 'none';
+									// PC端也显示统计信息，因为用户会通过个人中心按钮进入
+									sideMenuStats.style.display = 'block';
+									sideMenuActions.style.display = 'block';
+								}
+								
+								// 显示个人中心面板
+								if (sideMenuDashboard) {
+									sideMenuDashboard.style.display = 'block';
+								}
+								
+								// 显示测试按钮（始终显示）
+								testButtonContainer.style.display = 'flex';
+								
+								// 加载用户数据统计
+								loadUserStats();
+							} else {
+								// 令牌无效，显示登录按钮
+								localStorage.removeItem('token');
+								sessionStorage.removeItem('token');
+								localStorage.removeItem('user');
+								sessionStorage.removeItem('user');
+								
+								// 隐藏个人中心面板
+								if (sideMenuDashboard) {
+									sideMenuDashboard.style.display = 'none';
+								}
+								
+								if (isMobile) {
+									// 手机端：显示SideMenu登录按钮
+									userDropdownInfo.style.display = 'none';
+									authDropdownButtons.style.display = 'none';
+									sideMenuUserInfo.style.display = 'none';
+									sideMenuAuthButtons.style.display = 'flex';
+									sideMenuStats.style.display = 'none';
+									sideMenuActions.style.display = 'none';
+								} else {
+									// PC端：显示下拉菜单登录按钮，个人中心按钮始终显示
+									userDropdownInfo.style.display = 'none';
+									authDropdownButtons.style.display = 'block';
+									sideMenuUserInfo.style.display = 'none';
+									// PC端进入SideMenu时也显示登录选项
+									sideMenuAuthButtons.style.display = 'flex';
+									sideMenuStats.style.display = 'none';
+									sideMenuActions.style.display = 'none';
+								}
+								testButtonContainer.style.display = 'flex'; // 始终显示休息时间按钮
+							}
+						})
+						.catch(error => {
+							console.error('验证令牌失败:', error);
+							
+							// 隐藏个人中心面板
+							if (sideMenuDashboard) {
+								sideMenuDashboard.style.display = 'none';
+							}
+							
+							if (isMobile) {
+								// 手机端：显示SideMenu登录按钮
+								userDropdownInfo.style.display = 'none';
+								authDropdownButtons.style.display = 'none';
+								sideMenuUserInfo.style.display = 'none';
+								sideMenuAuthButtons.style.display = 'flex';
+								sideMenuStats.style.display = 'none';
+								sideMenuActions.style.display = 'none';
+							} else {
+								// PC端：显示下拉菜单登录按钮
+								userDropdownInfo.style.display = 'none';
+								authDropdownButtons.style.display = 'block';
+								sideMenuUserInfo.style.display = 'none';
+								// PC端进入SideMenu时也显示登录选项
+								sideMenuAuthButtons.style.display = 'flex';
+								sideMenuStats.style.display = 'none';
+								sideMenuActions.style.display = 'none';
+							}
+							testButtonContainer.style.display = 'flex'; // 始终显示休息时间按钮
+						});
+				} else {
+					// 未登录，显示登录按钮
+					// 设置默认用户名
+					dropdownUsername.textContent = '用户';
+					sideMenuUsername.textContent = '用户';
+					
+					// 隐藏个人中心面板
+					if (sideMenuDashboard) {
+						sideMenuDashboard.style.display = 'none';
+					}
+					
+					if (isMobile) {
+						// 手机端：SideMenu就是个人中心入口，显示登录选项
+						userDropdownInfo.style.display = 'none';
+						authDropdownButtons.style.display = 'none';
+						sideMenuUserInfo.style.display = 'none';
+						sideMenuAuthButtons.style.display = 'flex';
+						sideMenuStats.style.display = 'none';
+						sideMenuActions.style.display = 'none';
+					} else {
+						// PC端：个人中心按钮始终显示，显示登录选项
+						userDropdownInfo.style.display = 'none';
+						authDropdownButtons.style.display = 'block';
+						sideMenuUserInfo.style.display = 'none';
+						// PC端进入SideMenu时也显示登录选项
+						sideMenuAuthButtons.style.display = 'flex';
+						sideMenuStats.style.display = 'none';
+						sideMenuActions.style.display = 'none';
+					}
+					testButtonContainer.style.display = 'flex'; // 始终显示休息时间按钮
+				}
+			}
+
+			// 退出登录
+			function logout() {
+				const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+
+				if (token) {
+					fetch('/api/auth/logout', {
+						method: 'POST',
+						headers: {
+							'Authorization': `Bearer ${token}`
+						}
+					})
+						.catch(error => {
+							console.error('退出登录请求失败:', error);
+						});
+				}
+
+				// 清除本地存储
+				localStorage.removeItem('token');
+				sessionStorage.removeItem('token');
+				localStorage.removeItem('user');
+				sessionStorage.removeItem('user');
+
+
+				// 重新检查用户认证状态
+				setTimeout(() => {
+					checkUserAuth();
+				}, 500);
+			}
+
+			// 添加退出登录按钮事件监听器
+			function addLogoutEventListener() {
+				// 添加下拉菜单退出按钮事件监听器
+				const dropdownLogoutBtn = document.getElementById('dropdownLogoutBtn');
+				if (dropdownLogoutBtn) {
+					dropdownLogoutBtn.addEventListener('click', logout);
+				}
+				
+				// 添加sideMenu退出按钮事件监听器
+				const sideMenuLogoutBtn = document.getElementById('sideMenuLogoutBtn');
+				if (sideMenuLogoutBtn) {
+					sideMenuLogoutBtn.addEventListener('click', logout);
+				}
+			}
+			
+			// 显示个人中心 - 全局函数
+			window.showPersonalCenter = function () {
+				// 直接调用headers函数显示SideMenu
+				headers();
+			};
+			
+			// 加载用户统计数据
+			async function loadUserStats() {
+				const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+				if (!token) return;
+				
+				try {
+					const response = await fetch('/api/userdata/stats', {
+						headers: {
+							'Authorization': `Bearer ${token}`
+						}
+					});
+					
+					if (response.ok) {
+						const data = await response.json();
+						if (data.success) {
+							document.getElementById('totalData').textContent = data.data.total || 0;
+							document.getElementById('passwordCount').textContent = data.data.passwords || 0;
+							document.getElementById('phoneCount').textContent = data.data.phones || 0;
+							document.getElementById('noteCount').textContent = data.data.notes || 0;
+						}
+					}
+				} catch (error) {
+					console.error('加载统计数据失败:', error);
+				}
+			}
+			
+
+			
+			// 添加其他事件监听器
+			function addEventListeners() {
+				// 菜单按钮
+				const menuButton = document.getElementById('menuButton');
+				if (menuButton) {
+					menuButton.addEventListener('click', headers);
+				}
+				
+				// 清除输入按钮
+				const clearBtn = document.getElementById('clear');
+				if (clearBtn) {
+					clearBtn.addEventListener('click', clearInput);
+				}
+				
+				// 头像点击
+				const profilePicture = document.getElementById('profilePicture');
+				if (profilePicture) {
+					profilePicture.addEventListener('click', function() {
+						// 检查是否为手机端
+						const isMobile = window.innerWidth <= 600;
+						
+						if (isMobile) {
+							// 手机端：检查登录状态
+							const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+							if (!token) {
+								// 未登录，跳转到登录页面
+								window.location.href = 'Pages/login.html';
+								return;
+							}
+							// 已登录，显示侧边菜单
+							headers();
+						} else {
+							// PC端：保持原有的QQ头像设置功能
+							toXiang();
+						}
+					});
+				}
+				
+				// 侧边菜单头像点击
+				const sideMenuAvatar = document.getElementById('sideMenuAvatar');
+				if (sideMenuAvatar) {
+					sideMenuAvatar.addEventListener('click', function() {
+						// 检查是否为手机端
+						const isMobile = window.innerWidth <= 600;
+						
+						if (isMobile) {
+							// 手机端：检查登录状态
+							const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+							if (!token) {
+								// 未登录，跳转到登录页面
+								window.location.href = 'Pages/login.html';
+								return;
+							}
+							// 已登录，跳转到个人信息页面
+							window.location.href = 'Pages/profile.html';
+						}
+						// PC端：不处理点击事件，保持默认行为
+					});
+				}
+				
+				// 主要按钮
+				const mainButton = document.getElementById('mainButton');
+				if (mainButton) {
+					mainButton.addEventListener('click', change);
+				}
+				
+				// 提示框关闭
+				const tipClose = document.getElementById('tipClose');
+				if (tipClose) {
+					tipClose.addEventListener('click', tipBox);
+				}
+				
+				// 下拉菜单测试按钮
+				const testButtonContainer = document.getElementById('testButtonContainer');
+				if (testButtonContainer) {
+					testButtonContainer.addEventListener('click', function () {
+						// 测试按钮只用于开始休息
+							showRestReminder();
+					});
+					
+					// 右键菜单测试老式时钟音效
+					testButtonContainer.addEventListener('contextmenu', function (e) {
+						e.preventDefault();
+						console.log('🎵 右键测试：强制播放老式时钟音效');
+						playOldClockSound();
+					});
+					
+					// 中键重置累计时长
+					testButtonContainer.addEventListener('auxclick', function (e) {
+						e.preventDefault();
+						console.log('🔄 中键测试：重置累计工作时长');
+						resetAccumulatedTime();
+						alert('累计工作时长已重置');
+					});
+				}
+			}
+
+			// 页面加载完成后启动计时
+			window.addEventListener('load', function () {
+
+							// 添加退出登录事件监听器
+			addLogoutEventListener();
+			
+			// 添加快速操作按钮事件监听器
+			const addPasswordBtn = document.getElementById('addPasswordBtn');
+			const addPhoneBtn = document.getElementById('addPhoneBtn');
+			const addNoteBtn = document.getElementById('addNoteBtn');
+			
+			if (addPasswordBtn) {
+					addPasswordBtn.addEventListener('click', function (e) {
+					e.preventDefault();
+					alert('添加密码功能开发中...');
+				});
+			}
+			
+			if (addPhoneBtn) {
+					addPhoneBtn.addEventListener('click', function (e) {
+					e.preventDefault();
+					alert('添加电话功能开发中...');
+				});
+			}
+			
+			if (addNoteBtn) {
+					addNoteBtn.addEventListener('click', function (e) {
+					e.preventDefault();
+					alert('添加笔记功能开发中...');
+				});
+			}
+				
+				// 检查用户认证状态
+				checkUserAuth();
+				
+				// 监听窗口大小变化，动态调整个人中心显示
+				window.addEventListener('resize', function () {
+					checkUserAuth();
+				});
+				
+
+				
+				// 添加其他事件监听器
+				addEventListeners();
+
+				// 定期更新测试按钮文本
+				setInterval(() => {
+					const testButtonText = document.getElementById('testButtonText');
+					if (testButtonText) {
+							testButtonText.textContent = '测试休息提醒';
+					}
+				}, 1000);
+
+				// 加载累计时长
+				loadAccumulatedTime();
+
+				// 检查是否需要立即休息
+				if (checkImmediateRest()) {
+					// 立即进入休息状态
+					setTimeout(() => {
+						showRestReminder();
+					}, 1000); // 延迟1秒显示，确保页面完全加载
+				} else {
+					// 开始累计工作时长
+					startAccumulatingTime();
+				}
+
+				// 延迟5秒后开始正常计时
+				setTimeout(() => {
+					startRestTimer();
+					console.log('休息提醒功能已启动，每45分钟提醒一次');
+				}, 5000);
+			});
+
+			// 页面可见性变化时处理 - 已取消页面隐藏时停止计时功能
+			document.addEventListener('visibilitychange', function () {
+				// 注释掉页面隐藏时暂停计时的功能，让计时器持续运行
+
+				// 现在无论页面是否隐藏，计时器都会持续运行
+				// 但需要正确处理累计时长
+				if (!isInBreak) {
+					if (document.hidden) {
+						// 页面隐藏时停止累计
+						stopAccumulatingTime();
+					} else {
+						// 页面显示时继续累计
+						startAccumulatingTime();
+					}
+				}
+
+				console.log('页面可见性变化，但计时器继续运行');
+			});
+
+		})();
+	</script>
+</body>
+
+</html>

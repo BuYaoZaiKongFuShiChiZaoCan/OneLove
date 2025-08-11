@@ -1,0 +1,92 @@
+body {
+    font-family: '微软雅黑';
+}
+
+table {
+    background: #FFF;
+    /* #8BA3C7 东方既白 */
+}
+
+table tr th {
+    font-size: 30px;
+    background: url(./img/personalResume/Style1个人简历.png) no-repeat 0% / 25%;
+    height: 60px;
+    border: none;
+}
+
+table tr th span {
+    display: none;
+}
+
+table tr td[colspan="3"] span {
+    padding: 3px;
+    margin: 4px 1px;
+    font-size: 16px;
+    border-radius: 10px;
+    display: inline-block;
+    border: 1px solid lightskyblue;
+    box-shadow: 0 0 10px 5px #fff inset;
+}
+
+table tr td {
+    border: 1px solid;
+    width: 140px;
+    height: 20px;
+}
+
+table tr td:has(details) {
+    text-align: center;
+}
+
+table tr td:nth-of-type(odd) {
+    padding: 0 25px;
+    font-weight: 600;
+    box-sizing: border-box;
+    background: #D9D9D9;
+    text-align: justify;
+    text-align-last: justify;
+    /* 兼容IE */
+    text-justify: distribute-all-lines;
+}
+
+.tal {
+    text-align: left !important;
+}
+
+ol,
+ul {
+    transition: all 1s;
+    position: relative;
+}
+
+li:hover {
+    list-style-type: decimal;
+}
+
+ol:hover :not(li:hover),
+ul:hover :not(li:hover) {
+    filter: blur(2px);
+}
+
+ol li img,
+ul li img {
+    filter: none !important;
+    pointer-events: auto;
+    /* 允许元素交互 */
+    background: transparent;
+    opacity: 1;
+    max-width: 200px;
+    height: auto;
+    position: static;
+    transform: none;
+    z-index: auto;
+    transition: transform 0.3s ease;
+    margin: 5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 8px;
+}
+
+li:hover img {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}

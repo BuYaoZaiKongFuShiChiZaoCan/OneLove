@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>祁富强的个人简历</title>
+	<style>
+		::-webkit-scrollbar {
+			display: none;
+		}
+
+		@font-face {
+			font-family: "千图小兔体";
+			src: url("../../font/QTXTT.ttf");
+			font-weight: normal;
+			font-style: normal;
+		}
+
+		body {
+			margin: 0;
+			font-family: "千图小兔体", sans-serif;
+		}
+
+		table {
+			min-width: 14.8cm;
+			width: 21cm;
+			max-width: 29.7cm;
+			margin: auto;
+			font-size: 18px;
+			border-collapse: collapse;
+		}
+
+		th, td {
+			border: 1px solid #000;
+			padding: 8px;
+			text-align: left;
+		}
+
+		a {
+			color: #000;
+			font-size: 24px;
+			border-width: 2px;
+			border-style: dotted;
+			border-color: #000;
+			transition: all 0.3s;
+			text-decoration: none;
+		}
+
+		a:hover {
+			text-decoration: underline;
+			color: aqua;
+			border-color: red;
+		}
+
+		.tal {
+			text-align: left;
+		}
+
+		ul {
+			margin: 0;
+			padding-left: 20px;
+		}
+
+		li {
+			margin-bottom: 5px;
+		}
+
+		img {
+			max-width: 200px;
+			height: auto;
+			margin: 5px;
+			border-radius: 8px;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+			transition: transform 0.3s ease;
+		}
+
+		img:hover {
+			transform: scale(1.05);
+			box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+		}
+
+		/* 确保图片在列表项中正确显示 */
+		li img {
+			display: inline-block;
+			vertical-align: middle;
+			margin-left: 10px;
+		}
+	</style>
+</head>
+
+<body>
+	<a style="display: inline-block; margin: 20px 100px;" href="../../index.html">返回首页</a>
+	<label for="styleChange">切换样式</label>
+	<select name="styleChange" id="styleChangeSelect" onchange="changeStyle(cssUrls[this.value])">
+		<option value="grjlStyle1.css">样式1</option>
+		<option value="grjlStyle2.css">样式2</option>
+		<option value="grjlStyle3.css">样式3</option>
+	</select>
+	
+	<table cellspacing="0" cellpadding="5">
+		<tr>
+			<th colspan="5">
+				<span>祁富强的个人简历</span>
+			</th>
+		</tr>
+		<tr>
+			<td>姓名</td>
+			<td>
+				<details>
+					<summary>祁富强点击查看姓名</summary>
+					<span>看不见看不见看不见看不见看不见看不见~~~</span>
+				</details>
+			</td>
+			<td>性别</td>
+			<td>男</td>
+			<td rowspan="8">
+				<details>
+					<summary>祁富强点击查看照片</summary>
+					<span>这是我的照片，相看就看吧，聪明的人都很帅</span>
+				</details>
+			</td>
+		</tr>
+		<tr>
+			<td>民族</td>
+			<td>汉族</td>
+			<td>政治面貌</td>
+			<td>河南省洛阳市</td>
+		</tr>
+		<tr>
+			<td>第一学历</td>
+			<td>本科</td>
+			<td>专业</td>
+			<td>电子商务</td>
+		</tr>
+		<tr>
+			<td>出生年月</td>
+			<td>2004年xx月</td>
+			<td>政治面貌</td>
+			<td>团员</td>
+		</tr>
+		<tr>
+			<td>健康状况</td>
+			<td>
+				<details>
+					<summary>哈哈哈！(>ω< )！</summary>
+					<span>身体健康，视力良好！A、近视眼B、远视眼C、散光眼D、老花眼<b>E、我自己配一副眼镜！</b></span>
+				</details>
+			</td>
+			<td>邮箱</td>
+			<td>1425979360@qq.com</td>
+		</tr>
+		<tr>
+			<td>联系电话</td>
+			<td>1*1 **** **85</td>
+			<td>QQ</td>
+			<td>1*2 *9*9 3*0</td>
+		</tr>
+		<tr>
+			<td>兴趣爱好</td>
+			<td colspan="3">编程、音乐、游戏、阅读、写作、摄影、电影、动漫、设计+</td>
+		</tr>
+		<tr>
+			<td>性格标签</td>
+			<td colspan="3">
+				<span>乐观</span>
+				<span>开朗</span>
+				<span>幽默</span>
+				<span>细心</span>
+				<span>耐心</span>
+				<span>音乐</span>
+				<span>游戏</span>
+				<span>QQ飞车</span>
+				<span>王者荣耀</span>
+				<span>我的世界</span>
+				<span>歌</span>
+				<span>舞</span>
+				<span>rap</span>
+				<span>篮球</span>
+				<span>全栈</span>
+			</td>
+		</tr>
+		<tr>
+			<td>联系地址</td>
+			<td colspan="4">河南省洛阳市</td>
+		</tr>
+		<tr>
+			<td>学习经历</td>
+			<td colspan="4" class="tal">
+				<ul>
+					<li>2011~2017年：新安县实验小学</li>
+					<li>2017~2020年：洛阳市新安县初中</li>
+					<li>2020~2023年：洛阳市职业中等专业学校</li>
+					<li>2023~2026年：河南工业职业技术学院</li>
+				</ul>
+			</td>
+		</tr>
+		<tr style="height: 128px;">
+			<td>个人荣誉</td>
+			<td colspan="4" class="tal">
+				<ul>
+					<li>
+						2020年获得职业资格四级中级工"保育员"证书
+						<img src="./img/personalResume/2 职业资格四级中级工“保育员”证.jpg" alt="">
+					</li>
+					<li>
+						2022年获得县级学生技能大赛"电子商务"项目一等奖
+						<img src="./img/personalResume/3 县级学生技能大赛“电子商务”项目一等奖.jpg" alt="">
+					</li>
+					<li>
+						2022年获得"电子商务数据分析职业技能等级证书"（初级）
+						<img src="./img/personalResume/4 电子商务数据分析职业技能等级证书（初级）.jpg" alt="">
+					</li>
+					<li>
+						2022年获得第二学期"技能之星三等奖"
+						<img src="./img/personalResume/5 第二学期“技能之星三等奖“.jpg" alt="">
+					</li>
+					<li>
+						2022年获得县级学生技能大赛"电子商务"项目二等奖
+						<img src="./img/personalResume/6 县级学生技能大赛“电子商务”项目二等奖.jpg" alt="">
+					</li>
+					<li>
+						2022年获得市级学生技能大赛"电子商务"项目一等奖
+						<img src="./img/personalResume/7 市级学生技能大赛“电子商务”项目一等奖.jpg" alt="">
+					</li>
+					<li>
+						2023年获得省级职业院校学生技能大赛"电子商务"项目一等奖
+						<img src="./img/personalResume/9 省级职业院校学生技能大赛“电子商务”项目一等奖.jpg" alt="">
+					</li>
+					<li>
+						2024年获得高等学校英语应用能力考试A级证书
+						<img src="./img/personalResume/15 高等学校英语应用能力考试A级.jpg" alt="">
+					</li>
+					<li>
+						2024年获得救护员（初级）证书
+						<img src="./img/personalResume/13 祁富强的救护员（初级）证书（正面）622623200404222613.png" alt="">
+					</li>
+					<li>
+						2024年获得抖音奥运火炬手称号
+						<img src="./img/personalResume/10 抖音奥运火炬手.jpg" alt="">
+					</li>
+					<li>
+						2024年参加哈尔滨马拉松官方线上赛
+						<img src="./img/personalResume/11 2024哈尔滨马拉松官方线上赛.jpg" alt="">
+					</li>
+					<li>
+						2024年参加六盘水马拉松官方线上赛
+						<img src="./img/personalResume/12 2024六盘水马拉松官方线上赛.png" alt="">
+					</li>
+					<li>
+						2024年获得中央专项彩票公益金宏志助航计划证书
+						<img src="./img/personalResume/14 中央专项彩票公益金宏志助航计划.jpg" alt="">
+					</li>
+					<li>
+						2024年获得国防教育及爱国主义教育主题公益活动合格证明
+						<img src="./img/personalResume/16 国防教育及爱国主义教育主题公益活动合格证明.jpg" alt="">
+					</li>
+					<li>
+						2024年成为入党积极分子
+						<img src="./img/personalResume/17 入党积极分子.jpg" alt="">
+					</li>
+					<li>
+						2025年参加甘肃省职业院校技能大赛
+						<img src="./img/personalResume/18 2025年甘肃省职业院校技能大赛.jpg" alt="">
+					</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td>工作经历</td>
+			<td colspan="4" class="tal">
+				<ul>
+					<li>2023年6月~2023年8月：洛阳市某公司实习</li>
+					<li>2023年9月~2024年1月：自由职业者</li>
+					<li>2024年2月~至今：全职开发者</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td>技能特长</td>
+			<td colspan="4" class="tal">
+				<ul>
+					<li>前端开发：HTML、CSS、JavaScript、Vue.js、React</li>
+					<li>后端开发：Node.js、Python、Java</li>
+					<li>数据库：MySQL、MongoDB</li>
+					<li>其他技能：Git、Docker、Linux</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<td>自我评价</td>
+			<td colspan="4" class="tal">
+				<p>热爱编程，善于学习新技术，有良好的团队合作精神和沟通能力。喜欢挑战，追求代码的优雅和高效。</p>
+			</td>
+		</tr>
+	</table>
+
+	<script>
+		const cssUrls = {
+			"grjlStyle1.css": "./grjlStyle1.css",
+			"grjlStyle2.css": "./grjlStyle2.css",
+			"grjlStyle3.css": "./grjlStyle3.css"
+		};
+
+		function changeStyle(cssUrl) {
+			console.log('切换样式到:', cssUrl);
+			
+			// 移除现有的样式表
+			const existingLinks = document.querySelectorAll('link[href*="grjlStyle"]');
+			existingLinks.forEach(link => link.remove());
+
+			// 添加新的样式表
+			if (cssUrl) {
+				const link = document.createElement('link');
+				link.rel = 'stylesheet';
+				link.href = cssUrl;
+				link.onload = function() {
+					console.log('样式加载成功:', cssUrl);
+				};
+				link.onerror = function() {
+					console.error('样式加载失败:', cssUrl);
+				};
+				document.head.appendChild(link);
+			}
+		}
+
+		// 页面加载时设置默认样式
+		window.addEventListener('load', function() {
+			console.log('页面加载完成，设置默认样式');
+			// 默认使用第一个样式
+			const firstStyle = Object.values(cssUrls)[0];
+			if (firstStyle) {
+				changeStyle(firstStyle);
+			}
+		});
+
+		// 确保DOM加载完成后初始化
+		document.addEventListener('DOMContentLoaded', function() {
+			console.log('DOM加载完成');
+			// 设置选择器的默认值
+			const select = document.getElementById('styleChangeSelect');
+			if (select) {
+				select.value = 'grjlStyle1.css';
+			}
+		});
+	</script>
+</body>
+
+</html>

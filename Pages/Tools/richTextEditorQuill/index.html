@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>richTextEditorQuill</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.snow.css">
+    <script src="https://cdn.jsdelivr.net/npm/quill@2.0.3/dist/quill.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        #editor {
+            margin-bottom: 20px;
+            background: white;
+            border-radius: 5px;
+            min-height: 30vh;
+        }
+        
+        #contentList {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        #contentList h3 {
+            margin-top: 0;
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        
+        #contentItems {
+            list-style: none;
+            padding: 0;
+        }
+        
+        #contentItems li {
+            margin: 10px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fafafa;
+            transition: all 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        #contentItems li:hover {
+            border-color: #007bff;
+            box-shadow: 0 2px 8px rgba(0,123,255,0.2);
+        }
+        
+        .content-info {
+            flex: 1;
+            margin-right: 15px;
+        }
+        
+        .preview-text {
+            color: #666;
+            font-size: 12px;
+            margin: 8px 0;
+            max-height: 20px;
+            overflow: hidden;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        
+        .content-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        
+        .btn {
+            padding: 5px 12px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 8px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn-load {
+            background: #007bff;
+            color: white;
+        }
+        
+        .btn-load:hover {
+            background: #0056b3;
+        }
+        
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #c82333;
+        }
+        
+        .save-btn {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        
+        .save-btn:hover {
+            background: #218838;
+        }
+        
+        .btn-clear {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-clear:hover {
+            background: #545b62;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="editor"></div>
+    <div style="margin-bottom: 20px;">
+        <button class="save-btn" onclick="saveContent()">添加内容</button>
+        <button class="btn btn-clear" onclick="clearEditor()" style="margin-left: 10px;">清空编辑器</button>
+    </div>
+    <div id="contentList">
+        <h3>已保存的内容列表：</h3>
+        <ul id="contentItems"></ul>
+    </div>
+    <script>
+        // 全局变量跟踪当前加载的内容
+        var currentLoadedContent = null;
+        
+        // 格式化时间戳为易读的日期时间
+        function formatTimestamp(timestamp) {
+            var date = new Date(parseInt(timestamp));
+            var year = date.getFullYear();
+            var month = String(date.getMonth() + 1).padStart(2, '0');
+            var day = String(date.getDate()).padStart(2, '0');
+            var hours = String(date.getHours()).padStart(2, '0');
+            var minutes = String(date.getMinutes()).padStart(2, '0');
+            var seconds = String(date.getSeconds()).padStart(2, '0');
+            var milliseconds = String(date.getMilliseconds()).padStart(3, '0');
+            
+            return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
+        }
+
+        // 从内容名称中提取时间戳并格式化
+        function formatContentName(contentName) {
+            if (contentName.startsWith('Quill')) {
+                var timestamp = contentName.substring(5); // 去掉"Quill"前缀
+                var formattedTime = formatTimestamp(timestamp);
+                return `Quill - ${formattedTime}`;
+            }
+            return contentName;
+        }
+
+        // 获取所有保存的内容名称记录
+        function getContentNames() {
+            var contentNames = localStorage.getItem('quillContentNames');
+            return contentNames ? JSON.parse(contentNames) : [];
+        }
+
+        // 添加内容名称到记录中
+        function saveContentName(contentName) {
+            var contentNames = getContentNames();
+            if (!contentNames.includes(contentName)) {
+                contentNames.push(contentName);
+                localStorage.setItem('quillContentNames', JSON.stringify(contentNames));
+            }
+        }
+
+        // 从记录中删除内容名称
+        function removeContentName(contentName) {
+            var contentNames = getContentNames();
+            var index = contentNames.indexOf(contentName);
+            if (index > -1) {
+                contentNames.splice(index, 1);
+                localStorage.setItem('quillContentNames', JSON.stringify(contentNames));
+            }
+        }
+
+        // 显示所有保存的内容列表
+        function displayContentList() {
+            var contentNames = getContentNames();
+            var contentItems = document.getElementById('contentItems');
+            contentItems.innerHTML = '';
+            
+            contentNames.forEach(function(name) {
+                var li = document.createElement('li');
+                
+                // 获取内容预览
+                var content = localStorage.getItem(name);
+                var preview = '';
+                if (content) {
+                    try {
+                        var contentData = JSON.parse(content);
+                        // 提取纯文本内容用于预览
+                        preview = extractTextFromQuillContent(contentData);
+                        // 限制预览长度为第一行可视区域的80%
+                        var maxLength = Math.floor(window.innerWidth * 0.8 / 12); // 假设每个字符12px宽度
+                        if (preview.length > maxLength) {
+                            preview = preview.substring(0, maxLength) + '...';
+                        }
+                    } catch (e) {
+                        preview = '内容加载失败';
+                    }
+                }
+                
+                // 格式化显示名称
+                var displayName = formatContentName(name);
+                
+                li.innerHTML = `
+                    <div class="content-info">
+                        <div class="content-name">${displayName}</div>
+                        <div class="preview-text">${preview}</div>
+                    </div>
+                    <div class="button-group">
+                        <button class="btn btn-load" onclick="loadContent('${name}')">加载</button>
+                        <button class="btn btn-delete" onclick="deleteContent('${name}')">删除</button>
+                    </div>
+                `;
+                contentItems.appendChild(li);
+            });
+        }
+
+        // 从Quill内容中提取纯文本
+        function extractTextFromQuillContent(contentData) {
+            var text = '';
+            if (contentData && contentData.ops) {
+                contentData.ops.forEach(function(op) {
+                    if (op.insert) {
+                        if (typeof op.insert === 'string') {
+                            text += op.insert;
+                        } else if (op.insert.image) {
+                            text += '[图片]';
+                        }
+                    }
+                });
+            }
+            return text.trim() || '空内容';
+        }
+
+        // 加载指定名称的内容
+        function loadContent(contentName) {
+            var content = localStorage.getItem(contentName);
+            if (content) {
+                try {
+                    quill.setContents(JSON.parse(content));
+                    console.log('已加载内容：', contentName);
+                    currentLoadedContent = contentName; // 更新全局变量
+                    document.querySelector('.save-btn').textContent = '更新内容';
+                } catch (e) {
+                    console.error('加载内容失败：', e);
+                }
+            }
+        }
+
+        // 删除指定名称的内容
+        function deleteContent(contentName) {
+            if (confirm('确定要删除这个内容吗？')) {
+                localStorage.removeItem(contentName);
+                removeContentName(contentName);
+                displayContentList();
+                console.log('已删除内容：', contentName);
+                if (currentLoadedContent === contentName) {
+                    currentLoadedContent = null; // 如果删除的是当前加载的内容，则清空
+                    document.querySelector('.save-btn').textContent = '添加内容';
+                }
+            }
+        }
+
+        // 清空编辑器，开始新内容编辑
+        function clearEditor() {
+            quill.setText('');
+            currentLoadedContent = null;
+            document.querySelector('.save-btn').textContent = '添加内容';
+            console.log('编辑器已清空，可以开始新内容编辑');
+        }
+
+        // 添加内容，支持新增和更新
+        function saveContent() {
+            var content = quill.getContents();
+            var contentName;
+            var isUpdate = false;
+            
+            if (currentLoadedContent) {
+                // 如果当前有加载的内容，则更新该内容
+                contentName = currentLoadedContent;
+                isUpdate = true;
+            } else {
+                // 否则创建新内容
+                var timestamp = Date.now();
+                contentName = 'Quill' + timestamp;
+            }
+            
+            console.log(isUpdate ? '更新内容：' : '添加内容：', contentName);
+            console.log('内容数据：', content);
+            
+            // 将内容保存到本地
+            localStorage.setItem(contentName, JSON.stringify(content));
+            
+            if (!isUpdate) {
+                // 只有新增时才将内容名称保存到记录中
+                saveContentName(contentName);
+            }
+            
+            // 更新显示列表
+            displayContentList();
+            
+            // 显示相应的提示信息
+            if (isUpdate) {
+                var formattedTime = formatTimestamp(contentName.substring(5));
+                alert('内容已更新！\n更新时间：' + formattedTime);
+            } else {
+                var timestamp = Date.now();
+                var formattedTime = formatTimestamp(timestamp);
+                alert('内容已保存！\n保存时间：' + formattedTime);
+            }
+        }
+
+        window.onload = function () {
+            // 初始化时显示所有已保存的内容列表
+            displayContentList();
+        }
+
+        // 初始化编辑器
+        var quill = new Quill('#editor', {
+            theme: 'snow', // 主题 有snow和bubble snow是默认主题 bubble是气泡主题
+            modules: {
+                toolbar: [
+                    [{ header: [1, 2, false] }], // 标题
+                    ['bold', 'italic', 'underline', 'strike'], // 加粗 斜体 下划线 删除线
+                    [{ list: 'ordered' }, { list: 'bullet' }], // 有序列表 无序列表
+                    ['link', 'image'], // 链接 图片
+                    ['clean'] // 清除
+                ]
+            }
+        });
+    </script>
+</body>
+
+</html>

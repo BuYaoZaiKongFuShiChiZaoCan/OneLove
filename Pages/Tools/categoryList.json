@@ -1,0 +1,84 @@
+{
+    "category": [
+        {
+            "id": 1,
+            "name": "非辅助类工具",
+            "EnglishName": "nonAuxiliaryTools",
+            "description": "非辅助类工具描述"
+        },
+        {
+            "id": 2,
+            "name": "仅单系统可用工具",
+            "EnglishName": "singleSystemTools",
+            "description": "仅单系统可用工具描述",  
+            "subCategory": [
+                {
+                    "id": 1,
+                    "name": "Android",
+                    "EnglishName": "android",
+                    "description": "Android描述"
+                },
+                {
+                    "id": 2,
+                    "name": "iOS",
+                    "EnglishName": "ios",
+                    "description": "iOS描述"
+                },
+                {
+                    "id": 3,
+                    "name": "Web",
+                    "EnglishName": "web",
+                    "description": "Web描述"
+                },
+                {
+                    "id": 4,
+                    "name": "小程序",
+                    "EnglishName": "miniProgram",
+                    "description": "小程序描述"
+                }
+                ,{
+                    "id": 5,
+                    "name": "Windows",
+                    "EnglishName": "windows",
+                    "description": "Windows描述"
+                },
+                {
+                    "id": 6,
+                    "name": "Mac",
+                    "EnglishName": "mac",
+                    "description": "Mac描述"
+                },
+                {
+                    "id": 7,
+                    "name": "Linux",
+                    "EnglishName": "linux",
+                    "description": "Linux描述"
+                },
+                {
+                    "id": 7,
+                    "name": "HarmonyOS",
+                    "EnglishName": "harmonyos",
+                    "description": "HarmonyOS描述"
+                },
+                {
+                    "id": 8,
+                    "name": "Unix",
+                    "EnglishName": "unix",
+                    "description": "Unix描述"
+                },
+                {
+                    "id": 9,
+                    "name": "其他",
+                    "EnglishName": "other",
+                    "description": "其他描述"
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "name": "多系统可用工具",
+            "EnglishName": "multiSystemTools",
+            "description": "多系统可用工具描述"
+        }
+    ]
+}

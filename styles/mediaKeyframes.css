@@ -1,0 +1,198 @@
+@media screen and (max-width: 1100px) {
+
+    /* 手机、平板《1100 */
+    #main nav {
+        justify-content: space-between;
+        margin: auto;
+    }
+
+    #main nav a {
+        width: 39vw;
+        float: left;
+        text-align: center;
+    }
+
+    main#main-body {
+        flex-direction: column;
+        flex-wrap: wrap;
+        align-content: center;
+        align-items: self-start;
+    }
+
+    main#main-body #biJi {
+        order: -1;
+        /* 调整笔记与时钟的顺序 */
+        margin-top: 50px;
+    }
+
+    main#main-body #sidePanel {
+    align-items: center;
+    margin: auto 0;
+}
+
+main#main-body #sidePanel #cbThree #tipBox {
+    display: none;
+}
+
+    #header nav ul li {
+        width: 7vw;
+    }
+
+    #header nav ul li span {
+        padding: 0 5px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    footer div[footer] svg {
+        animation: none;
+        transform: translateX(0px);
+    }
+
+    #dog {
+        width: 80%;
+    }
+}
+
+@media screen and (min-width: 1001px) {
+
+    /* 电脑》1000 */
+    /* 移除SideMenu的隐藏设置，让PC端也能显示个人中心 */
+    /* #sideMenu {
+    display: none !important;
+    } */
+
+    main#main-body {
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-content: flex-start;
+        justify-content: space-between;
+    }
+}
+
+@media screen and (max-width: 1001px) {
+
+    /* 小于1001 */
+    main#main-body {
+        align-items: center;
+    }
+
+    main#main-body #time {
+        width: 90vw;
+        height: 100%;
+        padding-top: 5px;
+        max-width: 760px;
+        margin: 12px 4vw 0 4vw;
+        padding-bottom: 12px;
+        transform: translateY(20px);
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        box-shadow: 0px -6px 6px 0 #EFEFEF;
+    }
+
+    main#main-body #time #clockPanel {
+        color: black;
+        position: static;
+        margin: auto;
+    }
+
+    main#main-body #time>img {
+        display: none;
+    }
+
+    main#main-body #time>div:not(#clockPanel) {
+        display: none;
+    }
+
+    main#main-body #Center {
+        margin: 12px 4vw;
+        max-width: 760px;
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+        box-shadow: 0px 6px 6px 0 #EFEFEF;
+    }
+}
+
+@media screen and (max-width: 700px) {
+
+    /* 小于700 */
+    #header nav {
+        width: 100px;
+    }
+
+    #header nav ul li div.list {
+        left: 76px;
+    }
+}
+
+@media screen and (max-width: 500px) {
+
+    /* 小于500px */
+    #header nav {
+        min-width: 60px;
+    }
+
+    #main nav {
+        justify-content: center;
+    }
+
+    #main nav a {
+        width: 70%;
+    }
+}
+
+/* 移动端头像下拉菜单样式 */
+@media (max-width: 600px) {
+    .profile-dropdown {
+        width: 250px;
+        right: -50px;
+    }
+    
+    .dropdown-header {
+        padding: 12px 15px;
+    }
+    
+    .dropdown-item {
+        padding: 10px 15px;
+        font-size: 13px;
+    }
+    
+    /* SideMenu 移动端优化 */
+    .side-menu-user-section {
+        width: 90%;
+        max-width: 280px;
+    }
+    
+    .side-menu-username {
+        font-size: 16px;
+    }
+    
+    .side-menu-link,
+    .side-menu-logout-btn {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+    
+    .side-menu-dashboard {
+        width: 90%;
+        max-width: 320px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .stat-card {
+        padding: 10px;
+    }
+    
+    .stat-number {
+        font-size: 1.2rem;
+    }
+    
+    .btn-action {
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+}

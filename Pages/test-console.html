@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>控制台错误测试</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>🔧 控制台错误测试</h1>
+    
+    <div class="test">
+        <h3>1. 基础JavaScript测试</h3>
+        <button onclick="testBasicJS()">测试基础JS</button>
+        <div id="basic-result"></div>
+    </div>
+
+    <div class="test">
+        <h3>2. Fetch API测试</h3>
+        <button onclick="testFetch()">测试Fetch</button>
+        <div id="fetch-result"></div>
+    </div>
+
+    <div class="test">
+        <h3>3. 注册API测试</h3>
+        <button onclick="testRegisterAPI()">测试注册API</button>
+        <div id="register-result"></div>
+    </div>
+
+    <div class="test">
+        <h3>4. 错误捕获测试</h3>
+        <button onclick="testErrorHandling()">测试错误处理</button>
+        <div id="error-result"></div>
+    </div>
+
+    <script>
+        // 全局错误处理
+        window.onerror = function(msg, url, line, col, error) {
+            console.error('全局错误:', {msg, url, line, col, error});
+            document.body.innerHTML += `<div class="error">全局错误: ${msg} (行: ${line})</div>`;
+        };
+
+        // 未处理的Promise错误
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('未处理的Promise错误:', event.reason);
+            document.body.innerHTML += `<div class="error">Promise错误: ${event.reason}</div>`;
+        });
+
+        function testBasicJS() {
+            try {
+                console.log('测试基础JavaScript...');
+                const result = 1 + 1;
+                document.getElementById('basic-result').innerHTML = 
+                    `<span class="success">✅ 基础JS正常: ${result}</span>`;
+            } catch (error) {
+                document.getElementById('basic-result').innerHTML = 
+                    `<span class="error">❌ 基础JS错误: ${error.message}</span>`;
+            }
+        }
+
+        async function testFetch() {
+            try {
+                console.log('测试Fetch API...');
+                const response = await fetch('http://localhost:3000');
+                const data = await response.json();
+                document.getElementById('fetch-result').innerHTML = 
+                    `<span class="success">✅ Fetch正常: ${data.version}</span>`;
+            } catch (error) {
+                document.getElementById('fetch-result').innerHTML = 
+                    `<span class="error">❌ Fetch错误: ${error.message}</span>`;
+                console.error('Fetch错误详情:', error);
+            }
+        }
+
+        async function testRegisterAPI() {
+            try {
+                console.log('测试注册API...');
+                const response = await fetch('http://localhost:3000/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: 'testuser4',
+                        email: 'test4@example.com',
+                        password: '123456'
+                    })
+                });
+                
+                const data = await response.json();
+                console.log('注册API响应:', data);
+                
+                if (data.success) {
+                    document.getElementById('register-result').innerHTML = 
+                        `<span class="success">✅ 注册API正常: ${data.message}</span>`;
+                } else {
+                    document.getElementById('register-result').innerHTML = 
+                        `<span class="error">❌ 注册API错误: ${data.message}</span>`;
+                }
+            } catch (error) {
+                document.getElementById('register-result').innerHTML = 
+                    `<span class="error">❌ 注册API错误: ${error.message}</span>`;
+                console.error('注册API错误详情:', error);
+            }
+        }
+
+        function testErrorHandling() {
+            try {
+                console.log('测试错误处理...');
+                // 故意制造一个错误
+                const undefinedVar = undefined;
+                undefinedVar.someMethod();
+            } catch (error) {
+                document.getElementById('error-result').innerHTML = 
+                    `<span class="success">✅ 错误处理正常: ${error.message}</span>`;
+            }
+        }
+
+        // 页面加载时自动测试
+        window.onload = function() {
+            console.log('页面加载完成，开始自动测试...');
+            testBasicJS();
+            setTimeout(testFetch, 1000);
+            setTimeout(testRegisterAPI, 2000);
+            setTimeout(testErrorHandling, 3000);
+        };
+    </script>
+</body>
+</html> 

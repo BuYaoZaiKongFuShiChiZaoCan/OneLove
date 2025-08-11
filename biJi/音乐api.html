@@ -1,0 +1,78 @@
+<!-- <!- 导入JQ --
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+
+<script>
+$.ajax({
+    url: 'https://api.gmit.vip/Api/Tencent',
+    type: 'post',
+    dataType: 'json',
+    async: false, 
+    data: {
+        format : 'json',
+        id : '004GZSIl40lGXm',
+    },
+    beforeSend:function(){
+        //请求中执行的代码
+    },
+    complete:function(){
+        //请求完成执行的代码
+    },
+    error: function() {
+        //请求成功失败执行的代码
+    }, 
+    success: function (res) {
+        // 状态码 200 表示请求成功
+        if(res.code === 200){
+            console.log(res)
+        }else{
+            console.log(res)
+        }
+    }
+})
+</script>
+
+
+ -->
+<h1 id="title"></h1>
+<audio id="audio" src="" controls></audio>
+<img src="" id="img" alt="">
+<div id="lrc"></div>
+<div class="lyric_area">
+	<ul id="lyric"></ul>
+</div>
+<!-- 导入JQ -->
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+
+<script>
+    $.ajax({
+        url: 'https://api.gmit.vip/Api/Netease',
+        type: 'post',
+        dataType: 'json',
+        async: false,
+        data: {
+            format: 'json',
+            id: '1461930683',
+        },
+        beforeSend: function () {
+            //请求中执行的代码
+        },
+        complete: function () {
+            //请求完成执行的代码
+        },
+        error: function () {
+            //请求成功失败执行的代码
+        },
+        success: function (res) {
+            // 状态码 200 表示请求成功
+            if (res.code === 200) {
+                console.log(res)
+                document.getElementById('title').innerText = res.data.title
+                document.getElementById('lrc').innerText = res.data.lrc
+                document.getElementById('audio').src = res.data.url
+                document.getElementById('img').src = res.data.pic
+            } else {
+                console.log(res)
+            }
+        }
+    })
+</script>

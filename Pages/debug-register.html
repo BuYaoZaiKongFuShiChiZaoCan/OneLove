@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>注册功能调试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 注册功能调试</h1>
+    
+    <div class="test-section">
+        <h2>📊 服务器状态测试</h2>
+        <button onclick="testServer()">测试服务器连接</button>
+        <div id="server-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>🔐 注册API测试</h2>
+        <button onclick="testRegister()">测试注册API</button>
+        <div id="register-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📝 手动注册测试</h2>
+        <form id="manualForm">
+            <p><label>用户名: <input type="text" id="manualUsername" value="testuser3"></label></p>
+            <p><label>邮箱: <input type="email" id="manualEmail" value="test3@example.com"></label></p>
+            <p><label>密码: <input type="password" id="manualPassword" value="123456"></label></p>
+            <button type="submit">手动注册</button>
+        </form>
+        <div id="manual-result" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3000';
+
+        async function testServer() {
+            const resultDiv = document.getElementById('server-result');
+            resultDiv.innerHTML = '<span class="loading">正在测试服务器连接...</span>';
+            
+            try {
+                const response = await fetch(API_BASE);
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <span class="success">✅ 服务器连接成功！</span>
+                    <br>版本: ${data.version}
+                    <br>数据库状态: ${data.database}
+                    <br>时间: ${data.timestamp}
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ 服务器连接失败: ${error.message}</span>`;
+            }
+        }
+
+        async function testRegister() {
+            const resultDiv = document.getElementById('register-result');
+            resultDiv.innerHTML = '<span class="loading">正在测试注册API...</span>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: 'testuser2',
+                        email: 'test2@example.com',
+                        password: '123456'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <span class="success">✅ 注册API测试成功！</span>
+                        <br>消息: ${data.message}
+                        <br>用户ID: ${data.data.user.id}
+                        <br>用户名: ${data.data.user.username}
+                        <br>令牌: ${data.data.token.substring(0, 20)}...
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ 注册API测试失败: ${data.message}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ 注册API测试失败: ${error.message}</span>`;
+            }
+        }
+
+        document.getElementById('manualForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('manualUsername').value;
+            const email = document.getElementById('manualEmail').value;
+            const password = document.getElementById('manualPassword').value;
+            
+            const resultDiv = document.getElementById('manual-result');
+            resultDiv.innerHTML = '<span class="loading">正在注册...</span>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username,
+                        email,
+                        password
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <span class="success">✅ 注册成功！</span>
+                        <br>消息: ${data.message}
+                        <br>用户ID: ${data.data.user.id}
+                        <br>用户名: ${data.data.user.username}
+                        <br>令牌: ${data.data.token.substring(0, 20)}...
+                        <br><br>3秒后跳转到登录页面...
+                    `;
+                    
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 3000);
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ 注册失败: ${data.message}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ 注册失败: ${error.message}</span>`;
+            }
+        });
+
+        // 页面加载时自动测试服务器
+        window.onload = function() {
+            testServer();
+        };
+    </script>
+</body>
+</html> 

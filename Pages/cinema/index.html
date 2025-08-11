@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh_CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>观影院</title>
+        <style>
+            /* 去掉滚动条 */
+            ::-webkit-scrollbar {
+                display: none;
+            }
+
+            body {
+                width: 100%;
+                height: 100vh;
+                margin: 0;
+            }
+
+            body>* {
+                margin-left: auto;
+                margin-right: auto;
+                max-width: 1000px;
+            }
+
+            body>hr {
+                width: inherit;
+                max-width: 100%;
+                height: 4px;
+                background: rgba(0, 0, 0, 0.2);
+            }
+
+            #videoContent {
+                height: 100vh;
+                position: relative;
+            }
+
+            video {
+                margin: auto;
+                display: block;
+                width: 100vmin;
+                height: 100vmin;
+                /* padding: 2.5vmin; */
+                filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.7));
+            }
+
+            .videoInfo {
+                opacity: 0;
+                width: 100%;
+                padding: 1em;
+                color: white;
+                box-sizing: border-box;
+                background: linear-gradient(to bottom, black, transparent);
+                transition: all 0.3s;
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+
+            video:hover+.videoInfo {
+                opacity: 1;
+            }
+
+            h1 {
+                text-indent: 2em;
+            }
+
+            ol {
+                padding-inline: 0;
+                padding-bottom: 1em;
+            }
+
+            @keyframes liBox {
+                0% {
+                    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+                }
+
+                50% {
+                    box-shadow: inset 0 0 0 rgba(0, 0, 0, 0.2);
+                }
+
+                51% {
+                    box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
+                }
+            }
+
+            ol li {
+                display: flex;
+                height: 100px;
+                overflow: hidden;
+                border-radius: 1em;
+                margin-bottom: 2em;
+                padding-right: 3em;
+                flex-direction: row-reverse;
+                justify-content: space-between;
+                align-items: center;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+                transition: all .6s;
+                animation: liBox .9s;
+                position: relative;
+            }
+
+            @keyframes liBoxHover {
+                50% {
+                    box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
+                }
+
+                51% {
+                    box-shadow: inset 0 0 0 rgba(0, 0, 0, 0.2);
+                }
+
+                100% {
+                    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+                }
+            }
+
+            ol li:hover {
+                animation: liBoxHover .8s forwards;
+            }
+
+            ol li.visited {
+                color: #aaa;
+            }
+
+            ol li.visited::after {
+                content: "已看";
+                position: absolute;
+                top: 1em;
+                right: 1em;
+            }
+
+            ol li div h5 {
+                transition: all .6s;
+            }
+
+            ol li:hover div h5 {
+                font-size: 1em;
+            }
+
+            ol li img {
+                height: 100%;
+                border-radius: inherit;
+                transition: all .6s;
+                background: quadratic-bezier(0.5, 0, 0.5, 1);
+            }
+
+            ol li:hover img {
+                transform: scale(1.2);
+            }
+
+            ol li .currentVideo {
+                position: absolute;
+                top: 0;
+                left: 0;
+                color: white;
+                background: red;
+                padding: 5px 100px;
+                box-shadow: 0 0 10px red;
+                transform: rotate(-45deg) translateX(-82px) translateY(-67px);
+            }
+        </style>
+    </head>
+    <body>
+        <div id="videoContent">
+            <video src="" controls preload="metadata"><!-- poster="videoLoad.png" -->
+                <p>您正在适用的浏览器不支持video标签，推荐使用Chrome浏览器查看。</p>
+            </video>
+            <div class="videoInfo">
+                <h2 id="videoTitle"></h2>
+            </div>
+        </div>
+        <hr />
+        <h1>视频列表</h1>
+        <ol class="videoList">
+
+        </ol>
+        <script>
+            const videoList = document.querySelector(".videoList");
+            const videoTitle = document.querySelector("#videoTitle");
+            let videoInfo = [];
+            let videoStartUrl = `https://chennas.hh2022.cn:8920/Items/`;
+            let videoEndUrl = `/Download?api_key=08b0f0deb5774d6cb7c280d447b546a7`;
+            let videoListArr = [];
+
+            // 请求一个json文件
+            videoList.textContent = "加载中...";
+            fetch("https://api.hh2022.cn/video.php")
+                .then(res => res.json())
+                .then(res => {
+                    console.log(res);
+                    videoInfo = res;
+                    videoList.textContent = "";
+                    videoListArr = res;
+                    reset();
+                })
+                .catch(err => {
+                    console.log(err);
+                    videoList.textContent = "网络错误，列表加载失败！";
+                });
+
+            // 渲染列表到页面
+            function reset() {
+                // 创建文档片段
+                let fragment = document.createDocumentFragment();
+                for (let i = 0; i < videoInfo.length; i++) {
+                    let li = document.createElement("li");
+                    let div = document.createElement("div");
+                    let h5 = document.createElement("h5");
+                    let span = document.createElement("span");
+                    // 设置一个自定义属性
+                    li.setAttribute("itemUrl", videoStartUrl + videoInfo[i].id + videoEndUrl);
+                    // 设置显示名称
+                    h5.textContent = videoInfo[i].name;
+                    div.appendChild(h5);
+                    /* div.appendChild(span); */
+                    li.appendChild(div);
+                    let img = document.createElement("img");
+                    // 正则判断封面是否为空（有没有对应的链接 开头为http）
+                    if (videoInfo[i].img.match(/^http/)) {
+                        img.src = videoInfo[i].img;
+                    } else {
+                        img.src = "error.png";
+                        img.alt = "封面加载失败";
+                    }
+                    img.loading = "lazy";
+                    // 设置img的onerror事件
+                    img.onerror = function () {
+                        this.src = "error.png";
+                        this.alt = "封面加载失败";
+                    };
+                    // 把img和video放在li中
+                    li.appendChild(img);
+                    // 添加到文档片段
+                    fragment.appendChild(li);
+                    // video.src = videoInfo[i].url;
+                }
+                videoList.appendChild(fragment);
+
+                setCurrentVideo();
+            }
+
+            function setcurrentTime(currentTime, videoSrc) {
+                window.localStorage.setItem("videoCurrentTime", currentTime);
+                window.localStorage.setItem("videoUrl", videoSrc);
+            }
+
+            // 判断正在播放的视频的索引
+            function getCurrentVideoIndex() {
+                let videoUrl = window.localStorage.getItem("videoUrl");
+                for (let i = 0; i < videoListArr.length; i++) {
+                    if (videoUrl === videoStartUrl + videoListArr[i].id + videoEndUrl) {
+                        return i;
+                    }
+                }
+                return 0;
+            }
+            // 更新正在播放的视频
+            function setCurrentVideo() {
+                // 对上一个li标签添加已看过的样式
+                let currentVideoOld = document.querySelector("li:has(.currentVideo)");
+                if (currentVideoOld) {
+                    currentVideoOld.classList.add("visited");
+                }
+
+                // 删除上一次的标签
+                let currentVideoPseudoOld = document.querySelector(".currentVideo");
+                if (currentVideoPseudoOld) {
+                    currentVideoPseudoOld.remove();
+                }
+
+                let currentVideoIndex = getCurrentVideoIndex();
+                let currentVideo = document.querySelectorAll(".videoList>li")[currentVideoIndex];
+                // 创建一个伪元素
+                let currentVideoPseudo = document.createElement("pseudo");
+                currentVideoPseudo.textContent = "正在播放";
+                currentVideoPseudo.classList.add("currentVideo");
+                currentVideo.appendChild(currentVideoPseudo);
+                // console.log(currentVideoIndex);
+
+                // 设置标题
+                videoTitle.textContent = videoListArr[currentVideoIndex].name;
+            }
+
+            var video = document.querySelector("video");
+            // 当视频暂停时，自动播放
+            video.addEventListener("pause", function () {
+                setcurrentTime(video.currentTime, video.src);
+            });
+            // src改变时修改videoUrl
+            video.addEventListener("srcchange", function () {
+                window.localStorage.setItem("videoUrl", video.src);
+            });
+            // 视频播放结束触发事件
+            video.addEventListener("ended", function () {
+                // 跳转到下一集
+                let currentVideoIndex = getCurrentVideoIndex();
+                if (currentVideoIndex < videoListArr.length - 1) {
+                    video.src = videoStartUrl + videoListArr[currentVideoIndex + 1].id + videoEndUrl;
+                    video.play();
+                }
+                // 更新应用程序缓存
+                setcurrentTime(0, video.src);
+                // 更新页面显示
+                setCurrentVideo();
+            });
+            // 页面关闭触发事件
+            window.onbeforeunload = function () {
+                setcurrentTime(video.currentTime, video.src);
+            };
+            // 离开页面触发事件
+            window.onunload = function () {
+                setcurrentTime(video.currentTime, video.src);
+            };
+
+            // 页面加载触发事件
+            window.onload = function () {
+                if (window.localStorage.getItem("videoUrl")) {
+                    // 设置视频地址
+                    video.src = window.localStorage.getItem("videoUrl");
+                    // 获取视频播放进度
+                    var currentTime = window.localStorage.getItem("videoCurrentTime");
+                    // 跳转到指定播放进度
+                    video.currentTime = currentTime;
+                } else {
+                    setcurrentTime(0, videoStartUrl + "403716b135021b8f7b8acce874bb5ba1" + videoEndUrl);
+                    video.src = videoStartUrl + "403716b135021b8f7b8acce874bb5ba1" + videoEndUrl;
+                }
+            };
+
+            // 点击列表事件
+            videoList.addEventListener("click", function (e) {
+                console.log(e);
+                // 获取点击的li
+                let li = e.target.closest("li");
+                console.log(li);
+                // 获取li的自定义属性 itemUrl[视频地址]
+                let videoSrc = li.getAttribute("itemUrl");
+                // 设置视频地址
+                video.src = videoSrc;
+                // 设置应用程序
+                setcurrentTime(video.currentTime, video.src);
+                // 滚动到video元素
+                video.scrollIntoView({
+                    behavior: "smooth",
+                    block: "center",
+                    inline: "center"
+                });
+                // 播放视频
+                video.play();
+                setCurrentVideo();
+            });
+
+            console.log(`%c页面由 橙寻网络chennas 提供后端技术及储存支持`,
+                "font-size:20px; background:#FFF; color:#581845;padding:10px; border: 3px solid #581845;border-radius:10px;");
+        </script>
+    </body>
+</html>

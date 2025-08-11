@@ -1,0 +1,261 @@
+{
+  "project": "壹比零",
+  "task": "Pages目录文件重命名",
+  "date": "2025-07-30",
+  "description": "将Pages目录下的中文文件和文件夹重命名为符合规范的英文驼峰命名",
+  "status": "completed",
+  "renamedItems": {
+    "mainDirectoryFiles": [
+      {
+        "original": "联系我.html",
+        "new": "contactMe.html",
+        "description": "联系页面"
+      },
+      {
+        "original": "视频解析.html",
+        "new": "videoParser.html",
+        "description": "视频解析工具"
+      },
+      {
+        "original": "HTML样式生成器.html",
+        "new": "htmlStyleGenerator.html",
+        "description": "HTML样式生成器"
+      }
+    ],
+    "mainDirectoryFolders": [
+      {
+        "original": "聚会",
+        "new": "party",
+        "description": "聚会游戏相关"
+      },
+      {
+        "original": "影院",
+        "new": "cinema",
+        "description": "影院功能"
+      },
+      {
+        "original": "肤色测试",
+        "new": "skinColorTest",
+        "description": "肤色测试工具"
+      },
+      {
+        "original": "Lrc歌词制作",
+        "new": "lrcLyricMaker",
+        "description": "LRC歌词制作工具"
+      }
+    ],
+    "toolsDirectory": [
+      {
+        "original": "音乐播放器",
+        "new": "musicPlayer",
+        "description": "音乐播放器工具"
+      },
+      {
+        "original": "confession",
+        "new": "confession",
+        "description": "倾诉工具（已是英文）",
+        "note": "无需重命名"
+      },
+      {
+        "original": "loveMeDailySign",
+        "new": "loveMeDailySign",
+        "description": "爱我日签（已是英文）",
+        "note": "无需重命名"
+      }
+    ],
+    "partyDirectory": [
+      {
+        "original": "快问速答",
+        "new": "quickQuestionAnswer",
+        "description": "快问速答游戏"
+      },
+      {
+        "original": "真心话大冒险",
+        "new": "truthOrDare",
+        "description": "真心话大冒险游戏"
+      },
+      {
+        "original": "答案之书",
+        "new": "answerBook",
+        "description": "答案之书功能"
+      },
+      {
+        "original": "真心话大冒险数据.json.bak",
+        "new": "truthOrDareData.json.bak",
+        "description": "数据备份文件"
+      },
+      {
+        "original": "真心话大冒险数据清洗-重复项删除.py",
+        "new": "truthOrDareDataCleanup.py",
+        "description": "数据清洗脚本"
+      },
+      {
+        "original": "题库.json",
+        "new": "questionBank.json",
+        "description": "题库数据文件"
+      }
+    ],
+    "qfqDirectory": [
+      {
+        "original": "个人简历.html",
+        "new": "personalResume.html",
+        "description": "个人简历页面"
+      },
+      {
+        "original": "个人简历/",
+        "new": "personalResume/",
+        "description": "个人简历图片文件夹"
+      }
+    ],
+    "lrcLyricMakerDirectory": [
+      {
+        "original": "Lrc歌词制作.html",
+        "new": "lrcLyricMaker.html",
+        "description": "主页面文件"
+      }
+    ]
+  },
+  "currentStructure": {
+    "description": "当前Pages目录的完整结构，展示重命名后的文件组织情况",
+    "introduction": "此结构反映了重命名完成后的Pages目录布局，所有中文名称已转换为英文驼峰命名，便于跨平台开发和维护",
+    "Pages": {
+      "description": "Pages主目录 - 包含网站的所有页面和功能模块",
+      "files": {
+        "description": "主目录下的HTML文件",
+        "items": [
+          "contactMe.html",
+          "videoParser.html", 
+          "htmlStyleGenerator.html",
+          "GiveMoneyIncentives.html"
+        ]
+      },
+      "directories": {
+        "description": "主目录下的文件夹",
+        "items": [
+          "About",
+          "Tools", 
+          "party",
+          "cinema",
+          "skinColorTest",
+          "lrcLyricMaker",
+          "QFQ",
+          "userInfoSettingPage",
+          "img",
+          "SheAndI"
+        ]
+      },
+      "tools": {
+        "description": "Tools目录 - 工具集合模块",
+        "directories": {
+          "description": "工具子目录",
+          "items": [
+            "musicPlayer",
+            "confession", 
+            "loveMeDailySign",
+            "richTextEditorQuill",
+            "screenFlashlight"
+          ]
+        },
+        "files": {
+          "description": "工具配置文件",
+          "items": [
+            "categoryList.json",
+            "Tools list.json",
+            "ReadMe.md"
+          ]
+        }
+      },
+      "party": {
+        "description": "party目录 - 聚会游戏模块",
+        "files": {
+          "description": "聚会游戏相关文件",
+          "items": [
+            "index.html",
+            "questionBank.json",
+            "truthOrDareData.json.bak", 
+            "truthOrDareDataCleanup.py"
+          ]
+        },
+        "directories": {
+          "description": "聚会游戏子功能",
+          "items": [
+            "quickQuestionAnswer",
+            "truthOrDare",
+            "answerBook"
+          ]
+        }
+      },
+      "qfq": {
+        "description": "QFQ目录 - 个人简历模块",
+        "files": {
+          "description": "简历页面和样式文件",
+          "items": [
+            "personalResume.html",
+            "grjlStyle1.css",
+            "grjlStyle2.css",
+            "grjlStyle3.css"
+          ]
+        },
+        "directories": {
+          "description": "简历资源目录",
+          "items": [
+            "img",
+            "mp4"
+          ]
+        },
+        "img": {
+          "description": "图片资源子目录",
+          "directories": {
+            "description": "个人简历图片文件夹",
+            "items": [
+              "personalResume"
+            ]
+          }
+        }
+      },
+      "lrcLyricMaker": {
+        "description": "lrcLyricMaker目录 - LRC歌词制作工具",
+        "files": {
+          "description": "歌词制作相关文件",
+          "items": [
+            "lrcLyricMaker.html",
+            "style.css"
+          ]
+        },
+        "directories": {
+          "description": "JavaScript脚本目录",
+          "items": [
+            "js"
+          ]
+        }
+      }
+    }
+  },
+  "namingConventions": {
+    "camelCase": "所有重命名都使用 camelCase 驼峰命名法",
+    "semanticNaming": "文件名清晰表达功能用途",
+    "consistency": "保持原有的文件扩展名和目录结构",
+    "readability": "英文名称便于跨平台开发和维护"
+  },
+  "completionStats": {
+    "mainDirectoryFiles": "3/3 (100%)",
+    "mainDirectoryFolders": "4/4 (100%)",
+    "toolsDirectory": "1/1 (100%)",
+    "partyDirectory": "6/6 (100%)",
+    "qfqDirectory": "2/2 (100%)",
+    "lrcLyricMakerDirectory": "1/1 (100%)",
+    "overall": "17/17 (100%)"
+  },
+  "summary": {
+    "totalRenamed": 17,
+    "totalChecked": 17,
+    "successRate": "100%",
+    "status": "✅ 重命名工作已全部完成",
+    "benefits": [
+      "提高代码可读性",
+      "增强跨平台兼容性",
+      "符合国际开发规范",
+      "便于团队协作"
+    ]
+  }
+} 

@@ -1,0 +1,343 @@
+{
+    "Tools": [
+        {
+            "id": 1,
+            "name": "屏幕补光灯",
+            "EnglishName": "screenFlashlight",
+            "url": "screenFlashlight/index.html",
+            "icon": "fas fa-lightbulb",
+            "tags": [
+                "补光灯",
+                "屏幕补光灯",
+                "补光",
+                "护眼",
+                "照明"
+            ],
+            "category": {
+                "name": "实用工具",
+                "EnglishName": "utilityTools",
+                "description": "提升用户体验的实用工具",
+                "subCategory": [
+                    {
+                        "id": 1,
+                        "name": "护眼工具",
+                        "EnglishName": "eyeCare",
+                        "description": "保护眼睛健康的工具",
+                        "ofTheSameClass": [
+                            {
+                                "id": 1,
+                                "name": "屏幕优化",
+                                "EnglishName": "screenOptimization",
+                                "description": "优化屏幕显示效果的工具",
+                                "tools": [
+                                    {
+                                        "id": 1,
+                                        "name": "屏幕补光灯",
+                                        "EnglishName": "screenFlashlight",
+                                        "description": "为屏幕提供柔和光线的工具"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "status": {
+                "development": "completed",
+                "lastUpdated": "2025-08-05",
+                "version": "1.0.0",
+                "maintenance": "active"
+            },
+            "statistics": {
+                "usageCount": 0,
+                "lastUsed": null,
+                "rating": 0,
+                "downloads": 0
+            },
+            "createdAt": "2021-01-01",
+            "updatedAt": "2025-08-05",
+            "demand": "在光线不足的环境下使用电脑时，需要额外的屏幕补光来保护眼睛健康",
+            "function": "为屏幕提供柔和的光线，减少眼睛疲劳，提升使用体验",
+            "scene": "夜间使用电脑、光线不足的办公环境、长时间看屏幕的场景",
+            "method": "点击工具卡片进入页面，选择合适的光线强度和颜色，开始补光",
+            "limit": "需要浏览器支持，部分老旧设备可能无法正常使用",
+            "attention": "使用时间不宜过长，建议每隔一段时间休息眼睛",
+            "skill": "根据环境光线调整补光强度，选择暖色调光线更护眼",
+            "description": "屏幕补光灯工具，为您的屏幕提供柔和的光线，保护眼睛健康，提升使用体验"
+        },
+        {
+            "id": 2,
+            "name": "富文本编辑器",
+            "EnglishName": "richTextEditorQuill",
+            "url": "richTextEditorQuill/index.html",
+            "icon": "fas fa-edit",
+            "tags": [
+                "编辑器",
+                "富文本",
+                "文字处理",
+                "文档编辑"
+            ],
+            "category": {
+                "name": "办公工具",
+                "EnglishName": "officeTools",
+                "description": "提高办公效率的工具",
+                "subCategory": [
+                    {
+                        "id": 2,
+                        "name": "文字处理",
+                        "EnglishName": "textProcessing",
+                        "description": "文字编辑和处理工具",
+                        "ofTheSameClass": [
+                            {
+                                "id": 2,
+                                "name": "文档编辑",
+                                "EnglishName": "documentEditing",
+                                "description": "文档编辑和格式化工具",
+                                "tools": [
+                                    {
+                                        "id": 2,
+                                        "name": "富文本编辑器",
+                                        "EnglishName": "richTextEditorQuill",
+                                        "description": "基于Quill.js的现代化富文本编辑器"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "status": {
+                "development": "completed",
+                "lastUpdated": "2025-08-05",
+                "version": "1.0.0",
+                "maintenance": "active"
+            },
+            "statistics": {
+                "usageCount": 0,
+                "lastUsed": null,
+                "rating": 0,
+                "downloads": 0
+            },
+            "createdAt": "2021-01-01",
+            "updatedAt": "2025-08-05",
+            "demand": "需要在线编辑富文本内容，支持多种格式和样式",
+            "function": "提供现代化的富文本编辑功能，支持多种格式和样式",
+            "scene": "在线文档编辑、内容创作、文字处理等场景",
+            "method": "点击工具卡片进入编辑器，开始编辑富文本内容",
+            "limit": "需要现代浏览器支持，部分功能可能受浏览器限制",
+            "attention": "编辑内容时注意保存，避免数据丢失",
+            "skill": "熟悉快捷键可以提高编辑效率，合理使用格式功能",
+            "description": "基于Quill.js的现代化富文本编辑器，支持多种格式和样式，提供流畅的编辑体验"
+        },
+        {
+            "id": 3,
+            "name": "音乐播放器",
+            "EnglishName": "musicPlayer",
+            "url": "musicPlayer/index.html",
+            "icon": "fas fa-music",
+            "tags": [
+                "音乐",
+                "播放器",
+                "音频",
+                "娱乐"
+            ],
+            "category": {
+                "name": "娱乐工具",
+                "EnglishName": "entertainmentTools",
+                "description": "提供娱乐体验的工具",
+                "subCategory": [
+                    {
+                        "id": 3,
+                        "name": "音频播放",
+                        "EnglishName": "audioPlayback",
+                        "description": "音频播放和处理工具",
+                        "ofTheSameClass": [
+                            {
+                                "id": 3,
+                                "name": "音乐工具",
+                                "EnglishName": "musicTools",
+                                "description": "音乐相关的工具",
+                                "tools": [
+                                    {
+                                        "id": 3,
+                                        "name": "音乐播放器",
+                                        "EnglishName": "musicPlayer",
+                                        "description": "在线音乐播放器"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "status": {
+                "development": "completed",
+                "lastUpdated": "2025-08-05",
+                "version": "1.0.0",
+                "maintenance": "active"
+            },
+            "statistics": {
+                "usageCount": 0,
+                "lastUsed": null,
+                "rating": 0,
+                "downloads": 0
+            },
+            "createdAt": "2021-01-01",
+            "updatedAt": "2025-08-05",
+            "demand": "需要在线播放音乐，支持多种音频格式",
+            "function": "提供在线音乐播放功能，支持多种音频格式",
+            "scene": "在线音乐欣赏、背景音乐播放、音频播放等场景",
+            "method": "点击工具卡片进入播放器，选择音乐开始播放",
+            "limit": "需要网络连接，部分音频格式可能不支持",
+            "attention": "注意音量控制，避免影响他人",
+            "skill": "使用播放列表功能可以更好地管理音乐",
+            "description": "在线音乐播放器，支持多种格式，享受高品质音乐体验"
+        },
+        {
+            "id": 4,
+            "name": "表白墙",
+            "EnglishName": "confession",
+            "url": "confession/index.html",
+            "icon": "fas fa-heart",
+            "tags": [
+                "表白",
+                "情感",
+                "社交",
+                "分享"
+            ],
+            "category": {
+                "name": "社交工具",
+                "EnglishName": "socialTools",
+                "description": "促进社交互动的工具",
+                "subCategory": [
+                    {
+                        "id": 4,
+                        "name": "情感表达",
+                        "EnglishName": "emotionalExpression",
+                        "description": "情感表达和分享工具",
+                        "ofTheSameClass": [
+                            {
+                                "id": 4,
+                                "name": "社交分享",
+                                "EnglishName": "socialSharing",
+                                "description": "社交分享和互动工具",
+                                "tools": [
+                                    {
+                                        "id": 4,
+                                        "name": "表白墙",
+                                        "EnglishName": "confession",
+                                        "description": "记录和分享真挚情感的平台"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "status": {
+                "development": "completed",
+                "lastUpdated": "2025-08-05",
+                "version": "1.0.0",
+                "maintenance": "active"
+            },
+            "statistics": {
+                "usageCount": 0,
+                "lastUsed": null,
+                "rating": 0,
+                "downloads": 0
+            },
+            "createdAt": "2021-01-01",
+            "updatedAt": "2025-08-05",
+            "demand": "需要记录和分享真挚情感的平台",
+            "function": "提供情感记录和分享功能，让爱意传递",
+            "scene": "情感表达、纪念日记录、美好时光分享等场景",
+            "method": "点击工具卡片进入表白墙，记录和分享情感",
+            "limit": "需要用户登录，内容需要遵守社区规范",
+            "attention": "分享内容时注意隐私保护，遵守社区规范",
+            "skill": "定期记录美好时光，让情感更有意义",
+            "description": "记录美好时光，分享真挚情感，让爱意传递"
+        },
+        {
+            "id": 5,
+            "name": "每日签到",
+            "EnglishName": "loveMeDailySign",
+            "url": "loveMeDailySign/index.html",
+            "icon": "fas fa-calendar-check",
+            "tags": [
+                "签到",
+                "习惯",
+                "记录",
+                "坚持"
+            ],
+            "category": {
+                "name": "生活工具",
+                "EnglishName": "lifeTools",
+                "description": "提升生活质量的工具",
+                "subCategory": [
+                    {
+                        "id": 5,
+                        "name": "习惯养成",
+                        "EnglishName": "habitFormation",
+                        "description": "帮助养成良好习惯的工具",
+                        "ofTheSameClass": [
+                            {
+                                "id": 5,
+                                "name": "生活记录",
+                                "EnglishName": "lifeRecording",
+                                "description": "记录生活点滴的工具",
+                                "tools": [
+                                    {
+                                        "id": 5,
+                                        "name": "每日签到",
+                                        "EnglishName": "loveMeDailySign",
+                                        "description": "坚持每日签到，记录生活点滴"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            "status": {
+                "development": "completed",
+                "lastUpdated": "2025-08-05",
+                "version": "1.0.0",
+                "maintenance": "active"
+            },
+            "statistics": {
+                "usageCount": 0,
+                "lastUsed": null,
+                "rating": 0,
+                "downloads": 0
+            },
+            "createdAt": "2021-01-01",
+            "updatedAt": "2025-08-05",
+            "demand": "需要培养良好习惯，记录生活点滴",
+            "function": "提供每日签到功能，帮助养成良好习惯",
+            "scene": "习惯养成、生活记录、坚持打卡等场景",
+            "method": "点击工具卡片进入签到页面，完成每日签到",
+            "limit": "需要用户登录，需要坚持使用",
+            "attention": "坚持每日签到，不要中断，培养良好习惯",
+            "skill": "设定提醒功能，帮助坚持签到",
+            "description": "坚持每日签到，记录生活点滴，培养良好习惯"
+        }
+    ],
+    "metadata": {
+        "lastUpdated": "2025-08-05",
+        "totalTools": 5,
+        "categories": 4,
+        "version": "2.0.0",
+        "autoUpdate": {
+            "enabled": true,
+            "lastCheck": "2025-08-05",
+            "updateInterval": "daily",
+            "updateMethod": "automated"
+        },
+        "statistics": {
+            "totalUsage": 0,
+            "averageRating": 0,
+            "mostPopular": null,
+            "recentlyUsed": []
+        }
+    }
+}

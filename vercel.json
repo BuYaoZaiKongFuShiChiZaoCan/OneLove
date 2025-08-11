@@ -1,0 +1,88 @@
+{
+  "version": 2,
+  "name": "onelove-app",
+  "builds": [
+    {
+      "src": "OneLove-backend/server.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "Pages/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "styles/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "images/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "font/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "webfonts/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "music/**/*",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "*.json",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "OneLove-backend/server.js"
+    },
+    {
+      "src": "/Pages/(.*)",
+      "dest": "/Pages/$1"
+    },
+    {
+      "src": "/styles/(.*)",
+      "dest": "/styles/$1"
+    },
+    {
+      "src": "/images/(.*)",
+      "dest": "/images/$1"
+    },
+    {
+      "src": "/font/(.*)",
+      "dest": "/font/$1"
+    },
+    {
+      "src": "/webfonts/(.*)",
+      "dest": "/webfonts/$1"
+    },
+    {
+      "src": "/music/(.*)",
+      "dest": "/music/$1"
+    },
+    {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
+      "dest": "/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "OneLove-backend/server.js": {
+      "maxDuration": 30
+    }
+  }
+} 

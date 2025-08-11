@@ -1,0 +1,283 @@
+:root {
+    --setTime: .6s;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    background: #F8FAFE;
+    display: flex;
+    flex-direction: column;
+}
+
+header {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0px;
+    display: flex;
+    align-items: center;
+    background: #F8FAFE;
+    border-bottom: 1px solid #aaa;
+    z-index: 1;
+    padding: 10px;
+    flex-grow: 0.2;
+}
+
+header h1 {
+    margin-left: 40px;
+    -webkit-margin-before: 0;
+    margin-block-start: 0;
+    -webkit-margin-after: 0;
+    margin-block-end: 0;
+}
+
+header div {
+    margin-left: auto;
+}
+
+#音乐显示 {
+    text-align: center;
+    margin: 60px 0 30px;
+}
+
+#音乐显示 audio {
+    min-width: 25%;
+}
+
+main {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-grow: 1;
+}
+
+main>div {
+    height: 600px;
+    margin: 0 5px;
+    min-width: 50px;
+    overflow: hidden;
+    background: #aaa;
+    border-radius: 10px;
+    transition: all var(--setTime);
+    position: relative;
+}
+
+main>div.min {
+    width: 70px;
+}
+
+main>div.max {
+    width: 90%;
+}
+
+main>div .buZhou {
+    width: 50px;
+    height: 50px;
+    color: white;
+    margin: 10px auto;
+    line-height: 50px;
+    text-align: center;
+    border-radius: 50%;
+    position: relative;
+    box-sizing: border-box;
+    background: rebeccapurple;
+}
+
+main>div .content {
+    padding: 30px 20px;
+    box-sizing: border-box;
+    height: calc(100% - 70px);
+    background: rgba(255, 255, 255, .2);
+    transition: all var(--setTime);
+    overflow-x: hidden;
+}
+
+main>div.min .content {
+    opacity: .03;
+}
+
+main>div.max .content {
+    opacity: 1;
+}
+
+main textarea {
+    width: 100%;
+    height: calc(100% - 60px);
+}
+
+main .max .buZhou::after {
+    transition: all .6s;
+    position: absolute;
+    right: -5rem;
+}
+
+main #歌词编辑.max .buZhou#stepTwo::after {
+    content: '歌词编辑';
+}
+
+main #歌词预览 .content .lrcHead {
+    margin-top: 20px;
+    background: #ccc;
+    box-sizing: border-box;
+    padding: 10px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+main #歌词预览 .content .lrcHead span:last-child {
+    float: right;
+}
+
+main #歌词预览 .content #lrcList {
+    background: #ccc;
+    -webkit-margin-before: 2px;
+    margin-block-start: 2px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+main #歌词预览 .content #lrcList li {
+    margin: .1rem;
+}
+
+main #歌词预览 .content #lrcList li.active {
+    background: #daa;
+}
+
+main #歌词预览 .content #lrcList li .lrc-text {
+    display: flex;
+    justify-content: space-between;
+    padding: .3rem;
+}
+
+main #歌词预览 .content #lrcList li .lrc-text>div {
+    display: inline-block;
+}
+
+main #歌词预览 .content details #metaMessage {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    /* 列数自适应，最小宽度200px */
+}
+
+main #歌词预览 .content details #metaMessage>div {
+    margin-right: 40px;
+    -moz-text-align-last: justify;
+    text-align-last: justify;
+}
+
+main #歌词预览 .content details #metaMessage>div input {
+    float: right;
+    -moz-text-align-last: left;
+    text-align-last: left;
+}
+
+main #歌词预览 .content details #metaMessage div:has(input:required) label::after {
+    content: '*';
+    color: red;
+    float: left;
+}
+
+main #歌词预览 .content #tag,
+main #歌词预览 .content #lastItem {
+    position: absolute;
+    width: 56px;
+    height: 56px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 50%;
+    text-decoration: none;
+    transition: all .3s ease-in-out;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    user-select: none;
+    -ms-user-select: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+}
+
+main #歌词预览 .content #tag:active,
+main #歌词预览 .content #lastItem:active {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform: translateY(2px);
+
+}
+
+main #歌词预览 .content #tag {
+    background: #f44336;
+}
+
+main #歌词预览 .content #lastItem {
+    background: #FF4500;
+}
+
+main #歌词预览 .content #tag:hover {
+    font-size: 16px;
+    color: white;
+    filter: opacity(.9);
+    /* 悬停颜色 */
+}
+
+main #歌词预览 .content #tag {
+    left: 52%;
+    bottom: 10px;
+    transform: translateY(-4%);
+}
+
+main #歌词预览 .content #lastItem {
+    left: 48%;
+    bottom: 10px;
+    transform: translateY(-4%);
+}
+
+main #歌词预览.max .buZhou#stepThree::after {
+    content: '打点';
+}
+
+main #导出歌词 .content dl dt {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 60%;
+    margin: auto;
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+main #导出歌词 .content dl dt:nth-of-type(odd) {
+    background: #cccccc7f;
+    border-radius: 10px;
+}
+
+main #导出歌词 .content #Export {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    border-radius: 50%;
+    text-align: center;
+    background: aliceblue;
+    transform: translateX(-50%) translateY(-50%);
+}
+
+main #导出歌词.max .buZhou#stepFour::after {
+    content: '导出配置';
+}
+
+footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 0.8;
+}
