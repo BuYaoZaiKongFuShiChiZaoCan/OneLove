@@ -1,7 +1,7 @@
 setTimeout(() => {
   const localHosts = ['127.0.0.1', 'localhost', '0.0.0.0'];
   if (!localHosts.some(host => origin.includes(host))) {
-    console.clear();
+    // console.clear();
   }
   console.group('caiDan');
   console.log(
