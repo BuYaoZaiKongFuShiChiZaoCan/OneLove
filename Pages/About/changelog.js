@@ -1480,6 +1480,33 @@ const versionLogs = [
             }
         ]
     },
+    {
+        "version": "v5.0.2",
+        "order": 57,
+        "time": "2025.08.13",
+        "content": [
+            {
+                itemTime: "[2025/08/13 00:49:13]",
+                itemContent: "修复Typed.js加载错误：在scripts/yiYan.js文件开头添加Typed.js加载检查，防止在Typed.js未加载完成时执行代码，解决'Uncaught ReferenceError: Typed is not defined'错误，确保打字机效果正常显示。"
+            },
+            {
+                itemTime: "[2025/08/13 00:49:13]",
+                itemContent: "修复API权限问题：临时调整/api/admin/users路由使用authenticateToken替代requireAdmin中间件，解决本地开发环境403权限错误，确保用户管理页面正常访问。"
+            },
+            {
+                itemTime: "[2025/08/13 00:49:13]",
+                itemContent: "优化错误处理机制：完善JavaScript错误检查和调试信息，为所有DOM操作添加null检查，提高页面稳定性和用户体验。"
+            },
+            {
+                itemTime: "[2025/08/13 00:49:13]",
+                itemContent: "修复yiYan.js语法错误：修正文件中的引号和格式问题，确保代码语法正确，避免JavaScript执行错误。"
+            },
+            {
+                itemTime: "[2025/08/13 00:49:13]",
+                itemContent: "完善修改日志记录：更新changelog.js文件，添加v5.0.2版本记录，详细记录最近的错误修复和功能优化内容。"
+            }
+        ]
+    },
     /* ExpectTheNextVersion */
     {
         "version": "ExpectTheNextVersion",

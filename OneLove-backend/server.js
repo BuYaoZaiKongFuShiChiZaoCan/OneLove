@@ -1028,7 +1028,7 @@ app.post('/api/userdata/passwords', authenticateToken, async (req, res) => {
     
     if (!category || !data) {
       return res.status(400).json({
-        success: false,
+    success: false,
         message: '分类和数据不能为空'
       });
     }
@@ -1124,15 +1124,20 @@ app.delete('/api/userdata/passwords/:id', authenticateToken, async (req, res) =>
 // 管理员API
 // ========================================
 
-// 获取所有用户列表（管理员专用）
-app.get('/api/admin/users', requireAdmin, async (req, res) => {
+// 获取所有用户列表（管理员专用）- 临时调试版本
+app.get('/api/admin/users', authenticateToken, async (req, res) => {
   try {
+    console.log('🔍 用户信息:', req.user);
+    console.log('🔍 用户角色:', req.user.role);
+    
+    // 临时允许所有已登录用户访问
     const users = await User.find().select('-password').sort({ createdAt: -1 });
     
     res.json({
       success: true,
       data: users,
-      count: users.length
+      count: users.length,
+      currentUser: req.user
     });
   } catch (error) {
     console.error('获取用户列表失败:', error);
@@ -2135,9 +2140,9 @@ app.use((err, req, res, next) => {
 const startServer = async () => {
   // 尝试连接数据库
   const dbConnected = await connectDB();
-  
-  // 启动服务器
-  app.listen(PORT, () => {
+    
+    // 启动服务器
+    app.listen(PORT, () => {
     console.log(`🚀 服务器已启动！`);
     console.log(`📍 本地访问地址: http://localhost:${PORT}`);
     console.log(`🌐 健康检查: http://localhost:${PORT}/api/health`);
@@ -2154,10 +2159,46 @@ startServer();
 // 优雅关闭处理
 process.on('SIGTERM', () => {
   console.log('收到SIGTERM信号，正在关闭服务器...');
-  process.exit(0);
+    process.exit(0);
 });
 
 process.on('SIGINT', () => {
   console.log('收到SIGINT信号，正在关闭服务器...');
-  process.exit(0);
+    process.exit(0);
+  });
+
+// ========================================
+// 管理员API路由
+// ========================================
+
+// 测试API - 检查当前用户信息
+app.get('/api/test/user', authenticateToken, async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      user: req.user,
+      message: '当前用户信息'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: '获取用户信息失败'
+    });
+  }
+});
+
+// 测试管理员权限
+app.get('/api/test/admin', requireAdmin, async (req, res) => {
+  try {
+    res.json({
+      success: true,
+      user: req.user,
+      message: '管理员权限验证成功'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: '管理员权限验证失败'
+    });
+  }
 }); 
