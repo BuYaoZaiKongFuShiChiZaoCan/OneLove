@@ -1,44 +1,11 @@
 {
   "version": 2,
   "name": "onelove-app",
-  "builds": [
-    {
-      "src": "OneLove-backend/server.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "Pages/**/*",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "styles/**/*",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "images/**/*",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "font/**/*",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "webfonts/**/*",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "music/**/*",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "*.json",
-      "use": "@vercel/static"
+  "functions": {
+    "OneLove-backend/server.js": {
+      "maxDuration": 30
     }
-  ],
+  },
   "routes": [
     {
       "src": "/api/(.*)",
