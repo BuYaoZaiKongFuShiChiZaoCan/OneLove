@@ -1504,6 +1504,38 @@ const versionLogs = [
             {
                 itemTime: "[2025/08/13 00:49:13]",
                 itemContent: "完善修改日志记录：更新changelog.js文件，添加v5.0.2版本记录，详细记录最近的错误修复和功能优化内容。"
+            },
+            {
+                itemTime: "[2025/08/13 22:08:09]",
+                itemContent: "修复manifest.json语法错误：在根目录创建正确的manifest.json文件，解决PWA应用配置问题，确保应用清单文件正确加载。"
+            },
+            {
+                itemTime: "[2025/08/13 22:08:09]",
+                itemContent: "修复Typed.js文件404错误：修改.gitignore文件添加例外规则，强制添加typed.umd.js文件到Git仓库，确保文件能被正确部署到生产环境。"
+            },
+            {
+                itemTime: "[2025/08/13 22:08:09]",
+                itemContent: "配置Netlify部署：删除Vercel相关文件（vercel.json、api/index.js、DEPLOYMENT.md、deploy.ps1），创建netlify.toml配置文件，支持Netlify平台部署。"
+            },
+            {
+                itemTime: "[2025/08/13 22:08:09]",
+                itemContent: "创建部署指南：编写NETLIFY_DEPLOYMENT.md详细部署文档，包含前端部署、后端部署、API代理配置、环境变量设置等完整步骤。"
+            },
+            {
+                itemTime: "[2025/08/13 22:08:09]",
+                itemContent: "实现API配置管理：创建scripts/config.js配置文件，支持开发环境和生产环境的API地址动态切换，更新前端代码使用配置文件中的API地址。"
+            },
+            {
+                itemTime: "[2025/08/13 22:08:09]",
+                itemContent: "更新前端API调用：修改index.html中的API调用，使用配置文件中的动态API地址，支持不同部署环境的无缝切换。"
+            },
+            {
+                itemTime: "[2025/08/13 22:08:09]",
+                itemContent: "创建部署脚本：编写deploy-netlify.ps1 PowerShell脚本，自动化Netlify部署流程，包含环境检查、代码提交、部署指导等功能。"
+            },
+            {
+                itemTime: "[2025/08/13 22:08:09]",
+                itemContent: "优化部署架构：采用前后端分离架构，前端部署到Netlify（免费、稳定），后端部署到Railway（支持Node.js），确保国内访问稳定性。"
             }
         ]
     },
