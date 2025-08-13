@@ -292,7 +292,7 @@
 						const apiBaseUrl = window.AboutConfig?.apiBaseUrl || '/api';
 						const response = await fetch(`${apiBaseUrl}/changelog?limit=100`);
 						const result = await response.json();
-
+						
 						if (result.success && result.data.changelogs) {
 							const versionLogs = result.data.changelogs;
 							renderTimeline('versionLogContainer', versionLogs, {
@@ -307,7 +307,7 @@
 						}
 					} catch (error) {
 						console.error('加载changelog失败:', error);
-						document.getElementById('versionLogContainer').innerHTML =
+						document.getElementById('versionLogContainer').innerHTML = 
 							'<div style="text-align: center; padding: 20px; color: #ff6b6b;">' +
 							'<i class="fas fa-exclamation-triangle"></i> 加载版本信息失败，请稍后重试' +
 							'</div>';
@@ -411,7 +411,15 @@
 							contentDiv.appendChild(ol);
 						} else {
 							// 其他内容直接显示
-							contentDiv.textContent = item[contentField];
+							if (Array.isArray(item[contentField])) {
+								item[contentField].forEach(content => {
+									const p = document.createElement('p');
+									p.innerHTML = content.itemContent || content;
+									contentDiv.appendChild(p);
+								});
+							} else {
+								contentDiv.innerHTML = item[contentField];
+							}
 						}
 
 						rightDiv.appendChild(contentDiv);
@@ -472,8 +480,33 @@
 					}
 				}
 
-				// 页面加载完成后获取changelog数据
-				document.addEventListener('DOMContentLoaded', function () {
+				// 页面加载完成后初始化所有时间轴
+				document.addEventListener('DOMContentLoaded', function() {
+					// 渲染My past时间轴
+					if (typeof timelineData !== 'undefined' && timelineData.myPastData) {
+						renderTimeline('myPastContainer', timelineData.myPastData, {
+							iconText: '📅',
+							titleField: 'title',
+							timeField: 'time',
+							contentField: 'content',
+							imagesField: 'images',
+							videosField: 'videos'
+						});
+					}
+
+					// 渲染调经时间轴
+					if (typeof timelineData !== 'undefined' && timelineData.healthData) {
+						renderTimeline('healthContainer', timelineData.healthData, {
+							iconText: '💊',
+							titleField: 'title',
+							timeField: 'time',
+							contentField: 'content',
+							imagesField: 'images',
+							videosField: 'videos'
+						});
+					}
+
+					// 加载changelog数据
 					loadChangelogFromAPI();
 				});
 			</script>
