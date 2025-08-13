@@ -107,7 +107,7 @@
 	</script>
 	<!-- SEO结束 -->
 	<!-- PWA开始 manifest清单、告诉浏览器安装一些应用信息 -->
-	<link rel="manifest" href="./scripts/manifest.json" />
+	<link rel="manifest" href="./manifest.json" />
 </head>
 
 <body>
@@ -883,9 +883,6 @@
 	</script>
 	<!-- 窗口 -->
 	<script src="./scripts/window.on.js"></script>
-	<!-- 彩蛋 -->
-	<script async src="./scripts/caiDan.js"></script>
-	<!-- 脚本独立运行，无依赖	❌ 不必要，可考虑  -->
 	<!-- 最大化窗口 -->
 	<script src="./scripts/maxScreen.js" defer></script>
 	<!-- Click on the pop-up text -->
@@ -2077,6 +2074,9 @@
 
 		})();
 	</script>
+	
+	<!-- 彩蛋 最后加载 -->
+	<script async src="./scripts/caiDan.js"></script>
 </body>
 
 </html>

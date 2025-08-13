@@ -100,9 +100,16 @@ window.musicList.addEventListener('click', function (e) {
 
 let mErrTimeout = null;
 let lastChange = "nextSong";
+let errorCount = 0;
 // 音乐加载错误
 function MusicError() {
-    tanChuang('加载错误，即将自动切换', 2000);
+    errorCount++;
+    if (errorCount > 3) {
+        tanChuang('加载错误次数过多，已暂停', 2000);
+        pauseSong();
+        errorCount = 0;
+        return;
+    }
     clearTimeout(mErrTimeout);
     title.textContent = '已暂停';
     mErrTimeout = setTimeout(() => {
