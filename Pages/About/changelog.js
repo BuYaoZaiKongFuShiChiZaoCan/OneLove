@@ -1567,6 +1567,10 @@ const versionLogs = [
         "content": [
             {
                 itemTime: null,
+                itemContent: "预计后续会增加论坛、同源标签页互通、muted视频静音播放（包括其它页面）等功能、页面暗亮色，多语言"
+            },
+            {
+                itemTime: null,
                 itemContent: "数据看板页面"
             },
             {
@@ -1645,3 +1649,8 @@ const versionLogs = [
         ]
     }
 ];
+
+// 导出数据供Node.js使用
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { versionLogs };
+}
