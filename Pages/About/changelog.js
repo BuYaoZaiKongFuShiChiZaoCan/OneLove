@@ -1536,6 +1536,26 @@ const versionLogs = [
             {
                 itemTime: "[2025/08/13 22:08:09]",
                 itemContent: "优化部署架构：采用前后端分离架构，前端部署到Netlify（免费、稳定），后端部署到Railway（支持Node.js），确保国内访问稳定性。"
+            },
+            {
+                itemTime: "[2025/08/13 22:36:51]",
+                itemContent: "修复config变量冲突：将scripts/audio.js中的config变量重命名为observerConfig，避免与scripts/config.js中的config变量冲突，解决'Identifier config has already been declared'错误。"
+            },
+            {
+                itemTime: "[2025/08/13 22:36:51]",
+                itemContent: "解决CDN资源加载失败：创建本地styles/bootstrap.min.css文件替代Bootstrap CDN，将Font Awesome CDN替换为本地文件，修复注册页面资源加载超时问题。"
+            },
+            {
+                itemTime: "[2025/08/13 22:36:51]",
+                itemContent: "修复HTTPS/HTTP混合内容错误：更新Pages/register.html中的API调用，使用配置文件中的动态API地址，解决Mixed Content安全策略阻止HTTP请求的问题。"
+            },
+            {
+                itemTime: "[2025/08/13 22:36:51]",
+                itemContent: "完善配置文件引用：在Pages/register.html中添加scripts/config.js引用，确保注册页面能正确使用配置文件中的API地址设置。"
+            },
+            {
+                itemTime: "[2025/08/13 22:36:51]",
+                itemContent: "优化资源路径：修复注册页面中Bootstrap和Font Awesome文件的相对路径，确保在Netlify部署环境下能正确加载本地资源文件。"
             }
         ]
     },
