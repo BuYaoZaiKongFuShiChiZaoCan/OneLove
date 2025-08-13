@@ -108,7 +108,7 @@
 	<!-- SEO结束 -->
 	<!-- PWA开始 manifest清单、告诉浏览器安装一些应用信息 -->
 	<link rel="manifest" href="./manifest.json" />
-	
+
 	<!-- 配置文件 -->
 	<script src="./scripts/config.js"></script>
 </head>
@@ -540,7 +540,7 @@
 		<audio src="./time/秒针.mp3" id="seconds" preload="auto"></audio>
 		<span id="secondPaused">秒针声音：关(默认)</span>
 		<span>忍一时风平浪静、退一步越想越气</span>
-		
+
 		<!-- 个人中心集成 -->
 		<div class="side-menu-dashboard" id="sideMenuDashboard">
 			<!-- 用户信息区域 -->
@@ -565,59 +565,59 @@
 					</a>
 				</div>
 			</div>
-		
-		<!-- 数据统计区域 -->
-		<div class="side-menu-stats" id="sideMenuStats" style="display: none;">
-			<h3><i class="fas fa-chart-bar"></i> 数据统计</h3>
-			<div class="stats-grid">
-				<div class="stat-card">
-					<div class="stat-number" id="totalData">0</div>
-					<div class="stat-label">总数据</div>
-				</div>
-				<div class="stat-card">
-					<div class="stat-number" id="passwordCount">0</div>
-					<div class="stat-label">密码</div>
-				</div>
-				<div class="stat-card">
-					<div class="stat-number" id="phoneCount">0</div>
-					<div class="stat-label">电话</div>
-				</div>
-				<div class="stat-card">
-					<div class="stat-number" id="noteCount">0</div>
-					<div class="stat-label">笔记</div>
+
+			<!-- 数据统计区域 -->
+			<div class="side-menu-stats" id="sideMenuStats" style="display: none;">
+				<h3><i class="fas fa-chart-bar"></i> 数据统计</h3>
+				<div class="stats-grid">
+					<div class="stat-card">
+						<div class="stat-number" id="totalData">0</div>
+						<div class="stat-label">总数据</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-number" id="passwordCount">0</div>
+						<div class="stat-label">密码</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-number" id="phoneCount">0</div>
+						<div class="stat-label">电话</div>
+					</div>
+					<div class="stat-card">
+						<div class="stat-number" id="noteCount">0</div>
+						<div class="stat-label">笔记</div>
+					</div>
 				</div>
 			</div>
-		</div>
-		
-		<!-- 快速操作区域 -->
-		<div class="side-menu-actions" id="sideMenuActions" style="display: none;">
-			<h3><i class="fas fa-tools"></i> 快速操作</h3>
-			<div class="action-buttons">
-				<a href="#" class="btn-action" id="addPasswordBtn">
-					<i class="fas fa-key"></i> 添加密码
-				</a>
-				<a href="#" class="btn-action" id="addPhoneBtn">
-					<i class="fas fa-phone"></i> 添加电话
-				</a>
-				<a href="#" class="btn-action" id="addNoteBtn">
-					<i class="fas fa-sticky-note"></i> 添加笔记
-				</a>
-				<button class="btn-action" onclick="showRestReminder()">
-					<i class="fas fa-clock"></i> 休息提醒
-				</button>
-				<button class="btn-action" onclick="window.location.href='Pages/Tools/'">
-					<i class="fas fa-tools"></i> 工具集合
-				</button>
-				<button class="btn-action" onclick="window.location.href='Pages/About/About.html'">
-					<i class="fas fa-info-circle"></i> 关于我们
-				</button>
+
+			<!-- 快速操作区域 -->
+			<div class="side-menu-actions" id="sideMenuActions" style="display: none;">
+				<h3><i class="fas fa-tools"></i> 快速操作</h3>
+				<div class="action-buttons">
+					<a href="#" class="btn-action" id="addPasswordBtn">
+						<i class="fas fa-key"></i> 添加密码
+					</a>
+					<a href="#" class="btn-action" id="addPhoneBtn">
+						<i class="fas fa-phone"></i> 添加电话
+					</a>
+					<a href="#" class="btn-action" id="addNoteBtn">
+						<i class="fas fa-sticky-note"></i> 添加笔记
+					</a>
+					<button class="btn-action" onclick="showRestReminder()">
+						<i class="fas fa-clock"></i> 休息提醒
+					</button>
+					<button class="btn-action" onclick="window.location.href='Pages/Tools/'">
+						<i class="fas fa-tools"></i> 工具集合
+					</button>
+					<button class="btn-action" onclick="window.location.href='Pages/About/About.html'">
+						<i class="fas fa-info-circle"></i> 关于我们
+					</button>
 					<a href="Pages/admin/dashboard.html" class="btn-action" id="adminPanelBtn" style="display: none;">
 						<i class="fas fa-tachometer-alt"></i> 管理中心
 					</a>
+				</div>
 			</div>
 		</div>
-	</div>
-		
+
 		<div>
 			<b>快捷键</b><br /><kbd>?/</kbd> 播放 暂停<br /><kbd>.&lt;</kbd>
 			下一首<br /><kbd>,&gt;</kbd> 上一首<br /><kbd>←</kbd> 后退5秒<br /><kbd>→</kbd>
@@ -1530,7 +1530,7 @@
 						countdownElement.textContent = `剩余时间: ${newMinutes}:${newSeconds.toString().padStart(2, '0')}`;
 
 						console.log(`⏰ 减少时间: ${currentMinutes}:${currentSeconds.toString().padStart(2, '0')} → ${newMinutes}:${newSeconds.toString().padStart(2, '0')} (减少${reducedSeconds}秒)`);
-						
+
 						// 显示成功提示
 						showToast('时间已减少20%', 'success');
 					} else {
@@ -1563,7 +1563,7 @@
 					max-width: 300px;
 					word-wrap: break-word;
 				`;
-				
+
 				// 根据类型设置颜色
 				switch (type) {
 					case 'success':
@@ -1578,15 +1578,15 @@
 					default:
 						toast.style.background = 'linear-gradient(135deg, #17a2b8, #6f42c1)';
 				}
-				
+
 				toast.textContent = message;
 				document.body.appendChild(toast);
-				
+
 				// 显示动画
 				setTimeout(() => {
 					toast.style.transform = 'translateX(0)';
 				}, 100);
-				
+
 				// 自动隐藏
 				setTimeout(() => {
 					toast.style.transform = 'translateX(100%)';
@@ -1611,17 +1611,17 @@
 				}
 				return './images/toXiang.jpg'; // 默认头像
 			}
-			
+
 			function checkUserAuth() {
 				const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-				
+
 				// 下拉菜单元素
 				const userDropdownInfo = document.getElementById('userDropdownInfo');
 				const authDropdownButtons = document.getElementById('authDropdownButtons');
 				const dropdownUsername = document.getElementById('dropdownUsername');
 				const dropdownAvatar = document.getElementById('dropdownAvatar');
 				const testButtonContainer = document.getElementById('testButtonContainer');
-				
+
 				// SideMenu 元素
 				const sideMenuUserInfo = document.getElementById('sideMenuUserInfo');
 				const sideMenuAuthButtons = document.getElementById('sideMenuAuthButtons');
@@ -1630,7 +1630,7 @@
 				const sideMenuActions = document.getElementById('sideMenuActions');
 				const sideMenuDashboard = document.getElementById('sideMenuDashboard');
 				const sideMenuUserSection = document.querySelector('.side-menu-user-section');
-				
+
 				// 检查屏幕尺寸
 				const isMobile = window.innerWidth <= 600;
 
@@ -1647,7 +1647,7 @@
 								// 已登录，显示用户信息
 								dropdownUsername.textContent = data.data.user.username;
 								sideMenuUsername.textContent = data.data.user.username;
-								
+
 								// 更新SideMenu中的用户信息
 								const sideMenuEmail = document.getElementById('sideMenuEmail');
 								const sideMenuRole = document.getElementById('sideMenuRole');
@@ -1663,7 +1663,7 @@
 									const adminPanelBtn = document.getElementById('adminPanelBtn');
 									if (adminPanelBtn) adminPanelBtn.style.display = 'inline-block';
 								}
-								
+
 								// 尝试获取QQ头像（如果用户名是QQ号）
 								const username = data.data.user.username;
 								if (/^\d{5,11}$/.test(username)) { // QQ号格式验证
@@ -1681,7 +1681,7 @@
 										}
 									});
 								}
-								
+
 								// 根据屏幕尺寸显示不同的个人中心
 								if (isMobile) {
 									// 手机端：SideMenu就是个人中心入口，始终显示
@@ -1702,15 +1702,15 @@
 									sideMenuStats.style.display = 'block';
 									sideMenuActions.style.display = 'block';
 								}
-								
+
 								// 显示个人中心面板
 								if (sideMenuDashboard) {
 									sideMenuDashboard.style.display = 'block';
 								}
-								
+
 								// 显示测试按钮（始终显示）
 								testButtonContainer.style.display = 'flex';
-								
+
 								// 加载用户数据统计
 								loadUserStats();
 							} else {
@@ -1719,12 +1719,12 @@
 								sessionStorage.removeItem('token');
 								localStorage.removeItem('user');
 								sessionStorage.removeItem('user');
-								
+
 								// 隐藏个人中心面板
 								if (sideMenuDashboard) {
 									sideMenuDashboard.style.display = 'none';
 								}
-								
+
 								if (isMobile) {
 									// 手机端：显示SideMenu登录按钮
 									userDropdownInfo.style.display = 'none';
@@ -1748,12 +1748,12 @@
 						})
 						.catch(error => {
 							console.error('验证令牌失败:', error);
-							
+
 							// 隐藏个人中心面板
 							if (sideMenuDashboard) {
 								sideMenuDashboard.style.display = 'none';
 							}
-							
+
 							if (isMobile) {
 								// 手机端：显示SideMenu登录按钮
 								userDropdownInfo.style.display = 'none';
@@ -1779,12 +1779,12 @@
 					// 设置默认用户名
 					dropdownUsername.textContent = '用户';
 					sideMenuUsername.textContent = '用户';
-					
+
 					// 隐藏个人中心面板
 					if (sideMenuDashboard) {
 						sideMenuDashboard.style.display = 'none';
 					}
-					
+
 					if (isMobile) {
 						// 手机端：SideMenu就是个人中心入口，显示登录选项
 						userDropdownInfo.style.display = 'none';
@@ -1843,32 +1843,32 @@
 				if (dropdownLogoutBtn) {
 					dropdownLogoutBtn.addEventListener('click', logout);
 				}
-				
+
 				// 添加sideMenu退出按钮事件监听器
 				const sideMenuLogoutBtn = document.getElementById('sideMenuLogoutBtn');
 				if (sideMenuLogoutBtn) {
 					sideMenuLogoutBtn.addEventListener('click', logout);
 				}
 			}
-			
+
 			// 显示个人中心 - 全局函数
 			window.showPersonalCenter = function () {
 				// 直接调用headers函数显示SideMenu
 				headers();
 			};
-			
+
 			// 加载用户统计数据
 			async function loadUserStats() {
 				const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 				if (!token) return;
-				
+
 				try {
 					const response = await fetch(`${window.OneLoveConfig?.apiBaseUrl || '/api'}/userdata/stats`, {
 						headers: {
 							'Authorization': `Bearer ${token}`
 						}
 					});
-					
+
 					if (response.ok) {
 						const data = await response.json();
 						if (data.success) {
@@ -1882,9 +1882,9 @@
 					console.error('加载统计数据失败:', error);
 				}
 			}
-			
 
-			
+
+
 			// 添加其他事件监听器
 			function addEventListeners() {
 				// 菜单按钮
@@ -1892,20 +1892,20 @@
 				if (menuButton) {
 					menuButton.addEventListener('click', headers);
 				}
-				
+
 				// 清除输入按钮
 				const clearBtn = document.getElementById('clear');
 				if (clearBtn) {
 					clearBtn.addEventListener('click', clearInput);
 				}
-				
+
 				// 头像点击
 				const profilePicture = document.getElementById('profilePicture');
 				if (profilePicture) {
-					profilePicture.addEventListener('click', function() {
+					profilePicture.addEventListener('click', function () {
 						// 检查是否为手机端
 						const isMobile = window.innerWidth <= 600;
-						
+
 						if (isMobile) {
 							// 手机端：检查登录状态
 							const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -1922,14 +1922,14 @@
 						}
 					});
 				}
-				
+
 				// 侧边菜单头像点击
 				const sideMenuAvatar = document.getElementById('sideMenuAvatar');
 				if (sideMenuAvatar) {
-					sideMenuAvatar.addEventListener('click', function() {
+					sideMenuAvatar.addEventListener('click', function () {
 						// 检查是否为手机端
 						const isMobile = window.innerWidth <= 600;
-						
+
 						if (isMobile) {
 							// 手机端：检查登录状态
 							const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -1944,34 +1944,34 @@
 						// PC端：不处理点击事件，保持默认行为
 					});
 				}
-				
+
 				// 主要按钮
 				const mainButton = document.getElementById('mainButton');
 				if (mainButton) {
 					mainButton.addEventListener('click', change);
 				}
-				
+
 				// 提示框关闭
 				const tipClose = document.getElementById('tipClose');
 				if (tipClose) {
 					tipClose.addEventListener('click', tipBox);
 				}
-				
+
 				// 下拉菜单测试按钮
 				const testButtonContainer = document.getElementById('testButtonContainer');
 				if (testButtonContainer) {
 					testButtonContainer.addEventListener('click', function () {
 						// 测试按钮只用于开始休息
-							showRestReminder();
+						showRestReminder();
 					});
-					
+
 					// 右键菜单测试老式时钟音效
 					testButtonContainer.addEventListener('contextmenu', function (e) {
 						e.preventDefault();
 						console.log('🎵 右键测试：强制播放老式时钟音效');
 						playOldClockSound();
 					});
-					
+
 					// 中键重置累计时长
 					testButtonContainer.addEventListener('auxclick', function (e) {
 						e.preventDefault();
@@ -1985,45 +1985,45 @@
 			// 页面加载完成后启动计时
 			window.addEventListener('load', function () {
 
-							// 添加退出登录事件监听器
-			addLogoutEventListener();
-			
-			// 添加快速操作按钮事件监听器
-			const addPasswordBtn = document.getElementById('addPasswordBtn');
-			const addPhoneBtn = document.getElementById('addPhoneBtn');
-			const addNoteBtn = document.getElementById('addNoteBtn');
-			
-			if (addPasswordBtn) {
+				// 添加退出登录事件监听器
+				addLogoutEventListener();
+
+				// 添加快速操作按钮事件监听器
+				const addPasswordBtn = document.getElementById('addPasswordBtn');
+				const addPhoneBtn = document.getElementById('addPhoneBtn');
+				const addNoteBtn = document.getElementById('addNoteBtn');
+
+				if (addPasswordBtn) {
 					addPasswordBtn.addEventListener('click', function (e) {
-					e.preventDefault();
-					alert('添加密码功能开发中...');
-				});
-			}
-			
-			if (addPhoneBtn) {
+						e.preventDefault();
+						alert('添加密码功能开发中...');
+					});
+				}
+
+				if (addPhoneBtn) {
 					addPhoneBtn.addEventListener('click', function (e) {
-					e.preventDefault();
-					alert('添加电话功能开发中...');
-				});
-			}
-			
-			if (addNoteBtn) {
+						e.preventDefault();
+						alert('添加电话功能开发中...');
+					});
+				}
+
+				if (addNoteBtn) {
 					addNoteBtn.addEventListener('click', function (e) {
-					e.preventDefault();
-					alert('添加笔记功能开发中...');
-				});
-			}
-				
+						e.preventDefault();
+						alert('添加笔记功能开发中...');
+					});
+				}
+
 				// 检查用户认证状态
 				checkUserAuth();
-				
+
 				// 监听窗口大小变化，动态调整个人中心显示
 				window.addEventListener('resize', function () {
 					checkUserAuth();
 				});
-				
 
-				
+
+
 				// 添加其他事件监听器
 				addEventListeners();
 
@@ -2031,7 +2031,7 @@
 				setInterval(() => {
 					const testButtonText = document.getElementById('testButtonText');
 					if (testButtonText) {
-							testButtonText.textContent = '测试休息提醒';
+						testButtonText.textContent = '测试休息提醒';
 					}
 				}, 1000);
 
@@ -2077,7 +2077,7 @@
 
 		})();
 	</script>
-	
+
 	<!-- 彩蛋 最后加载 -->
 	<script async src="./scripts/caiDan.js"></script>
 </body>

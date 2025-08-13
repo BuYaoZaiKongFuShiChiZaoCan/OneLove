@@ -1,427 +1,429 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>手机管理 - OneLove</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>手机管理 - OneLove</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			min-height: 100vh;
+			color: #333;
+		}
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 20px;
+		}
 
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+		.header {
+			background: rgba(255, 255, 255, 0.95);
+			backdrop-filter: blur(10px);
+			border-radius: 15px;
+			padding: 20px;
+			margin-bottom: 20px;
+			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
 
-        .header h1 {
-            color: #4a5568;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+		.header h1 {
+			color: #4a5568;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
 
-        .back-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 14px;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+		.back-btn {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			color: white;
+			border: none;
+			padding: 10px 20px;
+			border-radius: 25px;
+			cursor: pointer;
+			font-size: 14px;
+			text-decoration: none;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
 
-        .back-btn:hover {
-            transform: scale(1.05);
-        }
+		.back-btn:hover {
+			transform: scale(1.05);
+		}
 
-        .controls {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
+		.controls {
+			background: rgba(255, 255, 255, 0.95);
+			backdrop-filter: blur(10px);
+			border-radius: 15px;
+			padding: 20px;
+			margin-bottom: 20px;
+			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+			display: flex;
+			gap: 15px;
+			align-items: center;
+			flex-wrap: wrap;
+		}
 
-        .search-box {
-            flex: 1;
-            min-width: 200px;
-            position: relative;
-        }
+		.search-box {
+			flex: 1;
+			min-width: 200px;
+			position: relative;
+		}
 
-        .search-box input {
-            width: 100%;
-            padding: 12px 40px 12px 15px;
-            border: 2px solid #e2e8f0;
-            border-radius: 25px;
-            font-size: 14px;
-            transition: border-color 0.3s ease;
-        }
+		.search-box input {
+			width: 100%;
+			padding: 12px 40px 12px 15px;
+			border: 2px solid #e2e8f0;
+			border-radius: 25px;
+			font-size: 14px;
+			transition: border-color 0.3s ease;
+		}
 
-        .search-box input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+		.search-box input:focus {
+			outline: none;
+			border-color: #667eea;
+		}
 
-        .search-box i {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #a0aec0;
-        }
+		.search-box i {
+			position: absolute;
+			right: 15px;
+			top: 50%;
+			transform: translateY(-50%);
+			color: #a0aec0;
+		}
 
-        .add-btn {
-            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: transform 0.2s ease;
-        }
+		.add-btn {
+			background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+			color: white;
+			border: none;
+			padding: 12px 25px;
+			border-radius: 25px;
+			cursor: pointer;
+			font-size: 14px;
+			font-weight: 500;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			transition: transform 0.2s ease;
+		}
 
-        .add-btn:hover {
-            transform: scale(1.05);
-        }
+		.add-btn:hover {
+			transform: scale(1.05);
+		}
 
-        .phones-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-            gap: 20px;
-        }
+		.phones-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+			gap: 20px;
+		}
 
-        .phone-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 2px solid transparent;
-        }
+		.phone-card {
+			background: rgba(255, 255, 255, 0.95);
+			backdrop-filter: blur(10px);
+			border-radius: 15px;
+			padding: 25px;
+			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+			transition: transform 0.3s ease, box-shadow 0.3s ease;
+			border: 2px solid transparent;
+		}
 
-        .phone-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-            border-color: #667eea;
-        }
+		.phone-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+			border-color: #667eea;
+		}
 
-        .phone-card .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 0;
-            background: none;
-            box-shadow: none;
-        }
+		.phone-card .header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 20px;
+			padding: 0;
+			background: none;
+			box-shadow: none;
+		}
 
-        .phone-card .number {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #2d3748;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+		.phone-card .number {
+			font-size: 1.5em;
+			font-weight: bold;
+			color: #2d3748;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
 
-        .phone-card .actions {
-            display: flex;
-            gap: 8px;
-        }
+		.phone-card .actions {
+			display: flex;
+			gap: 8px;
+		}
 
-        .action-btn {
-            background: none;
-            border: none;
-            padding: 8px;
-            border-radius: 50%;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            color: #718096;
-        }
+		.action-btn {
+			background: none;
+			border: none;
+			padding: 8px;
+			border-radius: 50%;
+			cursor: pointer;
+			transition: background-color 0.2s ease;
+			color: #718096;
+		}
 
-        .action-btn:hover {
-            background-color: #f7fafc;
-            color: #667eea;
-        }
+		.action-btn:hover {
+			background-color: #f7fafc;
+			color: #667eea;
+		}
 
-        .action-btn.delete:hover {
-            background-color: #fed7d7;
-            color: #e53e3e;
-        }
+		.action-btn.delete:hover {
+			background-color: #fed7d7;
+			color: #e53e3e;
+		}
 
-        .phone-info {
-            display: grid;
-            gap: 15px;
-        }
+		.phone-info {
+			display: grid;
+			gap: 15px;
+		}
 
-        .info-item {
-            padding: 12px;
-            background: #f7fafc;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
+		.info-item {
+			padding: 12px;
+			background: #f7fafc;
+			border-radius: 8px;
+			border-left: 4px solid #667eea;
+		}
 
-        .info-item .label {
-            font-size: 12px;
-            color: #718096;
-            margin-bottom: 5px;
-            font-weight: 500;
-            text-transform: uppercase;
-        }
+		.info-item .label {
+			font-size: 12px;
+			color: #718096;
+			margin-bottom: 5px;
+			font-weight: 500;
+			text-transform: uppercase;
+		}
 
-        .info-item .value {
-            font-size: 14px;
-            color: #2d3748;
-            word-break: break-all;
-        }
+		.info-item .value {
+			font-size: 14px;
+			color: #2d3748;
+			word-break: break-all;
+		}
 
-        .info-item .value.empty {
-            color: #a0aec0;
-            font-style: italic;
-        }
+		.info-item .value.empty {
+			color: #a0aec0;
+			font-style: italic;
+		}
 
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #718096;
-        }
+		.loading {
+			text-align: center;
+			padding: 40px;
+			color: #718096;
+		}
 
-        .error {
-            background: #fed7d7;
-            color: #c53030;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
+		.error {
+			background: #fed7d7;
+			color: #c53030;
+			padding: 15px;
+			border-radius: 8px;
+			margin: 20px 0;
+		}
 
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #718096;
-        }
+		.empty-state {
+			text-align: center;
+			padding: 60px 20px;
+			color: #718096;
+		}
 
-        .empty-state i {
-            font-size: 4em;
-            margin-bottom: 20px;
-            color: #cbd5e0;
-        }
+		.empty-state i {
+			font-size: 4em;
+			margin-bottom: 20px;
+			color: #cbd5e0;
+		}
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .controls {
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .phones-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+		@media (max-width: 768px) {
+			.container {
+				padding: 10px;
+			}
+
+			.controls {
+				flex-direction: column;
+				align-items: stretch;
+			}
+
+			.phones-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
 </head>
+
 <body>
-    <div class="container">
-        <!-- 头部 -->
-        <div class="header">
-            <h1>
-                <i class="fas fa-mobile-alt"></i>
-                手机管理
-            </h1>
-            <a href="/Pages/admin/dashboard.html" class="back-btn">
-                <i class="fas fa-arrow-left"></i>
-                返回仪表板
-            </a>
-        </div>
+	<div class="container">
+		<!-- 头部 -->
+		<div class="header">
+			<h1>
+				<i class="fas fa-mobile-alt"></i>
+				手机管理
+			</h1>
+			<a href="/Pages/admin/dashboard.html" class="back-btn">
+				<i class="fas fa-arrow-left"></i>
+				返回仪表板
+			</a>
+		</div>
 
-        <!-- 控制栏 -->
-        <div class="controls">
-            <div class="search-box">
-                <input type="text" id="searchInput" placeholder="搜索手机号码...">
-                <i class="fas fa-search"></i>
-            </div>
-            <button class="add-btn" onclick="addPhone()">
-                <i class="fas fa-plus"></i>
-                添加手机
-            </button>
-        </div>
+		<!-- 控制栏 -->
+		<div class="controls">
+			<div class="search-box">
+				<input type="text" id="searchInput" placeholder="搜索手机号码...">
+				<i class="fas fa-search"></i>
+			</div>
+			<button class="add-btn" onclick="addPhone()">
+				<i class="fas fa-plus"></i>
+				添加手机
+			</button>
+		</div>
 
-        <!-- 手机列表 -->
-        <div id="phonesContainer">
-            <div class="loading">
-                <i class="fas fa-spinner fa-spin"></i>
-                加载手机数据...
-            </div>
-        </div>
-    </div>
+		<!-- 手机列表 -->
+		<div id="phonesContainer">
+			<div class="loading">
+				<i class="fas fa-spinner fa-spin"></i>
+				加载手机数据...
+			</div>
+		</div>
+	</div>
 
-    <script>
-        const API_BASE = window.location.origin + '/api';
-        
-        // 获取认证令牌的函数
-        function getAuthToken() {
-            return sessionStorage.getItem('token');
-        }
-        let phonesData = {};
+	<script>
+		const API_BASE = window.location.origin + '/api';
 
-        // 检查登录状态
-        async function checkAuth() {
-            const authToken = getAuthToken();
-            
-            if (!authToken) {
-                return false;
-            }
+		// 获取认证令牌的函数
+		function getAuthToken() {
+			return sessionStorage.getItem('token');
+		}
+		let phonesData = {};
 
-            try {
-                const response = await fetch(`${API_BASE}/auth/me`, {
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`
-                    }
-                });
+		// 检查登录状态
+		async function checkAuth() {
+			const authToken = getAuthToken();
 
-                if (!response.ok) {
-                    sessionStorage.removeItem('token');
-                    return false;
-                }
+			if (!authToken) {
+				return false;
+			}
 
-                return true;
-            } catch (error) {
-                console.error('认证检查失败:', error);
-                return false;
-            }
-        }
+			try {
+				const response = await fetch(`${API_BASE}/auth/me`, {
+					headers: {
+						'Authorization': `Bearer ${authToken}`
+					}
+				});
 
-        // 加载手机数据
-        async function loadPhones() {
-            try {
-                const authToken = getAuthToken();
-                const response = await fetch(`${API_BASE}/userdata/phones`, {
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`
-                    }
-                });
+				if (!response.ok) {
+					sessionStorage.removeItem('token');
+					return false;
+				}
 
-                if (!response.ok) {
-                    throw new Error('获取手机数据失败');
-                }
+				return true;
+			} catch (error) {
+				console.error('认证检查失败:', error);
+				return false;
+			}
+		}
 
-                const data = await response.json();
-                phonesData = data.data;
-                displayPhones(phonesData);
-            } catch (error) {
-                console.error('加载手机数据失败:', error);
-                document.getElementById('phonesContainer').innerHTML = `
+		// 加载手机数据
+		async function loadPhones() {
+			try {
+				const authToken = getAuthToken();
+				const response = await fetch(`${API_BASE}/userdata/phones`, {
+					headers: {
+						'Authorization': `Bearer ${authToken}`
+					}
+				});
+
+				if (!response.ok) {
+					throw new Error('获取手机数据失败');
+				}
+
+				const data = await response.json();
+				phonesData = data.data;
+				displayPhones(phonesData);
+			} catch (error) {
+				console.error('加载手机数据失败:', error);
+				document.getElementById('phonesContainer').innerHTML = `
                     <div class="error">
                         <i class="fas fa-exclamation-triangle"></i>
                         加载手机数据失败: ${error.message}
                     </div>
                 `;
-            }
-        }
+			}
+		}
 
-        // 显示手机数据
-        function displayPhones(phones) {
-            const container = document.getElementById('phonesContainer');
-            
-            if (!phones || Object.keys(phones).length === 0) {
-                container.innerHTML = `
+		// 显示手机数据
+		function displayPhones(phones) {
+			const container = document.getElementById('phonesContainer');
+
+			if (!phones || Object.keys(phones).length === 0) {
+				container.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-mobile-alt"></i>
                         <h3>暂无手机数据</h3>
                         <p>点击"添加手机"开始管理您的手机信息</p>
                     </div>
                 `;
-                return;
-            }
+				return;
+			}
 
-            // 检查数据结构
-            if (Array.isArray(phones)) {
-                // 如果是数组，转换为对象格式
-                const phonesObj = {};
-                phones.forEach(phone => {
-                    if (phone.number) {
-                        phonesObj[phone.number] = phone;
-                    }
-                });
-                phones = phonesObj;
-            }
+			// 检查数据结构
+			if (Array.isArray(phones)) {
+				// 如果是数组，转换为对象格式
+				const phonesObj = {};
+				phones.forEach(phone => {
+					if (phone.number) {
+						phonesObj[phone.number] = phone;
+					}
+				});
+				phones = phonesObj;
+			}
 
-            container.innerHTML = `
+			container.innerHTML = `
                 <div class="phones-grid">
                     ${Object.entries(phones).map(([number, info]) => createPhoneCard(number, info)).join('')}
                 </div>
             `;
-        }
+		}
 
-        // 创建手机卡片
-        function createPhoneCard(number, info) {
-            
-            // 处理不同的数据结构
-            let plan, apps, notes, location;
-            
-            if (typeof info === 'object' && info !== null) {
-                plan = info.套餐 || info.plan || '未设置';
-                
-                // 处理绑定APP，可能是对象或字符串
-                const appsData = info.绑定APP || info.apps;
-                if (typeof appsData === 'object' && appsData !== null) {
-                    apps = Object.keys(appsData).join(', ') || '未设置';
-                } else {
-                    apps = appsData || '未设置';
-                }
-                
-                notes = info.备注 || info.notes || '无备注';
-                location = info.归属地 || info.location || '未知';
-            } else {
-                // 如果info不是对象，显示原始值
-                plan = '未设置';
-                apps = '未设置';
-                notes = String(info || '无备注');
-                location = '未知';
-            }
+		// 创建手机卡片
+		function createPhoneCard(number, info) {
 
-            return `
+			// 处理不同的数据结构
+			let plan, apps, notes, location;
+
+			if (typeof info === 'object' && info !== null) {
+				plan = info.套餐 || info.plan || '未设置';
+
+				// 处理绑定APP，可能是对象或字符串
+				const appsData = info.绑定APP || info.apps;
+				if (typeof appsData === 'object' && appsData !== null) {
+					apps = Object.keys(appsData).join(', ') || '未设置';
+				} else {
+					apps = appsData || '未设置';
+				}
+
+				notes = info.备注 || info.notes || '无备注';
+				location = info.归属地 || info.location || '未知';
+			} else {
+				// 如果info不是对象，显示原始值
+				plan = '未设置';
+				apps = '未设置';
+				notes = String(info || '无备注');
+				location = '未知';
+			}
+
+			return `
                 <div class="phone-card">
                     <div class="header">
                         <div class="number">
@@ -457,61 +459,61 @@
                     </div>
                 </div>
             `;
-        }
+		}
 
-        // 搜索功能
-        function setupSearch() {
-            const searchInput = document.getElementById('searchInput');
-            searchInput.addEventListener('input', (e) => {
-                const searchTerm = e.target.value.toLowerCase();
-                const filteredPhones = {};
-                
-                Object.entries(phonesData).forEach(([number, info]) => {
-                    if (number.includes(searchTerm) ||
-                        JSON.stringify(info).toLowerCase().includes(searchTerm)) {
-                        filteredPhones[number] = info;
-                    }
-                });
-                
-                displayPhones(filteredPhones);
-            });
-        }
+		// 搜索功能
+		function setupSearch() {
+			const searchInput = document.getElementById('searchInput');
+			searchInput.addEventListener('input', (e) => {
+				const searchTerm = e.target.value.toLowerCase();
+				const filteredPhones = {};
 
-        // 添加手机
-        function addPhone() {
-            alert('添加手机功能开发中...');
-        }
+				Object.entries(phonesData).forEach(([number, info]) => {
+					if (number.includes(searchTerm) ||
+						JSON.stringify(info).toLowerCase().includes(searchTerm)) {
+						filteredPhones[number] = info;
+					}
+				});
 
-        // 编辑手机
-        function editPhone(number) {
-            alert('编辑手机功能开发中...');
-        }
+				displayPhones(filteredPhones);
+			});
+		}
 
-        // 删除手机
-        async function deletePhone(number) {
-            if (!confirm(`确定要删除手机号码 ${number} 吗？`)) {
-                return;
-            }
+		// 添加手机
+		function addPhone() {
+			alert('添加手机功能开发中...');
+		}
 
-            try {
-                // 这里需要实现删除API
-                alert('删除功能开发中...');
-                // loadPhones();
-            } catch (error) {
-                console.error('删除手机失败:', error);
-                alert('删除失败: ' + error.message);
-            }
-        }
+		// 编辑手机
+		function editPhone(number) {
+			alert('编辑手机功能开发中...');
+		}
 
-        // 页面初始化
-        async function init() {
-            const isAuthenticated = await checkAuth();
-            
-            if (isAuthenticated) {
-                await loadPhones();
-                setupSearch();
-            } else {
-                document.getElementById('phonesContainer').innerHTML = `
+		// 删除手机
+		async function deletePhone(number) {
+			if (!confirm(`确定要删除手机号码 ${number} 吗？`)) {
+				return;
+			}
+
+			try {
+				// 这里需要实现删除API
+				alert('删除功能开发中...');
+				// loadPhones();
+			} catch (error) {
+				console.error('删除手机失败:', error);
+				alert('删除失败: ' + error.message);
+			}
+		}
+
+		// 页面初始化
+		async function init() {
+			const isAuthenticated = await checkAuth();
+
+			if (isAuthenticated) {
+				await loadPhones();
+				setupSearch();
+			} else {
+				document.getElementById('phonesContainer').innerHTML = `
                     <div class="error">
                         <i class="fas fa-exclamation-triangle"></i>
                         请先登录后再访问此页面
@@ -521,13 +523,14 @@
                         </a>
                     </div>
                 `;
-            }
-        }
+			}
+		}
 
-        // 延迟启动应用，给页面更多时间加载
-        setTimeout(() => {
-            init();
-        }, 100);
-    </script>
+		// 延迟启动应用，给页面更多时间加载
+		setTimeout(() => {
+			init();
+		}, 100);
+	</script>
 </body>
-</html> 
+
+</html>

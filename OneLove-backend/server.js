@@ -369,72 +369,6 @@ app.get('/api/health', (req, res) => {
 	});
 });
 
-// Changelog API路由
-app.get('/api/changelog', async (req, res) => {
-	try {
-		const { version, limit = 10, page = 1 } = req.query;
-
-		let query = {};
-		if (version) {
-			query.version = version;
-		}
-
-		const skip = (parseInt(page) - 1) * parseInt(limit);
-
-		const changelogs = await Changelog.find(query)
-			.sort({ order: -1, createdAt: -1 })
-			.skip(skip)
-			.limit(parseInt(limit));
-
-		const total = await Changelog.countDocuments(query);
-
-		res.json({
-			success: true,
-			data: {
-				changelogs,
-				pagination: {
-					page: parseInt(page),
-					limit: parseInt(limit),
-					total,
-					pages: Math.ceil(total / parseInt(limit))
-				}
-			}
-		});
-	} catch (error) {
-		console.error('获取changelog失败:', error);
-		res.status(500).json({
-			success: false,
-			message: '获取版本信息失败'
-		});
-	}
-});
-
-// 获取最新版本信息
-app.get('/api/changelog/latest', async (req, res) => {
-	try {
-		const latestVersion = await Changelog.findOne()
-			.sort({ order: -1, createdAt: -1 });
-
-		if (!latestVersion) {
-			return res.status(404).json({
-				success: false,
-				message: '未找到版本信息'
-			});
-		}
-
-		res.json({
-			success: true,
-			data: latestVersion
-		});
-	} catch (error) {
-		console.error('获取最新版本失败:', error);
-		res.status(500).json({
-			success: false,
-			message: '获取最新版本信息失败'
-		});
-	}
-});
-
 // 用户注册
 app.post('/api/auth/register', async (req, res) => {
 	try {
@@ -2181,6 +2115,112 @@ app.post('/api/userdata/export/batch', authenticateToken, async (req, res) => {
 // 错误处理中间件
 // ========================================
 
+// ========================================
+// Changelog API路由
+// ========================================
+
+// 获取changelog列表
+app.get('/api/changelog', async (req, res) => {
+	try {
+		const { version, limit = 10, page = 1 } = req.query;
+
+		let query = {};
+		if (version) {
+			query.version = version;
+		}
+
+		const skip = (parseInt(page) - 1) * parseInt(limit);
+
+		const changelogs = await Changelog.find(query)
+			.sort({ order: -1, createdAt: -1 })
+			.skip(skip)
+			.limit(parseInt(limit));
+
+		const total = await Changelog.countDocuments(query);
+
+		res.json({
+			success: true,
+			data: {
+				changelogs,
+				pagination: {
+					page: parseInt(page),
+					limit: parseInt(limit),
+					total,
+					pages: Math.ceil(total / parseInt(limit))
+				}
+			}
+		});
+	} catch (error) {
+		console.error('获取changelog失败:', error);
+		res.status(500).json({
+			success: false,
+			message: '获取版本信息失败'
+		});
+	}
+});
+
+// 获取最新版本信息
+app.get('/api/changelog/latest', async (req, res) => {
+	try {
+		const latestVersion = await Changelog.findOne()
+			.sort({ order: -1, createdAt: -1 });
+
+		if (!latestVersion) {
+			return res.status(404).json({
+				success: false,
+				message: '未找到版本信息'
+			});
+		}
+
+		res.json({
+			success: true,
+			data: latestVersion
+		});
+	} catch (error) {
+		console.error('获取最新版本失败:', error);
+		res.status(500).json({
+			success: false,
+			message: '获取最新版本信息失败'
+		});
+	}
+});
+
+// ========================================
+// 测试API路由
+// ========================================
+
+// 测试API - 检查当前用户信息
+app.get('/api/test/user', authenticateToken, async (req, res) => {
+	try {
+		res.json({
+			success: true,
+			user: req.user,
+			message: '当前用户信息'
+		});
+	} catch (error) {
+		res.status(500).json({
+			success: false,
+			message: '获取用户信息失败'
+		});
+	}
+});
+
+// 测试管理员权限
+app.get('/api/test/admin', requireAdmin, async (req, res) => {
+	try {
+		res.json({
+			success: true,
+			user: req.user,
+			message: '管理员权限验证成功'
+		});
+	} catch (error) {
+		res.status(500).json({
+			success: false,
+			message: '管理员权限验证失败'
+		});
+	}
+});
+
 // 404错误处理 - 当访问不存在的路由时
 app.use('*', (req, res) => {
 	res.status(404).json({
@@ -2217,7 +2257,7 @@ const startServer = async () => {
 		console.log(`🔐 认证API: http://localhost:${PORT}/api/auth`);
 		console.log(`📊 环境: ${process.env.NODE_ENV || 'development'}`);
 		console.log(`⏰ 启动时间: ${new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}`);
-		console.log(`📦 版本: 5.0.1`);
+		console.log(`📦 版本: 5.0.2`);
 		console.log(`💾 数据库状态: ${dbConnected ? '已连接' : '未连接（模拟模式）'}`);
 	});
 };
@@ -2233,40 +2273,4 @@ process.on('SIGTERM', () => {
 process.on('SIGINT', () => {
 	console.log('收到SIGINT信号，正在关闭服务器...');
 	process.exit(0);
-});
-
-// ========================================
-// 管理员API路由
-// ========================================
-
-// 测试API - 检查当前用户信息
-app.get('/api/test/user', authenticateToken, async (req, res) => {
-	try {
-		res.json({
-			success: true,
-			user: req.user,
-			message: '当前用户信息'
-		});
-	} catch (error) {
-		res.status(500).json({
-			success: false,
-			message: '获取用户信息失败'
-		});
-	}
-});
-
-// 测试管理员权限
-app.get('/api/test/admin', requireAdmin, async (req, res) => {
-	try {
-		res.json({
-			success: true,
-			user: req.user,
-			message: '管理员权限验证成功'
-		});
-	} catch (error) {
-		res.status(500).json({
-			success: false,
-			message: '管理员权限验证失败'
-		});
-	}
 }); 

@@ -1,682 +1,687 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>系统设置 - OneLove 管理中心</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>系统设置 - OneLove 管理中心</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }
+		body {
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			min-height: 100vh;
+			color: #333;
+		}
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 20px;
+		}
 
-        .header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+		.header {
+			background: rgba(255, 255, 255, 0.95);
+			backdrop-filter: blur(10px);
+			border-radius: 15px;
+			padding: 20px;
+			margin-bottom: 20px;
+			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
 
-        .header h1 {
-            color: #4a5568;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+		.header h1 {
+			color: #4a5568;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
 
-        .back-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            text-decoration: none;
-            font-size: 14px;
-            transition: transform 0.2s ease;
-        }
+		.back-btn {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			color: white;
+			border: none;
+			padding: 10px 20px;
+			border-radius: 25px;
+			cursor: pointer;
+			text-decoration: none;
+			font-size: 14px;
+			transition: transform 0.2s ease;
+		}
 
-        .back-btn:hover {
-            transform: scale(1.05);
-        }
+		.back-btn:hover {
+			transform: scale(1.05);
+		}
 
-        .settings-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 20px;
-        }
+		.settings-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+			gap: 20px;
+		}
 
-        .setting-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-        }
+		.setting-card {
+			background: rgba(255, 255, 255, 0.95);
+			backdrop-filter: blur(10px);
+			border-radius: 15px;
+			padding: 25px;
+			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+		}
 
-        .setting-card h3 {
-            color: #2d3748;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.3em;
-        }
+		.setting-card h3 {
+			color: #2d3748;
+			margin-bottom: 20px;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			font-size: 1.3em;
+		}
 
-        .setting-item {
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #e2e8f0;
-        }
+		.setting-item {
+			margin-bottom: 20px;
+			padding-bottom: 20px;
+			border-bottom: 1px solid #e2e8f0;
+		}
 
-        .setting-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
+		.setting-item:last-child {
+			border-bottom: none;
+			margin-bottom: 0;
+			padding-bottom: 0;
+		}
 
-        .setting-label {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
+		.setting-label {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 10px;
+		}
 
-        .setting-label .label {
-            font-weight: 600;
-            color: #4a5568;
-        }
+		.setting-label .label {
+			font-weight: 600;
+			color: #4a5568;
+		}
 
-        .setting-label .description {
-            font-size: 12px;
-            color: #718096;
-            margin-top: 5px;
-        }
+		.setting-label .description {
+			font-size: 12px;
+			color: #718096;
+			margin-top: 5px;
+		}
 
-        .toggle-switch {
-            position: relative;
-            width: 50px;
-            height: 24px;
-            background: #cbd5e0;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
+		.toggle-switch {
+			position: relative;
+			width: 50px;
+			height: 24px;
+			background: #cbd5e0;
+			border-radius: 12px;
+			cursor: pointer;
+			transition: background 0.3s ease;
+		}
 
-        .toggle-switch.active {
-            background: #667eea;
-        }
+		.toggle-switch.active {
+			background: #667eea;
+		}
 
-        .toggle-switch::after {
-            content: '';
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 20px;
-            height: 20px;
-            background: white;
-            border-radius: 50%;
-            transition: transform 0.3s ease;
-        }
+		.toggle-switch::after {
+			content: '';
+			position: absolute;
+			top: 2px;
+			left: 2px;
+			width: 20px;
+			height: 20px;
+			background: white;
+			border-radius: 50%;
+			transition: transform 0.3s ease;
+		}
 
-        .toggle-switch.active::after {
-            transform: translateX(26px);
-        }
+		.toggle-switch.active::after {
+			transform: translateX(26px);
+		}
 
-        .input-group {
-            margin-bottom: 15px;
-        }
+		.input-group {
+			margin-bottom: 15px;
+		}
 
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #4a5568;
-        }
+		.input-group label {
+			display: block;
+			margin-bottom: 5px;
+			font-weight: 600;
+			color: #4a5568;
+		}
 
-        .input-group input, .input-group select {
-            width: 100%;
-            padding: 10px 15px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s ease;
-        }
+		.input-group input,
+		.input-group select {
+			width: 100%;
+			padding: 10px 15px;
+			border: 2px solid #e2e8f0;
+			border-radius: 8px;
+			font-size: 14px;
+			transition: border-color 0.3s ease;
+		}
 
-        .input-group input:focus, .input-group select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+		.input-group input:focus,
+		.input-group select:focus {
+			outline: none;
+			border-color: #667eea;
+		}
 
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: transform 0.2s ease;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
+		.btn {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			color: white;
+			border: none;
+			padding: 12px 25px;
+			border-radius: 25px;
+			cursor: pointer;
+			font-size: 14px;
+			font-weight: 500;
+			transition: transform 0.2s ease;
+			margin-right: 10px;
+			margin-bottom: 10px;
+		}
 
-        .btn:hover {
-            transform: scale(1.05);
-        }
+		.btn:hover {
+			transform: scale(1.05);
+		}
 
-        .btn-danger {
-            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
-        }
+		.btn-danger {
+			background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+		}
 
-        .btn-success {
-            background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
-        }
+		.btn-success {
+			background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+		}
 
-        .btn-warning {
-            background: linear-gradient(135deg, #d69e2e 0%, #b7791f 100%);
-        }
+		.btn-warning {
+			background: linear-gradient(135deg, #d69e2e 0%, #b7791f 100%);
+		}
 
-        .status-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
+		.status-indicator {
+			display: inline-flex;
+			align-items: center;
+			gap: 5px;
+			padding: 4px 8px;
+			border-radius: 12px;
+			font-size: 12px;
+			font-weight: 500;
+		}
 
-        .status-online {
-            background: #c6f6d5;
-            color: #2f855a;
-        }
+		.status-online {
+			background: #c6f6d5;
+			color: #2f855a;
+		}
 
-        .status-offline {
-            background: #fed7d7;
-            color: #c53030;
-        }
+		.status-offline {
+			background: #fed7d7;
+			color: #c53030;
+		}
 
-        .status-warning {
-            background: #fef5e7;
-            color: #d69e2e;
-        }
+		.status-warning {
+			background: #fef5e7;
+			color: #d69e2e;
+		}
 
-        .info-box {
-            background: rgba(102, 126, 234, 0.1);
-            border: 1px solid rgba(102, 126, 234, 0.2);
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
+		.info-box {
+			background: rgba(102, 126, 234, 0.1);
+			border: 1px solid rgba(102, 126, 234, 0.2);
+			border-radius: 8px;
+			padding: 15px;
+			margin-bottom: 15px;
+		}
 
-        .info-box h4 {
-            color: #2b6cb0;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
+		.info-box h4 {
+			color: #2b6cb0;
+			margin-bottom: 10px;
+			font-size: 14px;
+		}
 
-        .info-box p {
-            color: #4a5568;
-            font-size: 13px;
-            line-height: 1.5;
-        }
+		.info-box p {
+			color: #4a5568;
+			font-size: 13px;
+			line-height: 1.5;
+		}
 
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #718096;
-        }
+		.loading {
+			text-align: center;
+			padding: 40px;
+			color: #718096;
+		}
 
-        .error {
-            background: #fed7d7;
-            color: #c53030;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 20px 0;
-        }
+		.error {
+			background: #fed7d7;
+			color: #c53030;
+			padding: 15px;
+			border-radius: 8px;
+			margin: 20px 0;
+		}
 
-        @media (max-width: 768px) {
-            .settings-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .setting-label {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 10px;
-            }
-        }
-    </style>
+		@media (max-width: 768px) {
+			.settings-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.setting-label {
+				flex-direction: column;
+				align-items: flex-start;
+				gap: 10px;
+			}
+		}
+	</style>
 </head>
+
 <body>
-    <div class="container">
-        <!-- 页面头部 -->
-        <div class="header">
-            <h1>
-                <i class="fas fa-cog"></i>
-                系统设置
-            </h1>
-            <a href="/Pages/admin/dashboard.html" class="back-btn">
-                <i class="fas fa-arrow-left"></i>
-                返回仪表板
-            </a>
-        </div>
+	<div class="container">
+		<!-- 页面头部 -->
+		<div class="header">
+			<h1>
+				<i class="fas fa-cog"></i>
+				系统设置
+			</h1>
+			<a href="/Pages/admin/dashboard.html" class="back-btn">
+				<i class="fas fa-arrow-left"></i>
+				返回仪表板
+			</a>
+		</div>
 
-        <!-- 设置内容 -->
-        <div class="settings-grid">
-            <!-- 系统配置 -->
-            <div class="setting-card">
-                <h3>
-                    <i class="fas fa-server"></i>
-                    系统配置
-                </h3>
-                
-                <div class="setting-item">
-                    <div class="setting-label">
-                        <div>
-                            <div class="label">数据库连接</div>
-                            <div class="description">MongoDB Atlas 连接状态</div>
-                        </div>
-                        <div class="status-indicator" id="dbStatus">
-                            <i class="fas fa-circle"></i>
-                            检查中...
-                        </div>
-                    </div>
-                </div>
+		<!-- 设置内容 -->
+		<div class="settings-grid">
+			<!-- 系统配置 -->
+			<div class="setting-card">
+				<h3>
+					<i class="fas fa-server"></i>
+					系统配置
+				</h3>
 
-                <div class="setting-item">
-                    <div class="setting-label">
-                        <div>
-                            <div class="label">服务器状态</div>
-                            <div class="description">Node.js 服务器运行状态</div>
-                        </div>
-                        <div class="status-indicator status-online">
-                            <i class="fas fa-circle"></i>
-                            运行中
-                        </div>
-                    </div>
-                </div>
+				<div class="setting-item">
+					<div class="setting-label">
+						<div>
+							<div class="label">数据库连接</div>
+							<div class="description">MongoDB Atlas 连接状态</div>
+						</div>
+						<div class="status-indicator" id="dbStatus">
+							<i class="fas fa-circle"></i>
+							检查中...
+						</div>
+					</div>
+				</div>
 
-                <div class="setting-item">
-                    <div class="setting-label">
-                        <div>
-                            <div class="label">API 版本</div>
-                            <div class="description">当前 API 版本信息</div>
-                        </div>
-                        <div>v5.0.2</div>
-                    </div>
-                </div>
+				<div class="setting-item">
+					<div class="setting-label">
+						<div>
+							<div class="label">服务器状态</div>
+							<div class="description">Node.js 服务器运行状态</div>
+						</div>
+						<div class="status-indicator status-online">
+							<i class="fas fa-circle"></i>
+							运行中
+						</div>
+					</div>
+				</div>
 
-                <div class="setting-item">
-                    <div class="input-group">
-                        <label>服务器端口</label>
-                        <input type="number" id="serverPort" value="3000" min="1000" max="9999">
-                    </div>
-                    <button class="btn" onclick="updateServerPort()">
-                        <i class="fas fa-save"></i>
-                        保存配置
-                    </button>
-                </div>
-            </div>
+				<div class="setting-item">
+					<div class="setting-label">
+						<div>
+							<div class="label">API 版本</div>
+							<div class="description">当前 API 版本信息</div>
+						</div>
+						<div>v5.0.2</div>
+					</div>
+				</div>
 
-            <!-- 安全设置 -->
-            <div class="setting-card">
-                <h3>
-                    <i class="fas fa-shield-alt"></i>
-                    安全设置
-                </h3>
+				<div class="setting-item">
+					<div class="input-group">
+						<label>服务器端口</label>
+						<input type="number" id="serverPort" value="3000" min="1000" max="9999">
+					</div>
+					<button class="btn" onclick="updateServerPort()">
+						<i class="fas fa-save"></i>
+						保存配置
+					</button>
+				</div>
+			</div>
 
-                <div class="setting-item">
-                    <div class="setting-label">
-                        <div>
-                            <div class="label">数据加密</div>
-                            <div class="description">启用敏感数据加密存储</div>
-                        </div>
-                        <div class="toggle-switch active" id="encryptionToggle" onclick="toggleEncryption()"></div>
-                    </div>
-                </div>
+			<!-- 安全设置 -->
+			<div class="setting-card">
+				<h3>
+					<i class="fas fa-shield-alt"></i>
+					安全设置
+				</h3>
 
-                <div class="setting-item">
-                    <div class="setting-label">
-                        <div>
-                            <div class="label">访问日志</div>
-                            <div class="description">记录用户访问和操作日志</div>
-                        </div>
-                        <div class="toggle-switch active" id="loggingToggle" onclick="toggleLogging()"></div>
-                    </div>
-                </div>
+				<div class="setting-item">
+					<div class="setting-label">
+						<div>
+							<div class="label">数据加密</div>
+							<div class="description">启用敏感数据加密存储</div>
+						</div>
+						<div class="toggle-switch active" id="encryptionToggle" onclick="toggleEncryption()"></div>
+					</div>
+				</div>
 
-                <div class="setting-item">
-                    <div class="setting-label">
-                        <div>
-                            <div class="label">安全审计</div>
-                            <div class="description">检测和记录可疑活动</div>
-                        </div>
-                        <div class="toggle-switch active" id="auditToggle" onclick="toggleAudit()"></div>
-                    </div>
-                </div>
+				<div class="setting-item">
+					<div class="setting-label">
+						<div>
+							<div class="label">访问日志</div>
+							<div class="description">记录用户访问和操作日志</div>
+						</div>
+						<div class="toggle-switch active" id="loggingToggle" onclick="toggleLogging()"></div>
+					</div>
+				</div>
 
-                <div class="setting-item">
-                    <div class="input-group">
-                        <label>会话超时时间（分钟）</label>
-                        <input type="number" id="sessionTimeout" value="60" min="5" max="1440">
-                    </div>
-                    <button class="btn" onclick="updateSessionTimeout()">
-                        <i class="fas fa-clock"></i>
-                        更新超时
-                    </button>
-                </div>
+				<div class="setting-item">
+					<div class="setting-label">
+						<div>
+							<div class="label">安全审计</div>
+							<div class="description">检测和记录可疑活动</div>
+						</div>
+						<div class="toggle-switch active" id="auditToggle" onclick="toggleAudit()"></div>
+					</div>
+				</div>
 
-                <div class="info-box">
-                    <h4><i class="fas fa-info-circle"></i> 安全提示</h4>
-                    <p>建议定期更改管理员密码，启用所有安全功能，并监控访问日志以发现异常活动。</p>
-                </div>
-            </div>
+				<div class="setting-item">
+					<div class="input-group">
+						<label>会话超时时间（分钟）</label>
+						<input type="number" id="sessionTimeout" value="60" min="5" max="1440">
+					</div>
+					<button class="btn" onclick="updateSessionTimeout()">
+						<i class="fas fa-clock"></i>
+						更新超时
+					</button>
+				</div>
 
-            <!-- 备份设置 -->
-            <div class="setting-card">
-                <h3>
-                    <i class="fas fa-database"></i>
-                    备份设置
-                </h3>
+				<div class="info-box">
+					<h4><i class="fas fa-info-circle"></i> 安全提示</h4>
+					<p>建议定期更改管理员密码，启用所有安全功能，并监控访问日志以发现异常活动。</p>
+				</div>
+			</div>
 
-                <div class="setting-item">
-                    <div class="setting-label">
-                        <div>
-                            <div class="label">自动备份</div>
-                            <div class="description">定期自动创建数据备份</div>
-                        </div>
-                        <div class="toggle-switch" id="autoBackupToggle" onclick="toggleAutoBackup()"></div>
-                    </div>
-                </div>
+			<!-- 备份设置 -->
+			<div class="setting-card">
+				<h3>
+					<i class="fas fa-database"></i>
+					备份设置
+				</h3>
 
-                <div class="setting-item">
-                    <div class="input-group">
-                        <label>备份频率</label>
-                        <select id="backupFrequency">
-                            <option value="daily">每日</option>
-                            <option value="weekly">每周</option>
-                            <option value="monthly">每月</option>
-                        </select>
-                    </div>
-                </div>
+				<div class="setting-item">
+					<div class="setting-label">
+						<div>
+							<div class="label">自动备份</div>
+							<div class="description">定期自动创建数据备份</div>
+						</div>
+						<div class="toggle-switch" id="autoBackupToggle" onclick="toggleAutoBackup()"></div>
+					</div>
+				</div>
 
-                <div class="setting-item">
-                    <div class="input-group">
-                        <label>保留备份数量</label>
-                        <input type="number" id="backupRetention" value="7" min="1" max="30">
-                    </div>
-                </div>
+				<div class="setting-item">
+					<div class="input-group">
+						<label>备份频率</label>
+						<select id="backupFrequency">
+							<option value="daily">每日</option>
+							<option value="weekly">每周</option>
+							<option value="monthly">每月</option>
+						</select>
+					</div>
+				</div>
 
-                <div class="setting-item">
-                    <button class="btn btn-success" onclick="createBackup()">
-                        <i class="fas fa-plus"></i>
-                        立即备份
-                    </button>
-                    <button class="btn btn-warning" onclick="restoreBackup()">
-                        <i class="fas fa-undo"></i>
-                        恢复备份
-                    </button>
-                    <button class="btn btn-danger" onclick="clearBackups()">
-                        <i class="fas fa-trash"></i>
-                        清理备份
-                    </button>
-                </div>
+				<div class="setting-item">
+					<div class="input-group">
+						<label>保留备份数量</label>
+						<input type="number" id="backupRetention" value="7" min="1" max="30">
+					</div>
+				</div>
 
-                <div class="info-box">
-                    <h4><i class="fas fa-info-circle"></i> 备份说明</h4>
-                    <p>备份包含所有用户数据、配置文件和系统设置。建议定期备份以防止数据丢失。</p>
-                </div>
-            </div>
+				<div class="setting-item">
+					<button class="btn btn-success" onclick="createBackup()">
+						<i class="fas fa-plus"></i>
+						立即备份
+					</button>
+					<button class="btn btn-warning" onclick="restoreBackup()">
+						<i class="fas fa-undo"></i>
+						恢复备份
+					</button>
+					<button class="btn btn-danger" onclick="clearBackups()">
+						<i class="fas fa-trash"></i>
+						清理备份
+					</button>
+				</div>
 
-            <!-- 维护工具 -->
-            <div class="setting-card">
-                <h3>
-                    <i class="fas fa-tools"></i>
-                    维护工具
-                </h3>
+				<div class="info-box">
+					<h4><i class="fas fa-info-circle"></i> 备份说明</h4>
+					<p>备份包含所有用户数据、配置文件和系统设置。建议定期备份以防止数据丢失。</p>
+				</div>
+			</div>
 
-                <div class="setting-item">
-                    <button class="btn" onclick="clearCache()">
-                        <i class="fas fa-broom"></i>
-                        清理缓存
-                    </button>
-                    <button class="btn" onclick="optimizeDatabase()">
-                        <i class="fas fa-database"></i>
-                        优化数据库
-                    </button>
-                </div>
+			<!-- 维护工具 -->
+			<div class="setting-card">
+				<h3>
+					<i class="fas fa-tools"></i>
+					维护工具
+				</h3>
 
-                <div class="setting-item">
-                    <button class="btn btn-warning" onclick="clearLogs()">
-                        <i class="fas fa-file-alt"></i>
-                        清理日志
-                    </button>
-                    <button class="btn btn-danger" onclick="resetSystem()">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        重置系统
-                    </button>
-                </div>
+				<div class="setting-item">
+					<button class="btn" onclick="clearCache()">
+						<i class="fas fa-broom"></i>
+						清理缓存
+					</button>
+					<button class="btn" onclick="optimizeDatabase()">
+						<i class="fas fa-database"></i>
+						优化数据库
+					</button>
+				</div>
 
-                <div class="setting-item">
-                    <div class="input-group">
-                        <label>系统日志级别</label>
-                        <select id="logLevel">
-                            <option value="error">仅错误</option>
-                            <option value="warn">警告</option>
-                            <option value="info" selected>信息</option>
-                            <option value="debug">调试</option>
-                        </select>
-                    </div>
-                    <button class="btn" onclick="updateLogLevel()">
-                        <i class="fas fa-cog"></i>
-                        更新日志级别
-                    </button>
-                </div>
+				<div class="setting-item">
+					<button class="btn btn-warning" onclick="clearLogs()">
+						<i class="fas fa-file-alt"></i>
+						清理日志
+					</button>
+					<button class="btn btn-danger" onclick="resetSystem()">
+						<i class="fas fa-exclamation-triangle"></i>
+						重置系统
+					</button>
+				</div>
 
-                <div class="info-box">
-                    <h4><i class="fas fa-exclamation-triangle"></i> 警告</h4>
-                    <p>重置系统将删除所有数据，请谨慎操作。建议在重置前进行完整备份。</p>
-                </div>
-            </div>
-        </div>
-    </div>
+				<div class="setting-item">
+					<div class="input-group">
+						<label>系统日志级别</label>
+						<select id="logLevel">
+							<option value="error">仅错误</option>
+							<option value="warn">警告</option>
+							<option value="info" selected>信息</option>
+							<option value="debug">调试</option>
+						</select>
+					</div>
+					<button class="btn" onclick="updateLogLevel()">
+						<i class="fas fa-cog"></i>
+						更新日志级别
+					</button>
+				</div>
 
-    <script>
-        const API_BASE = window.location.origin + '/api';
+				<div class="info-box">
+					<h4><i class="fas fa-exclamation-triangle"></i> 警告</h4>
+					<p>重置系统将删除所有数据，请谨慎操作。建议在重置前进行完整备份。</p>
+				</div>
+			</div>
+		</div>
+	</div>
 
-        // 获取认证令牌
-        function getAuthToken() {
-            return sessionStorage.getItem('token');
-        }
+	<script>
+		const API_BASE = window.location.origin + '/api';
 
-        // 检查管理员权限
-        async function checkAdminAuth() {
-            const authToken = getAuthToken();
-            
-            if (!authToken) {
-                window.location.href = '/Pages/login.html';
-                return false;
-            }
+		// 获取认证令牌
+		function getAuthToken() {
+			return sessionStorage.getItem('token');
+		}
 
-            try {
-                const response = await fetch(`${API_BASE}/auth/me`, {
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`
-                    }
-                });
+		// 检查管理员权限
+		async function checkAdminAuth() {
+			const authToken = getAuthToken();
 
-                if (!response.ok) {
-                    window.location.href = '/Pages/login.html';
-                    return false;
-                }
+			if (!authToken) {
+				window.location.href = '/Pages/login.html';
+				return false;
+			}
 
-                const data = await response.json();
-                const user = data.data.user;
-                
-                if (user.role !== 'admin') {
-                    alert('需要管理员权限才能访问此页面');
-                    window.location.href = '/Pages/admin/dashboard.html';
-                    return false;
-                }
+			try {
+				const response = await fetch(`${API_BASE}/auth/me`, {
+					headers: {
+						'Authorization': `Bearer ${authToken}`
+					}
+				});
 
-                return true;
-            } catch (error) {
-                console.error('权限检查失败:', error);
-                window.location.href = '/Pages/login.html';
-                return false;
-            }
-        }
+				if (!response.ok) {
+					window.location.href = '/Pages/login.html';
+					return false;
+				}
 
-        // 检查数据库状态
-        async function checkDatabaseStatus() {
-            const dbStatus = document.getElementById('dbStatus');
-            
-            try {
-                const authToken = getAuthToken();
-                const response = await fetch(`${API_BASE}/userdata/stats`, {
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`
-                    }
-                });
+				const data = await response.json();
+				const user = data.data.user;
 
-                if (response.ok) {
-                    dbStatus.className = 'status-indicator status-online';
-                    dbStatus.innerHTML = '<i class="fas fa-circle"></i> 已连接';
-                } else {
-                    dbStatus.className = 'status-indicator status-warning';
-                    dbStatus.innerHTML = '<i class="fas fa-circle"></i> 模拟模式';
-                }
-            } catch (error) {
-                dbStatus.className = 'status-indicator status-offline';
-                dbStatus.innerHTML = '<i class="fas fa-circle"></i> 连接失败';
-            }
-        }
+				if (user.role !== 'admin') {
+					alert('需要管理员权限才能访问此页面');
+					window.location.href = '/Pages/admin/dashboard.html';
+					return false;
+				}
 
-        // 切换开关
-        function toggleEncryption() {
-            const toggle = document.getElementById('encryptionToggle');
-            toggle.classList.toggle('active');
-            alert('数据加密设置已更新');
-        }
+				return true;
+			} catch (error) {
+				console.error('权限检查失败:', error);
+				window.location.href = '/Pages/login.html';
+				return false;
+			}
+		}
 
-        function toggleLogging() {
-            const toggle = document.getElementById('loggingToggle');
-            toggle.classList.toggle('active');
-            alert('访问日志设置已更新');
-        }
+		// 检查数据库状态
+		async function checkDatabaseStatus() {
+			const dbStatus = document.getElementById('dbStatus');
 
-        function toggleAudit() {
-            const toggle = document.getElementById('auditToggle');
-            toggle.classList.toggle('active');
-            alert('安全审计设置已更新');
-        }
+			try {
+				const authToken = getAuthToken();
+				const response = await fetch(`${API_BASE}/userdata/stats`, {
+					headers: {
+						'Authorization': `Bearer ${authToken}`
+					}
+				});
 
-        function toggleAutoBackup() {
-            const toggle = document.getElementById('autoBackupToggle');
-            toggle.classList.toggle('active');
-            alert('自动备份设置已更新');
-        }
+				if (response.ok) {
+					dbStatus.className = 'status-indicator status-online';
+					dbStatus.innerHTML = '<i class="fas fa-circle"></i> 已连接';
+				} else {
+					dbStatus.className = 'status-indicator status-warning';
+					dbStatus.innerHTML = '<i class="fas fa-circle"></i> 模拟模式';
+				}
+			} catch (error) {
+				dbStatus.className = 'status-indicator status-offline';
+				dbStatus.innerHTML = '<i class="fas fa-circle"></i> 连接失败';
+			}
+		}
 
-        // 更新设置
-        function updateServerPort() {
-            const port = document.getElementById('serverPort').value;
-            alert(`服务器端口已更新为: ${port}`);
-        }
+		// 切换开关
+		function toggleEncryption() {
+			const toggle = document.getElementById('encryptionToggle');
+			toggle.classList.toggle('active');
+			alert('数据加密设置已更新');
+		}
 
-        function updateSessionTimeout() {
-            const timeout = document.getElementById('sessionTimeout').value;
-            alert(`会话超时时间已更新为: ${timeout} 分钟`);
-        }
+		function toggleLogging() {
+			const toggle = document.getElementById('loggingToggle');
+			toggle.classList.toggle('active');
+			alert('访问日志设置已更新');
+		}
 
-        function updateLogLevel() {
-            const level = document.getElementById('logLevel').value;
-            alert(`日志级别已更新为: ${level}`);
-        }
+		function toggleAudit() {
+			const toggle = document.getElementById('auditToggle');
+			toggle.classList.toggle('active');
+			alert('安全审计设置已更新');
+		}
 
-        // 备份操作
-        function createBackup() {
-            if (confirm('确定要创建数据备份吗？')) {
-                alert('备份创建中...');
-                // 这里可以调用备份API
-            }
-        }
+		function toggleAutoBackup() {
+			const toggle = document.getElementById('autoBackupToggle');
+			toggle.classList.toggle('active');
+			alert('自动备份设置已更新');
+		}
 
-        function restoreBackup() {
-            if (confirm('确定要恢复备份吗？这将覆盖当前数据！')) {
-                alert('备份恢复中...');
-                // 这里可以调用恢复API
-            }
-        }
+		// 更新设置
+		function updateServerPort() {
+			const port = document.getElementById('serverPort').value;
+			alert(`服务器端口已更新为: ${port}`);
+		}
 
-        function clearBackups() {
-            if (confirm('确定要清理所有备份吗？此操作不可恢复！')) {
-                alert('备份清理中...');
-                // 这里可以调用清理API
-            }
-        }
+		function updateSessionTimeout() {
+			const timeout = document.getElementById('sessionTimeout').value;
+			alert(`会话超时时间已更新为: ${timeout} 分钟`);
+		}
 
-        // 维护操作
-        function clearCache() {
-            if (confirm('确定要清理系统缓存吗？')) {
-                alert('缓存清理中...');
-            }
-        }
+		function updateLogLevel() {
+			const level = document.getElementById('logLevel').value;
+			alert(`日志级别已更新为: ${level}`);
+		}
 
-        function optimizeDatabase() {
-            if (confirm('确定要优化数据库吗？')) {
-                alert('数据库优化中...');
-            }
-        }
+		// 备份操作
+		function createBackup() {
+			if (confirm('确定要创建数据备份吗？')) {
+				alert('备份创建中...');
+				// 这里可以调用备份API
+			}
+		}
 
-        function clearLogs() {
-            if (confirm('确定要清理系统日志吗？')) {
-                alert('日志清理中...');
-            }
-        }
+		function restoreBackup() {
+			if (confirm('确定要恢复备份吗？这将覆盖当前数据！')) {
+				alert('备份恢复中...');
+				// 这里可以调用恢复API
+			}
+		}
 
-        function resetSystem() {
-            if (confirm('警告：这将删除所有数据！确定要重置系统吗？')) {
-                if (confirm('再次确认：此操作不可恢复！')) {
-                    alert('系统重置中...');
-                }
-            }
-        }
+		function clearBackups() {
+			if (confirm('确定要清理所有备份吗？此操作不可恢复！')) {
+				alert('备份清理中...');
+				// 这里可以调用清理API
+			}
+		}
 
-        // 页面初始化
-        async function init() {
-            const hasAuth = await checkAdminAuth();
-            if (hasAuth) {
-                checkDatabaseStatus();
-            }
-        }
+		// 维护操作
+		function clearCache() {
+			if (confirm('确定要清理系统缓存吗？')) {
+				alert('缓存清理中...');
+			}
+		}
 
-        // 启动应用
-        setTimeout(() => {
-            init();
-        }, 100);
-    </script>
+		function optimizeDatabase() {
+			if (confirm('确定要优化数据库吗？')) {
+				alert('数据库优化中...');
+			}
+		}
+
+		function clearLogs() {
+			if (confirm('确定要清理系统日志吗？')) {
+				alert('日志清理中...');
+			}
+		}
+
+		function resetSystem() {
+			if (confirm('警告：这将删除所有数据！确定要重置系统吗？')) {
+				if (confirm('再次确认：此操作不可恢复！')) {
+					alert('系统重置中...');
+				}
+			}
+		}
+
+		// 页面初始化
+		async function init() {
+			const hasAuth = await checkAdminAuth();
+			if (hasAuth) {
+				checkDatabaseStatus();
+			}
+		}
+
+		// 启动应用
+		setTimeout(() => {
+			init();
+		}, 100);
+	</script>
 </body>
-</html> 
+
+</html>

@@ -276,10 +276,44 @@
 		<!-- 历史更新 -->
 		<h3 id="更新日志">. 更新日志 .</h3>
 		<div class="timeline">
-			<div id="versionLogContainer"></div>
-			<script src="./changelog.js"></script>
+			<div id="versionLogContainer">
+				<div style="text-align: center; padding: 20px;">
+					<i class="fas fa-spinner fa-spin"></i> 正在加载版本信息...
+				</div>
+			</div>
+			<script src="./config.js"></script>
 			<script src="./timelineData.js"></script>
 			<script>
+				/**
+				 * 从API获取changelog数据
+				 */
+				async function loadChangelogFromAPI() {
+					try {
+						const apiBaseUrl = window.AboutConfig?.apiBaseUrl || '/api';
+						const response = await fetch(`${apiBaseUrl}/changelog?limit=100`);
+						const result = await response.json();
+
+						if (result.success && result.data.changelogs) {
+							const versionLogs = result.data.changelogs;
+							renderTimeline('versionLogContainer', versionLogs, {
+								isVersionLog: true,
+								versionLogs: versionLogs,
+								titleField: 'version',
+								timeField: 'time',
+								contentField: 'content'
+							});
+						} else {
+							throw new Error('获取版本信息失败');
+						}
+					} catch (error) {
+						console.error('加载changelog失败:', error);
+						document.getElementById('versionLogContainer').innerHTML =
+							'<div style="text-align: center; padding: 20px; color: #ff6b6b;">' +
+							'<i class="fas fa-exclamation-triangle"></i> 加载版本信息失败，请稍后重试' +
+							'</div>';
+					}
+				}
+
 				/**
 				 * 通用的时间轴渲染函数
 				 * @param {string} containerId - 容器ID
@@ -290,7 +324,6 @@
 				function renderTimeline(containerId, data, options = {}) {
 					const container = document.getElementById(containerId);
 					if (!container) return;
-
 
 					/** @param {string} options.iconText - 图标文本
 					 * @param {string} options.titleField - 标题字段
@@ -312,6 +345,9 @@
 						isVersionLog = false,
 						versionLogs = null
 					} = options;
+
+					// 清空容器
+					container.innerHTML = '';
 
 					data.forEach((item, index) => {
 						const timelineItem = document.createElement('div');
@@ -367,80 +403,78 @@
 								li.appendChild(strong);
 								// 添加空格
 								li.appendChild(document.createTextNode(' '));
-								// 使用innerHTML来处理HTML标签
-								const contentText = document.createElement('span');
-								contentText.innerHTML = content.itemContent;
-								li.appendChild(contentText);
+								li.appendChild(document.createTextNode(content.itemContent));
+
 								ol.appendChild(li);
 							});
 
 							contentDiv.appendChild(ol);
 						} else {
-							// 普通时间轴使用段落和媒体
-							// 添加文本内容
-							if (item[contentField] && item[contentField].length > 0) {
-								item[contentField].forEach(content => {
-									const p = document.createElement('p');
-									p.innerHTML = content.itemContent;
-									contentDiv.appendChild(p);
-								});
-							}
-
-							// 添加图片
-							if (item[imagesField] && item[imagesField].length > 0) {
-								item[imagesField].forEach(imgSrc => {
-									const img = document.createElement('img');
-									img.src = imgSrc;
-									img.alt = '';
-									contentDiv.appendChild(img);
-								});
-							}
-
-							// 添加视频
-							if (item[videosField] && item[videosField].length > 0) {
-								item[videosField].forEach(videoSrc => {
-									const video = document.createElement('video');
-									video.src = videoSrc;
-									video.controls = true;
-									contentDiv.appendChild(video);
-								});
-							}
+							// 其他内容直接显示
+							contentDiv.textContent = item[contentField];
 						}
 
 						rightDiv.appendChild(contentDiv);
+
+						// 添加图片
+						if (item[imagesField] && item[imagesField].length > 0) {
+							const imagesDiv = document.createElement('div');
+							imagesDiv.className = 'images';
+
+							item[imagesField].forEach(image => {
+								const img = document.createElement('img');
+								img.src = image;
+								img.alt = '图片';
+								imagesDiv.appendChild(img);
+							});
+
+							rightDiv.appendChild(imagesDiv);
+						}
+
+						// 添加视频
+						if (item[videosField] && item[videosField].length > 0) {
+							const videosDiv = document.createElement('div');
+							videosDiv.className = 'videos';
+
+							item[videosField].forEach(video => {
+								const videoElement = document.createElement('video');
+								videoElement.src = video;
+								videoElement.controls = true;
+								videoElement.preload = 'metadata';
+								videosDiv.appendChild(videoElement);
+							});
+
+							rightDiv.appendChild(videosDiv);
+						}
+
+						// 组装时间轴项
 						timelineItem.appendChild(leftDiv);
 						timelineItem.appendChild(rightDiv);
+
+						// 添加到容器
 						container.appendChild(timelineItem);
 					});
 
-					// 版本日志特殊处理：在循环外设置最后两个元素的ID
+					// 版本日志特殊处理
 					if (isVersionLog && versionLogs && versionLogs.length > 0) {
 						const lastIndex = versionLogs.length - 1;
-						const lastItem = container.children[lastIndex];
-						const secondLastItem = lastIndex > 0 ? container.children[lastIndex - 1] : null;
+						const lastItem = versionLogs[lastIndex];
 
+						// 检查最后一个版本是否为ExpectTheNextVersion
 						if (versionLogs[lastIndex].version === 'ExpectTheNextVersion') {
-							lastItem.id = 'ExpectTheNextVersion';
-							secondLastItem ? secondLastItem.id = 'lastUpdate' : null;
-						} else {
-							lastItem.id = 'lastUpdate';
+							// 为ExpectTheNextVersion添加特殊样式
+							const lastTimelineItem = container.lastElementChild;
+							if (lastTimelineItem) {
+								lastTimelineItem.style.opacity = '0.7';
+								lastTimelineItem.style.fontStyle = 'italic';
+							}
 						}
 					}
 				}
 
-				window.addEventListener('DOMContentLoaded', () => {
-					// 渲染版本日志
-					renderTimeline('versionLogContainer', versionLogs, {
-						isVersionLog: true,
-						versionLogs: versionLogs,
-						titleField: 'version',
-						timeField: 'time',
-						contentField: 'content'
-					});
-
-					// 渲染时间轴数据
-					renderTimeline('myPastContainer', timelineData.myPastData);
-					renderTimeline('healthContainer', timelineData.healthData);
+				// 页面加载完成后获取changelog数据
+				document.addEventListener('DOMContentLoaded', function () {
+					loadChangelogFromAPI();
 				});
 			</script>
 		</div>

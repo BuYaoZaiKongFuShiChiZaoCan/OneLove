@@ -1,15 +1,13 @@
-// OneLove 项目配置文件
+// About页面配置文件
 const config = {
 	// 开发环境
 	development: {
 		apiBaseUrl: 'http://localhost:3000/api',
-		corsOrigin: 'http://localhost:3000'
 	},
 
-	// 生产环境 - Netlify
+	// 生产环境
 	production: {
-		apiBaseUrl: 'http://localhost:3000/api', // 暂时使用本地后端，避免CORS问题
-		corsOrigin: 'https://yibiling.netlify.app'
+		apiBaseUrl: 'http://localhost:3000/api', // 暂时使用本地后端
 	}
 };
 
@@ -22,4 +20,4 @@ const getConfig = () => {
 };
 
 // 导出配置
-window.OneLoveConfig = getConfig(); 
+window.AboutConfig = getConfig(); 
