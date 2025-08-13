@@ -108,6 +108,9 @@
 	<!-- SEO结束 -->
 	<!-- PWA开始 manifest清单、告诉浏览器安装一些应用信息 -->
 	<link rel="manifest" href="./manifest.json" />
+	
+	<!-- 配置文件 -->
+	<script src="./scripts/config.js"></script>
 </head>
 
 <body>
@@ -1633,7 +1636,7 @@
 
 				if (token) {
 					// 验证令牌有效性
-					fetch('/api/auth/me', {
+					fetch(`${window.OneLoveConfig?.apiBaseUrl || '/api'}/auth/me`, {
 						headers: {
 							'Authorization': `Bearer ${token}`
 						}
@@ -1809,7 +1812,7 @@
 				const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 
 				if (token) {
-					fetch('/api/auth/logout', {
+					fetch(`${window.OneLoveConfig?.apiBaseUrl || '/api'}/auth/logout`, {
 						method: 'POST',
 						headers: {
 							'Authorization': `Bearer ${token}`
@@ -1860,7 +1863,7 @@
 				if (!token) return;
 				
 				try {
-					const response = await fetch('/api/userdata/stats', {
+					const response = await fetch(`${window.OneLoveConfig?.apiBaseUrl || '/api'}/userdata/stats`, {
 						headers: {
 							'Authorization': `Bearer ${token}`
 						}
