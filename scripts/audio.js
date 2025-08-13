@@ -256,14 +256,14 @@ const observer = new MutationObserver((mutationsList) => {
     }
 });
 // 配置观察选项
-const config = { attributes: true };
+const observerConfig = { attributes: true };
 /**
  * 开始观察
  * @param {HTMLElement} audio 要监听audio元素
  * @param {const} 配置项
  * @returns {none} 无返回
  */
-observer.observe(audio, config);
+observer.observe(audio, observerConfig);
 
 let lrcContent
 // 歌词存储object
