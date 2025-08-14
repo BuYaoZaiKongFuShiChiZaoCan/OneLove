@@ -235,6 +235,8 @@ app.use(cors({
 		'https://onelove-app.vercel.app',
 		'https://onelove-app-git-main.vercel.app',
 		'https://onelove-app-git-develop.vercel.app',
+		'https://yibiling.netlify.app',
+		'https://your-railway-app.railway.app',
 		process.env.CORS_ORIGIN
 	].filter(Boolean), // 允许的域名
 	credentials: true  // 允许携带凭证（cookies等）

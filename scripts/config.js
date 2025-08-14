@@ -8,7 +8,7 @@ const config = {
 
 	// 生产环境 - Netlify
 	production: {
-		apiBaseUrl: 'http://localhost:3000/api', // 暂时使用本地后端，避免CORS问题
+		apiBaseUrl: 'https://your-railway-app.railway.app/api', // 使用HTTPS后端服务
 		corsOrigin: 'https://yibiling.netlify.app'
 	}
 };

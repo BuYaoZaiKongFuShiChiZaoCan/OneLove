@@ -7,7 +7,7 @@ const config = {
 
 	// 生产环境
 	production: {
-		apiBaseUrl: 'http://localhost:3000/api', // 暂时使用本地后端
+		apiBaseUrl: 'https://your-railway-app.railway.app/api', // 使用HTTPS后端服务
 	}
 };
 
