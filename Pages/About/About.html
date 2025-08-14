@@ -447,15 +447,15 @@
 							if (Array.isArray(item[contentField])) {
 								item[contentField].forEach(content => {
 									const p = document.createElement('p');
-									// 检查内容是否为空或undefined
-									const contentText = content.itemContent || content || '';
+									// 检查内容是否为空或undefined，并确保是字符串类型
+									const contentText = String(content.itemContent || content || '');
 									if (contentText.trim() !== '') {
 										p.innerHTML = contentText;
 										contentDiv.appendChild(p);
 									}
 								});
 							} else {
-								const contentText = item[contentField] || '';
+								const contentText = String(item[contentField] || '');
 								if (contentText.trim() !== '') {
 									contentDiv.innerHTML = contentText;
 								}
