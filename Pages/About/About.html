@@ -201,6 +201,35 @@
 			margin: 10px;
 		}
 
+		.timeline .item .right .content ol {
+			margin: 10px;
+			padding-left: 20px;
+		}
+
+		.timeline .item .right .content ol li {
+			margin: 5px 0;
+			line-height: 1.6;
+		}
+
+		.timeline .item .right .images {
+			margin: 10px;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+		}
+
+		.timeline .item .right .images img {
+			width: 200px;
+			height: 150px;
+			object-fit: cover;
+			border-radius: 8px;
+			border: 2px solid #ddd;
+		}
+
+		.timeline .item .right .videos {
+			margin: 10px;
+		}
+
 		.timeline .item .right .content img,
 		.timeline .item .right .content video {
 			width: 80%;
@@ -403,7 +432,11 @@
 								li.appendChild(strong);
 								// 添加空格
 								li.appendChild(document.createTextNode(' '));
-								li.appendChild(document.createTextNode(content.itemContent));
+								
+								// 使用innerHTML来正确渲染HTML标签
+								const contentSpan = document.createElement('span');
+								contentSpan.innerHTML = content.itemContent || '';
+								li.appendChild(contentSpan);
 
 								ol.appendChild(li);
 							});
@@ -414,11 +447,18 @@
 							if (Array.isArray(item[contentField])) {
 								item[contentField].forEach(content => {
 									const p = document.createElement('p');
-									p.innerHTML = content.itemContent || content;
-									contentDiv.appendChild(p);
+									// 检查内容是否为空或undefined
+									const contentText = content.itemContent || content || '';
+									if (contentText.trim() !== '') {
+										p.innerHTML = contentText;
+										contentDiv.appendChild(p);
+									}
 								});
 							} else {
-								contentDiv.innerHTML = item[contentField];
+								const contentText = item[contentField] || '';
+								if (contentText.trim() !== '') {
+									contentDiv.innerHTML = contentText;
+								}
 							}
 						}
 
