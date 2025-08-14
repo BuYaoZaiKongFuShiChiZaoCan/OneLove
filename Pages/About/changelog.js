@@ -1567,7 +1567,11 @@ const versionLogs = [
         "content": [
             {
                 itemTime: null,
-                itemContent: "预计后续会增加论坛、同源标签页互通、muted视频静音播放（包括其它页面）等功能、页面暗亮色，多语言"
+                itemContent: "预计后续会增加论坛、同源标签页互通、muted视频静音播放（包括其它页面）、视频画中画功能、页面暗亮色，多语言"
+            },
+            {
+                itemTime: null,
+                itemContent: "视频画中画功能：支持视频在独立窗口中播放，提升多任务处理体验"
             },
             {
                 itemTime: null,
@@ -1584,10 +1588,6 @@ const versionLogs = [
             {
                 itemTime: null,
                 itemContent: "目前浏览器还没有对应的耳机是否连接的标准API，所以暂时没有实现耳机连接断开事件"
-            },
-            {
-                itemTime: null,
-                itemContent: "预计后续会增加论坛、同源标签页互通、muted视频静音播放（包括其它页面）等功能"
             },
             {
                 itemTime: null,
