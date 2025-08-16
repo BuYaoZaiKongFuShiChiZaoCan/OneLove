@@ -1085,7 +1085,7 @@
 					margin-top: 10px;
 				`;
 
-				// 减少时间按钮
+				// 减少时间按钮（仅在测试环境显示）
 				const reduceTimeBtn = document.createElement('button');
 				reduceTimeBtn.innerHTML = '⏰ 减少20%时间';
 				reduceTimeBtn.style.cssText = `
@@ -1101,6 +1101,11 @@
 					transition: all 0.3s ease;
 				`;
 				reduceTimeBtn.onclick = reduceRestTime;
+				
+				// 只在测试环境显示减少时间按钮
+				if (!isLocalDevelopment()) {
+					reduceTimeBtn.style.display = 'none';
+				}
 
 				// 音效提示
 				const soundHint = document.createElement('div');

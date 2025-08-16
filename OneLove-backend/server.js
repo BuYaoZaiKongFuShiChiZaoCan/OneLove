@@ -20,6 +20,43 @@ const { loggerMiddleware, securityAudit, logAccess } = require('./middleware/log
 const User = require('./models/User');
 const Changelog = require('./models/Changelog');
 
+// TimelineData模型
+const TimelineDataSchema = new mongoose.Schema({
+	dataType: {
+		type: String,
+		required: true,
+		enum: ['myPast', 'health']
+	},
+	title: {
+		type: String,
+		required: true
+	},
+	time: {
+		type: String,
+		default: ''
+	},
+	content: [{
+		itemContent: String
+	}],
+	images: [String],
+	videos: [String],
+	status: {
+		type: String,
+		default: 'active',
+		enum: ['active', 'inactive']
+	},
+	createdAt: {
+		type: Date,
+		default: Date.now
+	},
+	updatedAt: {
+		type: Date,
+		default: Date.now
+	}
+});
+
+const TimelineData = mongoose.model('TimelineData', TimelineDataSchema);
+
 // 创建Express应用实例
 const app = express();
 
@@ -236,10 +273,10 @@ app.use(cors({
 		'https://onelove-app-git-main.vercel.app',
 		'https://onelove-app-git-develop.vercel.app',
 		'https://yibiling.netlify.app',
-		'https://your-railway-app.railway.app',
+		'https://your-railway-app.railway.app', // Placeholder for Railway backend
 		process.env.CORS_ORIGIN
-	].filter(Boolean), // 允许的域名
-	credentials: true  // 允许携带凭证（cookies等）
+	].filter(Boolean),
+	credentials: true
 }));
 
 // 日志中间件 - 记录所有HTTP请求
@@ -300,12 +337,12 @@ const authenticateToken = async (req, res, next) => {
 
 		req.user = user;
 		next();
-	} catch (error) {
+  } catch (error) {
 		return res.status(401).json({
 			success: false,
 			message: '无效的访问令牌'
 		});
-	}
+  }
 };
 
 // ========================================
@@ -314,61 +351,61 @@ const authenticateToken = async (req, res, next) => {
 
 // 根路由 - 返回主页HTML
 app.get('/', (req, res) => {
-	res.sendFile(path.join(__dirname, '../index.html'));
+  res.sendFile(path.join(__dirname, '../index.html'));
 });
 
 // API信息路由 - 访问/api/info获取API信息
 app.get('/api/info', (req, res) => {
-	res.json({
-		message: '欢迎使用 OneLove 后端API服务！',
-		version: '5.0.2',
-		timestamp: new Date().toISOString(),
-		database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-		endpoints: {
+  res.json({
+    message: '欢迎使用 OneLove 后端API服务！',
+    version: '5.0.2',
+    timestamp: new Date().toISOString(),
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    endpoints: {
 			'/api/auth/register': '用户注册',
 			'/api/auth/login': '用户登录',
 			'/api/auth/me': '获取用户信息',
 			'/api/auth/profile': '更新用户信息',
 			'/api/auth/password': '修改密码',
 			'/api/auth/logout': '用户登出',
-			'/api/health': '健康检查',
+      '/api/health': '健康检查',
 			'/api/changelog': '版本信息'
-		}
-	});
+    }
+  });
 });
 
 // 认证API根路径 - 访问/api/auth获取认证API信息
 app.get('/api/auth', (req, res) => {
-	res.json({
-		message: 'OneLove 认证API服务',
-		version: '5.0.2',
-		timestamp: new Date().toISOString(),
-		database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-		endpoints: {
-			'/api/auth/register': '用户注册 - POST',
-			'/api/auth/login': '用户登录 - POST',
-			'/api/auth/me': '获取用户信息 - GET',
-			'/api/auth/profile': '更新用户信息 - PUT',
-			'/api/auth/password': '修改密码 - PUT',
-			'/api/auth/logout': '用户登出 - POST'
-		},
-		authentication: {
-			type: 'JWT',
-			header: 'Authorization: Bearer <token>'
-		}
-	});
+  res.json({
+    message: 'OneLove 认证API服务',
+    version: '5.0.2',
+    timestamp: new Date().toISOString(),
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    endpoints: {
+      '/api/auth/register': '用户注册 - POST',
+      '/api/auth/login': '用户登录 - POST',
+      '/api/auth/me': '获取用户信息 - GET',
+      '/api/auth/profile': '更新用户信息 - PUT',
+      '/api/auth/password': '修改密码 - PUT',
+      '/api/auth/logout': '用户登出 - POST'
+    },
+    authentication: {
+      type: 'JWT',
+      header: 'Authorization: Bearer <token>'
+    }
+  });
 });
 
 // 健康检查路由 - 用于监控服务状态
 app.get('/api/health', (req, res) => {
-	res.json({
-		status: 'healthy',
-		uptime: process.uptime(),
-		timestamp: new Date().toISOString(),
-		environment: process.env.NODE_ENV || 'development',
-		version: '5.0.2',
-		database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
-	});
+  res.json({
+    status: 'healthy',
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+    version: '5.0.2',
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
 });
 
 // 用户注册
@@ -929,16 +966,16 @@ app.get('/api/users/:id', async (req, res) => {
 
 // 数据相关路由
 app.get('/api/data', (req, res) => {
-	const data = {
-		message: '这是来自后端的数据',
-		timestamp: new Date().toISOString(),
-		random: Math.random()
-	};
-
-	res.json({
-		success: true,
-		data: data
-	});
+  const data = {
+    message: '这是来自后端的数据',
+    timestamp: new Date().toISOString(),
+    random: Math.random()
+  };
+  
+  res.json({
+    success: true,
+    data: data
+  });
 });
 
 // 用户数据统计API
@@ -2155,7 +2192,7 @@ app.get('/api/changelog', async (req, res) => {
 	} catch (error) {
 		console.error('获取changelog失败:', error);
 		res.status(500).json({
-			success: false,
+    success: false,
 			message: '获取版本信息失败'
 		});
 	}
@@ -2183,6 +2220,244 @@ app.get('/api/changelog/latest', async (req, res) => {
 		res.status(500).json({
 			success: false,
 			message: '获取最新版本信息失败'
+		});
+	}
+});
+
+// ========================================
+// 时间轴管理API
+// ========================================
+
+// 添加时间轴项
+app.post('/api/timeline', authenticateToken, async (req, res) => {
+	try {
+		const { title, time, content, images, videos, private: isPrivate } = req.body;
+		const userId = req.user._id;
+
+		// 验证必填字段
+		if (!title || !time || !content) {
+			return res.status(400).json({
+				success: false,
+				message: '标题、时间和内容为必填字段'
+			});
+		}
+
+		// 创建时间轴项
+		const timelineItem = {
+			userId: userId,
+			dataType: 'timeline',
+			name: title,
+			content: {
+				title: title,
+				time: time,
+				content: content,
+				images: images || [],
+				videos: videos || [],
+				private: isPrivate || false
+			},
+			description: `用户 ${req.user.username} 的时间轴项`,
+			status: 'active',
+			tags: ['timeline', 'personal'],
+			priority: 1,
+			createdAt: new Date(),
+			updatedAt: new Date()
+		};
+
+		// 保存到数据库
+		const userData = new UserData(timelineItem);
+		await userData.save();
+
+		res.json({
+			success: true,
+			message: '时间轴项添加成功',
+			data: {
+				id: userData._id,
+				title: title,
+				time: time,
+				private: isPrivate || false
+			}
+		});
+
+	} catch (error) {
+		console.error('添加时间轴项失败:', error);
+		res.status(500).json({
+			success: false,
+			message: '服务器内部错误'
+		});
+	}
+});
+
+// 获取用户时间轴数据
+app.get('/api/timeline', authenticateToken, async (req, res) => {
+	try {
+		const userId = req.user._id;
+		const timelineData = await UserData.find({
+			userId: userId,
+			dataType: 'timeline',
+			status: 'active'
+		}).sort({ createdAt: -1 });
+
+		// 转换为前端需要的格式
+		const formattedData = timelineData.map(item => ({
+			id: item._id,
+			title: item.content.title,
+			time: item.content.time,
+			content: item.content.content,
+			images: item.content.images || [],
+			videos: item.content.videos || [],
+			private: item.content.private
+		}));
+
+		res.json({
+			success: true,
+			data: {
+				timeline: formattedData
+			}
+		});
+
+	} catch (error) {
+		console.error('获取时间轴数据失败:', error);
+		res.status(500).json({
+			success: false,
+			message: '服务器内部错误'
+		});
+	}
+});
+
+// 获取公开时间轴数据（无需登录）
+app.get('/api/timeline/public', async (req, res) => {
+	try {
+		const timelineData = await UserData.find({
+			dataType: 'timeline',
+			status: 'active',
+			'content.private': { $ne: true } // 只获取公开的项目
+		}).sort({ createdAt: -1 });
+
+		// 转换为前端需要的格式
+		const formattedData = timelineData.map(item => ({
+			id: item._id,
+			title: item.content.title,
+			time: item.content.time,
+			content: item.content.content,
+			images: item.content.images || [],
+			videos: item.content.videos || [],
+			private: false // 公开项目
+		}));
+
+		res.json({
+			success: true,
+			data: {
+				timeline: formattedData
+			}
+		});
+
+	} catch (error) {
+		console.error('获取公开时间轴数据失败:', error);
+		res.status(500).json({
+			success: false,
+			message: '服务器内部错误'
+		});
+	}
+});
+
+// 删除时间轴项
+app.delete('/api/timeline/:id', authenticateToken, async (req, res) => {
+	try {
+		const timelineId = req.params.id;
+		const userId = req.user._id;
+
+		// 验证权限（只能删除自己的时间轴项）
+		const timelineItem = await UserData.findOne({
+			_id: timelineId,
+			userId: userId,
+			dataType: 'timeline'
+		});
+
+		if (!timelineItem) {
+			return res.status(404).json({
+				success: false,
+				message: '时间轴项不存在或无权限删除'
+			});
+		}
+
+		// 软删除（标记为inactive）
+		timelineItem.status = 'inactive';
+		timelineItem.updatedAt = new Date();
+		await timelineItem.save();
+
+		res.json({
+			success: true,
+			message: '时间轴项删除成功'
+		});
+
+	} catch (error) {
+		console.error('删除时间轴项失败:', error);
+		res.status(500).json({
+			success: false,
+			message: '服务器内部错误'
+		});
+	}
+});
+
+// 更新时间轴项
+app.put('/api/timeline/:id', authenticateToken, async (req, res) => {
+	try {
+		const timelineId = req.params.id;
+		const userId = req.user._id;
+		const { title, time, content, images, videos, private: isPrivate } = req.body;
+
+		// 验证必填字段
+		if (!title || !time || !content) {
+			return res.status(400).json({
+				success: false,
+				message: '标题、时间和内容为必填字段'
+			});
+		}
+
+		// 验证权限（只能更新自己的时间轴项）
+		const timelineItem = await UserData.findOne({
+			_id: timelineId,
+			userId: userId,
+			dataType: 'timeline'
+		});
+
+		if (!timelineItem) {
+			return res.status(404).json({
+				success: false,
+				message: '时间轴项不存在或无权限更新'
+			});
+		}
+
+		// 更新时间轴项
+		timelineItem.name = title;
+		timelineItem.content = {
+			title: title,
+			time: time,
+			content: content,
+			images: images || timelineItem.content.images || [],
+			videos: videos || timelineItem.content.videos || [],
+			private: isPrivate || false
+		};
+		timelineItem.updatedAt = new Date();
+
+		await timelineItem.save();
+
+		res.json({
+			success: true,
+			message: '时间轴项更新成功',
+			data: {
+				id: timelineItem._id,
+				title: title,
+				time: time,
+				private: isPrivate || false
+			}
+		});
+
+	} catch (error) {
+		console.error('更新时间轴项失败:', error);
+		res.status(500).json({
+			success: false,
+			message: '服务器内部错误'
 		});
 	}
 });
@@ -2225,11 +2500,11 @@ app.get('/api/test/admin', requireAdmin, async (req, res) => {
 
 // 404错误处理 - 当访问不存在的路由时
 app.use('*', (req, res) => {
-	res.status(404).json({
-		success: false,
-		message: '请求的路径不存在',
-		path: req.originalUrl
-	});
+  res.status(404).json({
+    success: false,
+    message: '请求的路径不存在',
+    path: req.originalUrl
+  });
 });
 
 // 全局错误处理中间件
@@ -2240,7 +2515,7 @@ app.use((err, req, res, next) => {
 		success: false,
 		message: '服务器内部错误',
 		error: process.env.NODE_ENV === 'development' ? err.message : '请稍后重试'
-	});
+  });
 });
 
 // ========================================
@@ -2250,9 +2525,9 @@ app.use((err, req, res, next) => {
 const startServer = async () => {
 	// 尝试连接数据库
 	const dbConnected = await connectDB();
-
-	// 启动服务器
-	app.listen(PORT, () => {
+    
+    // 启动服务器
+    app.listen(PORT, () => {
 		console.log(`🚀 服务器已启动！`);
 		console.log(`📍 本地访问地址: http://localhost:${PORT}`);
 		console.log(`🌐 健康检查: http://localhost:${PORT}/api/health`);
@@ -2269,10 +2544,53 @@ startServer();
 // 优雅关闭处理
 process.on('SIGTERM', () => {
 	console.log('收到SIGTERM信号，正在关闭服务器...');
-	process.exit(0);
+    process.exit(0);
 });
 
 process.on('SIGINT', () => {
 	console.log('收到SIGINT信号，正在关闭服务器...');
-	process.exit(0);
-}); 
+    process.exit(0);
+  });
+
+// 获取timeline数据（My Past和Health）
+app.get('/api/timeline-data/:type', async (req, res) => {
+	try {
+		const { type } = req.params;
+		
+		if (!['myPast', 'health'].includes(type)) {
+			return res.status(400).json({
+				success: false,
+				message: '无效的数据类型'
+			});
+		}
+
+		const timelineData = await TimelineData.find({
+			dataType: type,
+			status: 'active'
+		}).sort({ createdAt: -1 });
+
+		// 转换为前端需要的格式
+		const formattedData = timelineData.map(item => ({
+			id: item._id,
+			title: item.title,
+			time: item.time,
+			content: item.content,
+			images: item.images || [],
+			videos: item.videos || []
+		}));
+
+		res.json({
+			success: true,
+			data: {
+				timeline: formattedData
+			}
+		});
+
+	} catch (error) {
+		console.error('获取timeline数据失败:', error);
+		res.status(500).json({
+			success: false,
+			message: '服务器内部错误'
+		});
+	}
+});

@@ -22,6 +22,8 @@
 
 		* {
 			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
 		}
 
 		marquee span {
@@ -43,6 +45,8 @@
 			display: flex;
 			align-items: center;
 			flex-direction: column;
+			min-height: 100vh;
+			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 		}
 
 		header,
@@ -84,12 +88,6 @@
 			text-decoration: underline;
 		}
 
-		video {
-			margin: 10px;
-			width: 100%;
-			height: 80vmin;
-		}
-
 		button {
 			color: #FFFFFF;
 			background: none;
@@ -100,12 +98,19 @@
 			z-index: 8;
 			border: 2px solid;
 			border-bottom: 4px solid;
+			cursor: pointer;
+			transition: all 0.3s ease;
+		}
+
+		button:hover {
+			transform: translateY(-2px);
 		}
 
 		article {
 			margin: 50px;
-			max-width: 760px;
+			max-width: 1200px;
 			text-align: justify;
+			width: 100%;
 		}
 
 		article>h3 {
@@ -113,6 +118,8 @@
 			transition: all .3s;
 			margin-bottom: 30px;
 			border-bottom: 3px solid #DDD;
+			color: #16A085;
+			font-size: 24px;
 		}
 
 		article>h3:hover {
@@ -122,6 +129,8 @@
 
 		article .content div {
 			text-indent: 2em;
+			margin-bottom: 15px;
+			line-height: 1.6;
 		}
 
 		article .content pre {
@@ -131,25 +140,26 @@
 
 		details {
 			text-align: center;
+			margin: 20px 0;
 		}
 
 		details :not(video) {
 			text-align: left;
 		}
 
-		/* 时间轴 */
+		/* 时间轴样式 - 恢复到之前的设计 */
 		.timeline {
-			margin: 20px 0;
+			position: relative;
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 20px;
 		}
 
 		.timeline .item {
+			position: relative;
 			margin-top: 50px;
 			display: flex;
 			flex-wrap: nowrap;
-		}
-
-		.timeline .item a {
-			color: #000;
 		}
 
 		.timeline .item .left {
@@ -161,13 +171,15 @@
 			color: #16A085;
 		}
 
+		/* 连接线 - 从图标中心到下一个图标中心 */
 		.timeline .item:not(:last-of-type) .left::after {
 			content: '';
 			display: block;
 			width: 0px;
-			height: calc(100% - .8rem);
+			height: calc(100% - 4rem);
 			border: 1px dashed;
 			margin: auto;
+			margin-top: 1rem;
 		}
 
 		.timeline .item .right {
@@ -219,8 +231,8 @@
 		}
 
 		.timeline .item .right .images img {
-			width: 200px;
-			height: 150px;
+			width: 100vmin;
+			height: 98vmin;
 			object-fit: cover;
 			border-radius: 8px;
 			border: 2px solid #ddd;
@@ -230,16 +242,155 @@
 			margin: 10px;
 		}
 
-		.timeline .item .right .content img,
 		.timeline .item .right .content video {
-			width: 80%;
-			margin-left: 5%;
+			width: 100vmin;
+			height: 98vmin;
 			border-radius: 5px;
-			/* vertical-align: bottom; */
 		}
 
 		.Ttime {
 			color: #16A085;
+		}
+
+		/* 操作按钮样式 */
+		.timeline-actions {
+			margin: 20px;
+			display: flex;
+			gap: 10px;
+			justify-content: flex-end;
+		}
+
+		.timeline-actions button {
+			background: rgba(52, 152, 219, 0.8);
+			border: none;
+			color: white;
+			padding: 5px 10px;
+			border-radius: 5px;
+			cursor: pointer;
+			font-size: 12px;
+			width: auto;
+			height: auto;
+		}
+
+		.timeline-actions button:last-child {
+			background: rgba(231, 76, 60, 0.8);
+		}
+
+		/* 响应式设计 */
+		@media (max-width: 768px) {
+			article {
+				margin: 20px;
+			}
+
+			.timeline {
+				padding: 10px;
+			}
+
+			.timeline::before {
+				left: 30px;
+			}
+
+			.timeline .item {
+				flex-direction: column;
+				align-items: center;
+				text-align: center;
+			}
+
+			.timeline .left {
+				margin-right: 0;
+				margin-bottom: 15px;
+				width: 60px;
+				height: 60px;
+				font-size: 20px;
+			}
+
+			.timeline .right h4 {
+				flex-direction: column;
+				gap: 10px;
+			}
+
+			.timeline .images {
+				grid-template-columns: 1fr;
+			}
+
+			.timeline .videos {
+				grid-template-columns: 1fr;
+			}
+		}
+		/* 修复按钮样式冲突 */
+		.timeline button,
+		.add-timeline-form button,
+		.edit-timeline-form button {
+			width: auto !important;
+			height: auto !important;
+			border: none !important;
+			background: none !important;
+		}
+
+		/* 确保表单元素正确显示 */
+		.add-timeline-form input,
+		.add-timeline-form textarea,
+		.add-timeline-form select,
+		.edit-timeline-form input,
+		.edit-timeline-form textarea,
+		.edit-timeline-form select {
+			width: 100% !important;
+			padding: 10px !important;
+			border: 1px solid rgba(255, 255, 255, 0.3) !important;
+			border-radius: 5px !important;
+			background: rgba(255, 255, 255, 0.1) !important;
+			color: white !important;
+			font-size: 14px !important;
+			margin-bottom: 15px !important;
+		}
+
+		/* 确保操作按钮正确显示 */
+		.timeline-actions button {
+			background: rgba(52, 152, 219, 0.8) !important;
+			border: none !important;
+			color: white !important;
+			padding: 5px 10px !important;
+			border-radius: 5px !important;
+			cursor: pointer !important;
+			font-size: 12px !important;
+			width: auto !important;
+			height: auto !important;
+		}
+
+		.timeline-actions button:last-child {
+			background: rgba(231, 76, 60, 0.8) !important;
+		}
+		/* 模态框样式 */
+		.modal-overlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.9);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			z-index: 1000;
+			cursor: pointer;
+		}
+
+		.modal-image {
+			max-width: 90%;
+			max-height: 90%;
+			object-fit: contain;
+		}
+		/* 私有标识样式 */
+		.private-badge {
+			position: absolute;
+			top: -10px;
+			right: 20px;
+			background: #e74c3c;
+			color: white;
+			padding: 4px 8px;
+			border-radius: 12px;
+			font-size: 12px;
+			z-index: 10;
 		}
 	</style>
 </head>
@@ -310,60 +461,66 @@
 					<i class="fas fa-spinner fa-spin"></i> 正在加载版本信息...
 				</div>
 			</div>
-			<script src="./config.js"></script>
-			<script src="./timelineData.js"></script>
-			<script>
-				/**
-				 * 从API获取changelog数据
-				 */
-				async function loadChangelogFromAPI() {
-					try {
-						const apiBaseUrl = window.AboutConfig?.apiBaseUrl || '/api';
-						const response = await fetch(`${apiBaseUrl}/changelog?limit=100`);
-						const result = await response.json();
-						
-						if (result.success && result.data.changelogs) {
-							const versionLogs = result.data.changelogs;
-							renderTimeline('versionLogContainer', versionLogs, {
-								isVersionLog: true,
-								versionLogs: versionLogs,
-								titleField: 'version',
-								timeField: 'time',
-								contentField: 'content'
-							});
-						} else {
-							throw new Error('获取版本信息失败');
-						}
-					} catch (error) {
-						console.error('加载changelog失败:', error);
-						document.getElementById('versionLogContainer').innerHTML = 
-							'<div style="text-align: center; padding: 20px; color: #ff6b6b;">' +
-							'<i class="fas fa-exclamation-triangle"></i> 加载版本信息失败，请稍后重试' +
-							'</div>';
+		</div>
+		<script src="./config.js"></script>
+		<script>
+			/**
+			 * 从API获取changelog数据
+			 */
+			async function loadChangelogFromAPI() {
+				try {
+					const apiBaseUrl = window.AboutConfig?.apiBaseUrl || '/api';
+					const response = await fetch(`${apiBaseUrl}/changelog?limit=100`);
+					const result = await response.json();
+					
+					if (result.success && result.data.changelogs) {
+						const versionLogs = result.data.changelogs;
+						renderTimeline('versionLogContainer', versionLogs, {
+							isVersionLog: true,
+							versionLogs: versionLogs,
+							titleField: 'version',
+							timeField: 'time',
+							contentField: 'content'
+						});
+					} else {
+						throw new Error('获取版本信息失败');
 					}
+				} catch (error) {
+					console.error('加载changelog失败:', error);
+					document.getElementById('versionLogContainer').innerHTML = 
+						'<div style="text-align: center; padding: 20px; color: #ff6b6b;">' +
+						'<i class="fas fa-exclamation-triangle"></i> 加载版本信息失败，请稍后重试' +
+						'</div>';
 				}
+			}
+
+			/**
+			 * 从API获取timeline数据
+			 */
+			async function loadTimelineData(type) {
+				try {
+					const apiBaseUrl = window.AboutConfig?.apiBaseUrl || '/api';
+					const response = await fetch(`${apiBaseUrl}/timeline-data/${type}`);
+					const result = await response.json();
+					
+					if (result.success && result.data.timeline) {
+						return result.data.timeline;
+					} else {
+						throw new Error(`获取${type}数据失败`);
+					}
+				} catch (error) {
+					console.error(`加载${type}数据失败:`, error);
+					return [];
+				}
+			}
 
 				/**
 				 * 通用的时间轴渲染函数
-				 * @param {string} containerId - 容器ID
-				 * @param {Array} data - 时间轴数据
-				 * @param {Object} options - 配置选项
-				 * @returns {void}
 				 */
 				function renderTimeline(containerId, data, options = {}) {
 					const container = document.getElementById(containerId);
 					if (!container) return;
 
-					/** @param {string} options.iconText - 图标文本
-					 * @param {string} options.titleField - 标题字段
-					 * @param {string} options.timeField - 时间字段
-					 * @param {string} options.contentField - 内容字段
-					 * @param {string} options.imagesField - 图片字段
-					 * @param {string} options.videosField - 视频字段
-					 * @param {boolean} options.isVersionLog - 是否为版本日志
-					 * @param {Array} options.versionLogs - 版本日志数据
-					 * @returns {void}
-					 */
 					const {
 						iconText = '☆',
 						titleField = 'title',
@@ -375,8 +532,8 @@
 						versionLogs = null
 					} = options;
 
-					// 清空容器
-					container.innerHTML = '';
+				// 清空容器
+				container.innerHTML = '';
 
 					data.forEach((item, index) => {
 						const timelineItem = document.createElement('div');
@@ -410,7 +567,8 @@
 
 						const timeSpan = document.createElement('span');
 						timeSpan.className = 'itemTime';
-						timeSpan.textContent = item[timeField] || '';
+					const originalTime = item[timeField] || '';
+					timeSpan.textContent = originalTime;
 						h4.appendChild(timeSpan);
 						rightDiv.appendChild(h4);
 
@@ -430,101 +588,122 @@
 								strong.textContent = content.itemTime || '';
 
 								li.appendChild(strong);
-								// 添加空格
 								li.appendChild(document.createTextNode(' '));
-								
-								// 使用innerHTML来正确渲染HTML标签
-								const contentSpan = document.createElement('span');
-								contentSpan.innerHTML = content.itemContent || '';
-								li.appendChild(contentSpan);
+							
+							const contentSpan = document.createElement('span');
+							contentSpan.innerHTML = content.itemContent || '';
+							li.appendChild(contentSpan);
 
 								ol.appendChild(li);
 							});
 
 							contentDiv.appendChild(ol);
 						} else {
-							// 其他内容直接显示
-							if (Array.isArray(item[contentField])) {
+						// 其他内容直接显示
+						if (Array.isArray(item[contentField])) {
 								item[contentField].forEach(content => {
 									const p = document.createElement('p');
-									// 检查内容是否为空或undefined，并确保是字符串类型
-									const contentText = String(content.itemContent || content || '');
-									if (contentText.trim() !== '') {
-										p.innerHTML = contentText;
-										contentDiv.appendChild(p);
-									}
-								});
-							} else {
-								const contentText = String(item[contentField] || '');
-								if (contentText.trim() !== '') {
-									contentDiv.innerHTML = contentText;
+								let contentText = '';
+								if (typeof content === 'string') {
+									contentText = content;
+								} else if (content && typeof content === 'object') {
+									contentText = content.itemContent || content.content || '';
+								} else {
+									contentText = String(content || '');
 								}
-							}
-						}
-
-						rightDiv.appendChild(contentDiv);
-
-						// 添加图片
-						if (item[imagesField] && item[imagesField].length > 0) {
-							const imagesDiv = document.createElement('div');
-							imagesDiv.className = 'images';
-
-							item[imagesField].forEach(image => {
-								const img = document.createElement('img');
-								img.src = image;
-								img.alt = '图片';
-								imagesDiv.appendChild(img);
-							});
-
-							rightDiv.appendChild(imagesDiv);
-						}
-
-						// 添加视频
-						if (item[videosField] && item[videosField].length > 0) {
-							const videosDiv = document.createElement('div');
-							videosDiv.className = 'videos';
-
-							item[videosField].forEach(video => {
-								const videoElement = document.createElement('video');
-								videoElement.src = video;
-								videoElement.controls = true;
-								videoElement.preload = 'metadata';
-								videosDiv.appendChild(videoElement);
-							});
-
-							rightDiv.appendChild(videosDiv);
-						}
-
-						// 组装时间轴项
-						timelineItem.appendChild(leftDiv);
-						timelineItem.appendChild(rightDiv);
-
-						// 添加到容器
-						container.appendChild(timelineItem);
-					});
-
-					// 版本日志特殊处理
-					if (isVersionLog && versionLogs && versionLogs.length > 0) {
-						const lastIndex = versionLogs.length - 1;
-						const lastItem = versionLogs[lastIndex];
-
-						// 检查最后一个版本是否为ExpectTheNextVersion
-						if (versionLogs[lastIndex].version === 'ExpectTheNextVersion') {
-							// 为ExpectTheNextVersion添加特殊样式
-							const lastTimelineItem = container.lastElementChild;
-							if (lastTimelineItem) {
-								lastTimelineItem.style.opacity = '0.7';
-								lastTimelineItem.style.fontStyle = 'italic';
+								
+								if (contentText.trim() !== '') {
+									p.innerHTML = contentText;
+									contentDiv.appendChild(p);
+								}
+								});
+						} else {
+							const contentText = String(item[contentField] || '');
+							if (contentText.trim() !== '') {
+								contentDiv.innerHTML = contentText;
 							}
 						}
 					}
-				}
 
-				// 页面加载完成后初始化所有时间轴
-				document.addEventListener('DOMContentLoaded', function() {
-					// 渲染My past时间轴
-					if (typeof timelineData !== 'undefined' && timelineData.myPastData) {
-						renderTimeline('myPastContainer', timelineData.myPastData, {
+					rightDiv.appendChild(contentDiv);
+
+							// 添加图片
+							if (item[imagesField] && item[imagesField].length > 0) {
+						const imagesDiv = document.createElement('div');
+						imagesDiv.className = 'images';
+
+						item[imagesField].forEach(image => {
+									const img = document.createElement('img');
+							img.src = image;
+							img.alt = '图片';
+							img.onclick = () => {
+								const modal = document.createElement('div');
+								modal.className = 'modal-overlay';
+								const modalImg = document.createElement('img');
+								modalImg.src = img.src;
+								modalImg.className = 'modal-image';
+								modal.appendChild(modalImg);
+								modal.onclick = () => modal.remove();
+								document.body.appendChild(modal);
+							};
+							imagesDiv.appendChild(img);
+								});
+
+						contentDiv.appendChild(imagesDiv);
+							}
+
+							// 添加视频
+							if (item[videosField] && item[videosField].length > 0) {
+						const videosDiv = document.createElement('div');
+						videosDiv.className = 'videos';
+
+						item[videosField].forEach(video => {
+							const videoElement = document.createElement('video');
+							videoElement.src = video;
+							videoElement.controls = true;
+							videoElement.preload = 'metadata';
+							videosDiv.appendChild(videoElement);
+								});
+
+						contentDiv.appendChild(videosDiv);
+					}
+
+					// 组装时间轴项
+						timelineItem.appendChild(leftDiv);
+						timelineItem.appendChild(rightDiv);
+
+					// 添加到容器
+						container.appendChild(timelineItem);
+					});
+
+				// 版本日志特殊处理
+					if (isVersionLog && versionLogs && versionLogs.length > 0) {
+						const lastIndex = versionLogs.length - 1;
+						if (versionLogs[lastIndex].version === 'ExpectTheNextVersion') {
+						const lastTimelineItem = container.lastElementChild;
+						if (lastTimelineItem) {
+							lastTimelineItem.style.opacity = '0.7';
+							lastTimelineItem.style.fontStyle = 'italic';
+						}
+					}
+				}
+			}
+
+			// 页面加载完成后执行
+			document.addEventListener('DOMContentLoaded', async function() {
+				console.log('页面加载完成');
+				
+				// 加载changelog数据
+				loadChangelogFromAPI();
+
+				// 从云端加载timeline数据
+				try {
+					// 加载My Past数据
+					const myPastData = await loadTimelineData('myPast');
+					console.log('My Past数据:', myPastData);
+					
+					if (myPastData.length > 0) {
+						renderTimeline('myPastContainer', myPastData, {
 							iconText: '📅',
 							titleField: 'title',
 							timeField: 'time',
@@ -534,10 +713,13 @@
 						});
 					}
 
-					// 渲染调经时间轴
-					if (typeof timelineData !== 'undefined' && timelineData.healthData) {
-						renderTimeline('healthContainer', timelineData.healthData, {
-							iconText: '💊',
+					// 加载Health数据
+					const healthData = await loadTimelineData('health');
+					console.log('Health数据:', healthData);
+					
+					if (healthData.length > 0) {
+						renderTimeline('healthContainer', healthData, {
+							iconText: '🏥',
 							titleField: 'title',
 							timeField: 'time',
 							contentField: 'content',
@@ -545,10 +727,16 @@
 							videosField: 'videos'
 						});
 					}
+				} catch (error) {
+					console.error('加载timeline数据失败:', error);
+				}
+			});
 
-					// 加载changelog数据
-					loadChangelogFromAPI();
-				});
+			// 检查用户是否已登录
+			function isUserLoggedIn() {
+				const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+				return !!token;
+			}
 			</script>
 		</div>
 	</article>
