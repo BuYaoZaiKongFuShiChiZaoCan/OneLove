@@ -11,6 +11,11 @@ const path = require('path');              // 路径模块 - 处理文件路径
 const mongoose = require('mongoose');      // 导入mongoose
 const bcrypt = require('bcryptjs');        // 密码加密
 const jwt = require('jsonwebtoken');       // JWT令牌
+const fs = require('fs');                  // 文件系统模块
+
+// 读取package.json获取版本号
+const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8'));
+const APP_VERSION = packageJson.version;
 
 // 导入中间件
 const { requireAdmin } = require('./middleware/auth');
@@ -358,7 +363,7 @@ app.get('/', (req, res) => {
 app.get('/api/info', (req, res) => {
   res.json({
     message: '欢迎使用 OneLove 后端API服务！',
-    version: '5.0.2',
+    version: APP_VERSION,
     timestamp: new Date().toISOString(),
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
     endpoints: {
@@ -378,7 +383,7 @@ app.get('/api/info', (req, res) => {
 app.get('/api/auth', (req, res) => {
   res.json({
     message: 'OneLove 认证API服务',
-    version: '5.0.2',
+    version: APP_VERSION,
     timestamp: new Date().toISOString(),
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
     endpoints: {
@@ -403,7 +408,7 @@ app.get('/api/health', (req, res) => {
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
-    version: '5.0.2',
+    version: APP_VERSION,
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
   });
 });
@@ -2534,7 +2539,7 @@ const startServer = async () => {
 		console.log(`🔐 认证API: http://localhost:${PORT}/api/auth`);
 		console.log(`📊 环境: ${process.env.NODE_ENV || 'development'}`);
 		console.log(`⏰ 启动时间: ${new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}`);
-		console.log(`📦 版本: 5.0.2`);
+		console.log(`📦 版本: ${APP_VERSION}`);
 		console.log(`💾 数据库状态: ${dbConnected ? '已连接' : '未连接（模拟模式）'}`);
 	});
 };
