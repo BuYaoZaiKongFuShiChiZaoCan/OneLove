@@ -26,6 +26,14 @@ const changelogSchema = new mongoose.Schema({
 		default: ''
 	},
 	content: [changelogItemSchema],
+	createdBy: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'User'
+	},
+	updatedBy: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'User'
+	},
 	createdAt: {
 		type: Date,
 		default: Date.now

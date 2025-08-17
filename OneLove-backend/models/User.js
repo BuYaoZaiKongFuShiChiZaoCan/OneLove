@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
 	// 用户角色
 	role: {
 		type: String,
-		enum: ['user', 'admin'],
+		enum: ['user', 'admin', 'developer'],
 		default: 'user'
 	},
 

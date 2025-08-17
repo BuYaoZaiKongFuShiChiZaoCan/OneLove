@@ -195,7 +195,7 @@
 		</div>
 	</div>
 
-	<script src="../scripts/config.js"></script>
+
 	<script>
 		// 使用配置文件中的API基础URL
 		const API_BASE = window.OneLoveConfig?.apiBaseUrl || window.location.origin;
@@ -297,7 +297,8 @@
 							// 返回上一页
 							window.history.back();
 						} else {
-							window.location.href = '/';
+							// 确保跳转到正确的首页路径
+							window.location.href = window.location.origin;
 						}
 					}, 1500);
 

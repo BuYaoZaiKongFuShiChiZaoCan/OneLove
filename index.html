@@ -109,8 +109,7 @@
 	<!-- PWA开始 manifest清单、告诉浏览器安装一些应用信息 -->
 	<link rel="manifest" href="./manifest.json" />
 
-	<!-- 配置文件 -->
-	<script src="./scripts/config.js"></script>
+
 </head>
 
 <body>
@@ -1660,11 +1659,17 @@
 									sideMenuEmail.textContent = data.data.user.email || '未设置邮箱';
 								}
 								if (sideMenuRole) {
-									sideMenuRole.textContent = data.data.user.role === 'admin' ? '管理员' : '用户';
+									if (data.data.user.role === 'admin') {
+										sideMenuRole.textContent = '管理员';
+									} else if (data.data.user.role === 'developer') {
+										sideMenuRole.textContent = '开发者';
+									} else {
+										sideMenuRole.textContent = '用户';
+									}
 								}
 
-								// 如果是管理员，显示管理页面链接
-								if (data.data.user.role === 'admin') {
+								// 如果是管理员或开发者，显示管理页面链接
+								if (data.data.user.role === 'admin' || data.data.user.role === 'developer') {
 									const adminPanelBtn = document.getElementById('adminPanelBtn');
 									if (adminPanelBtn) adminPanelBtn.style.display = 'inline-block';
 								}

@@ -474,16 +474,45 @@
 
 	<script>
 		const API_BASE = window.location.origin + '/api';
-		let authToken = sessionStorage.getItem('token');
+		let authToken = localStorage.getItem('token') || sessionStorage.getItem('token');
 
 		// 检查认证状态
-		function checkAuth() {
+		async function checkAuth() {
 			if (!authToken) {
 				alert('请先登录');
 				window.location.href = '../login.html';
 				return false;
 			}
-			return true;
+
+			try {
+				const response = await fetch(`${API_BASE}/auth/me`, {
+					headers: {
+						'Authorization': `Bearer ${authToken}`
+					}
+				});
+
+				if (!response.ok) {
+					alert('登录已过期，请重新登录');
+					window.location.href = '../login.html';
+					return false;
+				}
+
+				const data = await response.json();
+				const user = data.data.user;
+
+				if (user.role !== 'admin' && user.role !== 'developer') {
+					alert('需要管理员或开发者权限才能访问此页面');
+					window.location.href = '/Pages/admin/dashboard.html';
+					return false;
+				}
+
+				return true;
+			} catch (error) {
+				console.error('权限检查失败:', error);
+				alert('权限检查失败，请重新登录');
+				window.location.href = '../login.html';
+				return false;
+			}
 		}
 
 		// 检查管理员权限
@@ -508,8 +537,8 @@
 				const data = await response.json();
 				const user = data.data.user;
 
-				if (user.role !== 'admin') {
-					alert('需要管理员权限才能访问此页面');
+				if (user.role !== 'admin' && user.role !== 'developer') {
+					alert('需要管理员或开发者权限才能访问此页面');
 					window.location.href = '/Pages/admin/dashboard.html';
 					return false;
 				}
@@ -537,6 +566,10 @@
 
 		// 获取操作类型显示名称
 		function getActionDisplayName(action) {
+			if (!action || typeof action !== 'string') {
+				return '未知操作';
+			}
+			
 			const actionNames = {
 				'LOGIN': '登录',
 				'LOGOUT': '登出',
@@ -562,6 +595,10 @@
 
 		// 获取操作类型CSS类
 		function getActionClass(action) {
+			if (!action || typeof action !== 'string') {
+				return 'action-view';
+			}
+			
 			if (action.includes('LOGIN')) return 'action-login';
 			if (action.includes('LOGOUT')) return 'action-logout';
 			if (action.includes('CREATE')) return 'action-create';
@@ -579,7 +616,7 @@
 
 		// 加载访问日志
 		async function loadLogs() {
-			if (!checkAuth()) return;
+			if (!(await checkAuth())) return;
 
 			const days = document.getElementById('daysFilter').value;
 			const action = document.getElementById('actionFilter').value;
@@ -598,14 +635,25 @@
 
 				if (response.ok) {
 					const data = await response.json();
-					displayLogs(data.data);
-					updateStats(data.data);
+					if (data && data.success && Array.isArray(data.data)) {
+						displayLogs(data.data);
+						updateStats(data.data);
+					} else {
+						console.warn('API返回的数据格式不正确:', data);
+						displayLogs([]);
+						updateStats([]);
+					}
 				} else {
+					console.error('API请求失败:', response.status, response.statusText);
 					showAlert('加载日志失败', 'error');
+					displayLogs([]);
+					updateStats([]);
 				}
 			} catch (error) {
 				console.error('加载日志失败:', error);
 				showAlert('加载日志失败', 'error');
+				displayLogs([]);
+				updateStats([]);
 			}
 		}
 
@@ -613,7 +661,7 @@
 		function displayLogs(logs) {
 			const tbody = document.getElementById('logsTableBody');
 
-			if (logs.length === 0) {
+			if (!logs || logs.length === 0) {
 				tbody.innerHTML = `
                     <tr>
                         <td colspan="6" style="text-align: center; padding: 40px; color: #666;">
@@ -624,37 +672,52 @@
 				return;
 			}
 
-			tbody.innerHTML = logs.map(log => `
+			tbody.innerHTML = logs.map(log => {
+				// 安全地处理日志数据
+				const timestamp = log.timestamp ? new Date(log.timestamp).toLocaleString() : '未知时间';
+				const action = log.action || '未知操作';
+				const resource = log.resource || '未知资源';
+				const ipAddress = log.ipAddress || '未知IP';
+				const status = log.status || 'UNKNOWN';
+				const errorMessage = log.errorMessage || '';
+				const details = log.details || {};
+				
+				return `
                 <tr>
-                    <td>${new Date(log.timestamp).toLocaleString()}</td>
+                    <td>${timestamp}</td>
                     <td>
-                        <span class="action-badge ${getActionClass(log.action)}">
-                            ${getActionDisplayName(log.action)}
+                        <span class="action-badge ${getActionClass(action)}">
+                            ${getActionDisplayName(action)}
                         </span>
                     </td>
-                    <td>${log.resource}</td>
-                    <td>${log.ipAddress}</td>
+                    <td>${resource}</td>
+                    <td>${ipAddress}</td>
                     <td>
-                        <span class="status-${log.status.toLowerCase()}">
-                            ${log.status === 'SUCCESS' ? '成功' :
-					log.status === 'FAILED' ? '失败' : '错误'}
+                        <span class="status-${status.toLowerCase()}">
+                            ${status === 'SUCCESS' ? '成功' :
+					status === 'FAILED' ? '失败' : '错误'}
                         </span>
                     </td>
                     <td>
-                        ${log.errorMessage ?
-					`<span class="status-error">${log.errorMessage}</span>` :
-					log.details.method ? `${log.details.method} ${log.details.statusCode}` : '-'}
+                        ${errorMessage ?
+					`<span class="status-error">${errorMessage}</span>` :
+					(details && details.method) ? `${details.method} ${details.statusCode || ''}` : '-'}
                     </td>
                 </tr>
-            `).join('');
+            `;
+			}).join('');
 		}
 
 		// 更新统计信息
 		function updateStats(logs) {
+			if (!logs || !Array.isArray(logs)) {
+				logs = [];
+			}
+			
 			const totalLogs = logs.length;
-			const successLogs = logs.filter(log => log.status === 'SUCCESS').length;
-			const failedLogs = logs.filter(log => log.status === 'FAILED').length;
-			const securityAlerts = logs.filter(log => log.action === 'SECURITY_ALERT').length;
+			const successLogs = logs.filter(log => log && log.status === 'SUCCESS').length;
+			const failedLogs = logs.filter(log => log && log.status === 'FAILED').length;
+			const securityAlerts = logs.filter(log => log && log.action === 'SECURITY_ALERT').length;
 
 			document.getElementById('totalLogs').textContent = totalLogs;
 			document.getElementById('successLogs').textContent = successLogs;

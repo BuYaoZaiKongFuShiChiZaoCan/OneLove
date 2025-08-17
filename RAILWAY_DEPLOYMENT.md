@@ -55,13 +55,11 @@ CORS_ORIGIN=https://yibiling.netlify.app
 `https://your-app-name.railway.app`
 
 ### 7. 更新前端配置
-部署成功后，更新 `scripts/config.js` 中的生产环境配置：
+部署成功后，更新前端代码中的API地址配置：
 
 ```javascript
-production: {
-    apiBaseUrl: 'https://your-app-name.railway.app/api',
-    corsOrigin: 'https://yibiling.netlify.app'
-}
+// 在相关文件中更新API基础URL
+const API_BASE = 'https://your-app-name.railway.app/api';
 ```
 
 ### 8. 测试部署

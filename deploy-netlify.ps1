@@ -40,4 +40,4 @@ Write-Host "   - Publish directory: . (根目录)" -ForegroundColor White
 Write-Host "6. 点击 'Deploy site'" -ForegroundColor White
 
 Write-Host "🎉 部署完成后，您将获得一个 Netlify 域名" -ForegroundColor Green
-Write-Host "📝 记得更新 scripts/config.js 中的后端API地址" -ForegroundColor Yellow 
+Write-Host "📝 记得更新后端API地址配置" -ForegroundColor Yellow 

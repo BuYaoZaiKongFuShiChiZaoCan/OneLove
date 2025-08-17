@@ -513,7 +513,7 @@
 
 		// 获取认证令牌
 		function getAuthToken() {
-			return sessionStorage.getItem('token');
+			return localStorage.getItem('token') || sessionStorage.getItem('token');
 		}
 
 		// 检查管理员权限
@@ -540,8 +540,8 @@
 				const data = await response.json();
 				const user = data.data.user;
 
-				if (user.role !== 'admin') {
-					alert('需要管理员权限才能访问此页面');
+				if (user.role !== 'admin' && user.role !== 'developer') {
+					alert('需要管理员或开发者权限才能访问此页面');
 					window.location.href = '/Pages/admin/dashboard.html';
 					return false;
 				}

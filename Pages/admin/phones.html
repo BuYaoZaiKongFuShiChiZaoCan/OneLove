@@ -303,7 +303,7 @@
 
 		// 获取认证令牌的函数
 		function getAuthToken() {
-			return sessionStorage.getItem('token');
+			return localStorage.getItem('token') || sessionStorage.getItem('token');
 		}
 		let phonesData = {};
 
@@ -510,8 +510,52 @@
 			const isAuthenticated = await checkAuth();
 
 			if (isAuthenticated) {
-				await loadPhones();
-				setupSearch();
+				// 检查用户权限
+				try {
+					const authToken = getAuthToken();
+					const response = await fetch(`${API_BASE}/auth/me`, {
+						headers: {
+							'Authorization': `Bearer ${authToken}`
+						}
+					});
+
+					if (response.ok) {
+						const data = await response.json();
+						const user = data.data.user;
+						
+						// 检查用户角色
+						if (user.role === 'admin' || user.role === 'developer') {
+							await loadPhones();
+							setupSearch();
+						} else {
+							// 权限不足
+							document.getElementById('phonesContainer').innerHTML = `
+								<div class="error">
+									<i class="fas fa-exclamation-triangle"></i>
+									权限不足，只有管理员和开发者才能访问此页面
+									<br><br>
+									<a href="/" style="color: #667eea; text-decoration: none;">
+										<i class="fas fa-home"></i> 返回首页
+									</a>
+								</div>
+							`;
+						}
+					} else {
+						throw new Error('获取用户信息失败');
+					}
+				} catch (error) {
+					console.error('权限检查失败:', error);
+					document.getElementById('phonesContainer').innerHTML = `
+						<div class="error">
+							<i class="fas fa-exclamation-triangle"></i>
+							权限检查失败，请重新登录
+							<br><br>
+							<a href="/Pages/login.html" style="color: #667eea; text-decoration: none;">
+								<i class="fas fa-sign-in-alt"></i> 前往登录
+							</a>
+						</div>
+					`;
+				}
 			} else {
 				document.getElementById('phonesContainer').innerHTML = `
                     <div class="error">

@@ -215,6 +215,11 @@
 			color: #2b6cb0;
 		}
 
+		.role-developer {
+			background: #fef5e7;
+			color: #d69e2e;
+		}
+
 		.role-user {
 			background: #e2e8f0;
 			color: #4a5568;
@@ -313,6 +318,7 @@
 			<select class="filter-select" id="roleFilter">
 				<option value="">所有角色</option>
 				<option value="admin">管理员</option>
+				<option value="developer">开发者</option>
 				<option value="user">普通用户</option>
 			</select>
 			<button class="btn" onclick="refreshUsers()">
@@ -375,8 +381,8 @@
 				const data = await response.json();
 				const user = data.data.user;
 
-				if (user.role !== 'admin') {
-					alert('需要管理员权限才能访问此页面');
+				if (user.role !== 'admin' && user.role !== 'developer') {
+					alert('需要管理员或开发者权限才能访问此页面');
 					window.location.href = '/Pages/admin/dashboard.html';
 					return false;
 				}
@@ -447,7 +453,8 @@
                     <div>${user.email || '未设置邮箱'}</div>
                     <div>
                         <span class="role-badge role-${user.role || 'user'}">
-                            ${user.role === 'admin' ? '管理员' : '普通用户'}
+                            ${user.role === 'admin' ? '管理员' : 
+                              user.role === 'developer' ? '开发者' : '普通用户'}
                         </span>
                     </div>
                     <div>
@@ -537,13 +544,79 @@
 
 		// 更改用户角色
 		async function changeUserRole(userId, currentRole) {
-			const newRole = currentRole === 'admin' ? 'user' : 'admin';
-			const action = newRole === 'admin' ? '提升为管理员' : '降级为普通用户';
+			// 创建角色选择对话框
+			const roles = [
+				{ value: 'user', label: '普通用户' },
+				{ value: 'developer', label: '开发者' },
+				{ value: 'admin', label: '管理员' }
+			];
+			
+			const roleOptions = roles.map(role => 
+				`<option value="${role.value}" ${role.value === currentRole ? 'selected' : ''}>
+					${role.label}
+				</option>`
+			).join('');
+			
+			const dialog = document.createElement('div');
+			dialog.style.cssText = `
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background: rgba(0,0,0,0.5);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 1000;
+			`;
+			
+			dialog.innerHTML = `
+				<div style="
+					background: white;
+					padding: 20px;
+					border-radius: 8px;
+					min-width: 300px;
+				">
+					<h3>更改用户角色</h3>
+					<p>请选择新的用户角色：</p>
+					<select id="newRoleSelect" style="
+						width: 100%;
+						padding: 8px;
+						margin: 10px 0;
+						border: 1px solid #ddd;
+						border-radius: 4px;
+					">
+						${roleOptions}
+					</select>
+					<div style="text-align: right; margin-top: 20px;">
+						<button onclick="this.closest('div[style*=\"position: fixed\"]').remove()" style="
+							margin-right: 10px;
+							padding: 8px 16px;
+							border: 1px solid #ddd;
+							background: #f5f5f5;
+							border-radius: 4px;
+							cursor: pointer;
+						">取消</button>
+						<button onclick="confirmRoleChange('${userId}')" style="
+							padding: 8px 16px;
+							background: #667eea;
+							color: white;
+							border: none;
+							border-radius: 4px;
+							cursor: pointer;
+						">确认</button>
+					</div>
+				</div>
+			`;
+			
+			document.body.appendChild(dialog);
+		}
 
-			if (!confirm(`确定要${action}吗？`)) {
-				return;
-			}
-
+		// 确认角色更改
+		async function confirmRoleChange(userId) {
+			const newRole = document.getElementById('newRoleSelect').value;
+			
 			try {
 				const authToken = getAuthToken();
 				const response = await fetch(`${API_BASE}/admin/users/${userId}/role`, {
@@ -561,6 +634,9 @@
 
 				alert(`用户角色已更改`);
 				loadUsers();
+				
+				// 关闭对话框
+				document.querySelector('div[style*="position: fixed"]').remove();
 			} catch (error) {
 				console.error('更改用户角色失败:', error);
 				alert(`操作失败: ${error.message}`);

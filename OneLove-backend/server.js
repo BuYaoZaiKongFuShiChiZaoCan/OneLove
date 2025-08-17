@@ -5,7 +5,7 @@
 // 导入必要的模块
 const express = require('express');        // Express框架 - 用于创建Web服务器
 const cors = require('cors');              // CORS中间件 - 处理跨域请求
-const helmet = require('helmet');          // 安全中间件 - 添加安全头
+
 const morgan = require('morgan');          // 日志中间件 - 记录请求日志
 const path = require('path');              // 路径模块 - 处理文件路径
 const mongoose = require('mongoose');      // 导入mongoose
@@ -21,46 +21,38 @@ const APP_VERSION = packageJson.version;
 const { requireAdmin } = require('./middleware/auth');
 const { loggerMiddleware, securityAudit, logAccess } = require('./middleware/logger');
 
+// 定义开发者或管理员权限中间件
+const requireDeveloperOrAdmin = async (req, res, next) => {
+	try {
+		if (!req.user) {
+			return res.status(401).json({
+				success: false,
+				message: '需要登录'
+			});
+		}
+
+		if (req.user.role !== 'developer' && req.user.role !== 'admin') {
+			return res.status(403).json({
+				success: false,
+				message: '需要开发者或管理员权限'
+			});
+		}
+
+		next();
+	} catch (error) {
+		res.status(500).json({
+			success: false,
+			message: '权限验证失败'
+		});
+	}
+};
+
 // 导入数据模型
 const User = require('./models/User');
+const Password = require('./models/Password');
+const Phone = require('./models/Phone');
 const Changelog = require('./models/Changelog');
-
-// TimelineData模型
-const TimelineDataSchema = new mongoose.Schema({
-	dataType: {
-		type: String,
-		required: true,
-		enum: ['myPast', 'health']
-	},
-	title: {
-		type: String,
-		required: true
-	},
-	time: {
-		type: String,
-		default: ''
-	},
-	content: [{
-		itemContent: String
-	}],
-	images: [String],
-	videos: [String],
-	status: {
-		type: String,
-		default: 'active',
-		enum: ['active', 'inactive']
-	},
-	createdAt: {
-		type: Date,
-		default: Date.now
-	},
-	updatedAt: {
-		type: Date,
-		default: Date.now
-	}
-});
-
-const TimelineData = mongoose.model('TimelineData', TimelineDataSchema);
+// TimelineData模型已删除，直接使用模拟数据
 
 // 创建Express应用实例
 const app = express();
@@ -410,6 +402,16 @@ app.get('/api/health', (req, res) => {
     environment: process.env.NODE_ENV || 'development',
     version: APP_VERSION,
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
+});
+
+// 测试用户API - 用于前端权限检查
+app.get('/api/test/user', authenticateToken, (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      user: req.user
+    }
   });
 });
 
@@ -1024,21 +1026,64 @@ app.get('/api/userdata/passwords', authenticateToken, async (req, res) => {
 		const userId = req.user._id;
 		const passwords = await Password.find({ userId });
 
-		// 将密码记录转换为前端期望的格式
+		// 将密码记录转换为前端期望的格式，同时保留ID信息
 		const formattedData = {};
+		const passwordIds = {}; // 存储分类名到ID的映射
+		
 		passwords.forEach(password => {
 			formattedData[password.category] = password.data;
+			passwordIds[password.category] = password._id; // 保存ID映射
 		});
 
 		res.json({
 			success: true,
-			data: formattedData
+			data: formattedData,
+			ids: passwordIds // 返回ID映射
 		});
 	} catch (error) {
 		console.error('获取密码数据失败:', error);
 		res.status(500).json({
 			success: false,
 			message: '获取密码数据失败'
+		});
+	}
+});
+
+// 查询密码ID API
+app.get('/api/userdata/passwords/query', authenticateToken, async (req, res) => {
+	try {
+		const userId = req.user._id;
+		const { category } = req.query;
+
+		if (!category) {
+			return res.status(400).json({
+				success: false,
+				message: '分类名不能为空'
+			});
+		}
+
+		const password = await Password.findOne({ 
+			userId: userId,
+			category: category 
+		});
+
+		if (!password) {
+			return res.status(404).json({
+				success: false,
+				message: '密码不存在'
+			});
+		}
+
+		res.json({
+			success: true,
+			id: password._id,
+			category: password.category
+		});
+	} catch (error) {
+		console.error('查询密码ID失败:', error);
+		res.status(500).json({
+			success: false,
+			message: '查询密码ID失败'
 		});
 	}
 });
@@ -1135,7 +1180,7 @@ app.put('/api/userdata/passwords/:id', authenticateToken, async (req, res) => {
 	}
 });
 
-// 删除密码
+// 删除密码 - 更通用的路由放在后面
 app.delete('/api/userdata/passwords/:id', authenticateToken, async (req, res) => {
 	try {
 		const userId = req.user._id;
@@ -1166,17 +1211,55 @@ app.delete('/api/userdata/passwords/:id', authenticateToken, async (req, res) =>
 	}
 });
 
+// 通过分类名删除密码（备用方案）- 更具体的路由放在前面
+app.delete('/api/userdata/passwords/category/:category', authenticateToken, async (req, res) => {
+	try {
+		const userId = req.user._id;
+		const category = decodeURIComponent(req.params.category);
+
+		const password = await Password.findOneAndDelete({
+			category: category,
+			userId: userId
+		});
+
+		if (!password) {
+			return res.status(404).json({
+				success: false,
+				message: '密码不存在或无权限删除'
+			});
+		}
+
+		res.json({
+			success: true,
+			message: '密码删除成功'
+		});
+	} catch (error) {
+		console.error('通过分类名删除密码失败:', error);
+		res.status(500).json({
+			success: false,
+			message: '删除密码失败'
+		});
+	}
+});
+
 // ========================================
 // 管理员API
 // ========================================
 
-// 获取所有用户列表（管理员专用）- 临时调试版本
+// 获取所有用户列表（管理员和开发者专用）
 app.get('/api/admin/users', authenticateToken, async (req, res) => {
 	try {
 		console.log('🔍 用户信息:', req.user);
 		console.log('🔍 用户角色:', req.user.role);
 
-		// 临时允许所有已登录用户访问
+		// 检查用户权限
+		if (req.user.role !== 'admin' && req.user.role !== 'developer') {
+			return res.status(403).json({
+				success: false,
+				message: '需要管理员或开发者权限'
+			});
+		}
+
 		const users = await User.find().select('-password').sort({ createdAt: -1 });
 
 		res.json({
@@ -1194,8 +1277,8 @@ app.get('/api/admin/users', authenticateToken, async (req, res) => {
 	}
 });
 
-// 获取所有用户的密码数据（管理员专用）
-app.get('/api/admin/passwords', requireAdmin, async (req, res) => {
+// 获取所有用户的密码数据（管理员和开发者专用）
+app.get('/api/admin/passwords', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
 	try {
 		const passwords = await Password.find()
 			.populate('userId', 'username email role')
@@ -1215,8 +1298,8 @@ app.get('/api/admin/passwords', requireAdmin, async (req, res) => {
 	}
 });
 
-// 获取所有用户的手机数据（管理员专用）
-app.get('/api/admin/phones', requireAdmin, async (req, res) => {
+// 获取所有用户的手机数据（管理员和开发者专用）
+app.get('/api/admin/phones', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
 	try {
 		const phones = await Phone.find()
 			.populate('userId', 'username email role')
@@ -1296,7 +1379,7 @@ app.put('/api/admin/users/:id/role', requireAdmin, async (req, res) => {
 		const userId = req.params.id;
 		const { role } = req.body;
 
-		if (!['user', 'admin'].includes(role)) {
+		if (!['user', 'developer', 'admin'].includes(role)) {
 			return res.status(400).json({
 				success: false,
 				message: '无效的角色类型'
@@ -2111,8 +2194,8 @@ app.post('/api/userdata/export/batch', authenticateToken, async (req, res) => {
 			// CSV格式导出
 			let csvContent = 'Type,Category,Data\n';
 
-			if (exportData.data.passwords) {
-				exportData.data.passwords.forEach(password => {
+			// 导出密码数据
+			passwords.forEach(password => {
 					if (typeof password.data === 'object') {
 						Object.keys(password.data).forEach(key => {
 							const data = password.data[key];
@@ -2123,27 +2206,6 @@ app.post('/api/userdata/export/batch', authenticateToken, async (req, res) => {
 							}
 						});
 					}
-				});
-			}
-
-			if (exportData.data.phones) {
-				Object.keys(exportData.data.phones).forEach(phone => {
-					const data = exportData.data.phones[phone];
-					if (typeof data === 'object') {
-						csvContent += `Phone,${phone},${JSON.stringify(data)}\n`;
-					} else {
-						csvContent += `Phone,${phone},${data}\n`;
-					}
-				});
-			}
-
-			res.setHeader('Content-Type', 'text/csv');
-			res.setHeader('Content-Disposition', `attachment; filename="onelove-batch-${Date.now()}.csv"`);
-			res.send(csvContent);
-		} else {
-			res.status(400).json({
-				success: false,
-				message: '不支持的导出格式'
 			});
 		}
 	} catch (error) {
@@ -2156,377 +2218,235 @@ app.post('/api/userdata/export/batch', authenticateToken, async (req, res) => {
 });
 
 // ========================================
-// 错误处理中间件
-// ========================================
-
-// ========================================
-// Changelog API路由
+// Changelog API
 // ========================================
 
 // 获取changelog列表
 app.get('/api/changelog', async (req, res) => {
 	try {
-		const { version, limit = 10, page = 1 } = req.query;
-
-		let query = {};
-		if (version) {
-			query.version = version;
-		}
-
-		const skip = (parseInt(page) - 1) * parseInt(limit);
-
-		const changelogs = await Changelog.find(query)
+		const { limit = 100 } = req.query;
+		const changelogs = await Changelog.find()
 			.sort({ order: -1, createdAt: -1 })
-			.skip(skip)
 			.limit(parseInt(limit));
-
-		const total = await Changelog.countDocuments(query);
 
 		res.json({
 			success: true,
 			data: {
-				changelogs,
-				pagination: {
-					page: parseInt(page),
-					limit: parseInt(limit),
-					total,
-					pages: Math.ceil(total / parseInt(limit))
-				}
+				changelogs: changelogs
 			}
 		});
 	} catch (error) {
 		console.error('获取changelog失败:', error);
 		res.status(500).json({
     success: false,
-			message: '获取版本信息失败'
+			message: '获取changelog失败'
 		});
 	}
 });
 
-// 获取最新版本信息
-app.get('/api/changelog/latest', async (req, res) => {
+// 获取单个changelog
+app.get('/api/changelog/:id', async (req, res) => {
 	try {
-		const latestVersion = await Changelog.findOne()
-			.sort({ order: -1, createdAt: -1 });
+		const changelog = await Changelog.findById(req.params.id);
 
-		if (!latestVersion) {
+		if (!changelog) {
 			return res.status(404).json({
 				success: false,
-				message: '未找到版本信息'
+				message: 'Changelog不存在'
 			});
 		}
 
 		res.json({
 			success: true,
-			data: latestVersion
+			data: changelog
 		});
 	} catch (error) {
-		console.error('获取最新版本失败:', error);
+		console.error('获取changelog失败:', error);
 		res.status(500).json({
 			success: false,
-			message: '获取最新版本信息失败'
+			message: '获取changelog失败'
 		});
 	}
 });
 
-// ========================================
-// 时间轴管理API
-// ========================================
-
-// 添加时间轴项
-app.post('/api/timeline', authenticateToken, async (req, res) => {
+// 更新changelog
+app.put('/api/changelog/:id', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
 	try {
-		const { title, time, content, images, videos, private: isPrivate } = req.body;
-		const userId = req.user._id;
+		const { version, time } = req.body;
+		const changelog = await Changelog.findByIdAndUpdate(
+			req.params.id,
+			{ version, time },
+			{ new: true }
+		);
 
-		// 验证必填字段
-		if (!title || !time || !content) {
+		if (!changelog) {
+			return res.status(404).json({
+				success: false,
+				message: 'Changelog不存在'
+			});
+		}
+
+		res.json({
+			success: true,
+			message: 'Changelog更新成功',
+			data: changelog
+		});
+	} catch (error) {
+		console.error('更新changelog失败:', error);
+		res.status(500).json({
+			success: false,
+			message: '更新changelog失败'
+		});
+	}
+});
+
+// 添加changelog条目
+app.post('/api/changelog/:id/items', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
+	try {
+		const { itemTime, itemContent } = req.body;
+		const changelog = await Changelog.findById(req.params.id);
+
+		if (!changelog) {
+			return res.status(404).json({
+				success: false,
+				message: 'Changelog不存在'
+			});
+		}
+
+		// 添加新条目
+		changelog.content.push({
+			itemTime,
+			itemContent
+		});
+
+		await changelog.save();
+
+		res.json({
+			success: true,
+			message: '条目添加成功',
+			data: changelog
+		});
+	} catch (error) {
+		console.error('添加changelog条目失败:', error);
+		res.status(500).json({
+			success: false,
+			message: '添加条目失败'
+		});
+	}
+});
+
+// 更新changelog条目
+app.put('/api/changelog/:id/items/:itemIndex', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
+	try {
+		const { itemTime, itemContent } = req.body;
+		const itemIndex = parseInt(req.params.itemIndex);
+		const changelog = await Changelog.findById(req.params.id);
+
+		if (!changelog) {
+			return res.status(404).json({
+				success: false,
+				message: 'Changelog不存在'
+			});
+		}
+
+		if (itemIndex < 0 || itemIndex >= changelog.content.length) {
 			return res.status(400).json({
 				success: false,
-				message: '标题、时间和内容为必填字段'
+				message: '条目索引无效'
 			});
 		}
 
-		// 创建时间轴项
-		const timelineItem = {
-			userId: userId,
-			dataType: 'timeline',
-			name: title,
-			content: {
-				title: title,
-				time: time,
-				content: content,
-				images: images || [],
-				videos: videos || [],
-				private: isPrivate || false
-			},
-			description: `用户 ${req.user.username} 的时间轴项`,
-			status: 'active',
-			tags: ['timeline', 'personal'],
-			priority: 1,
-			createdAt: new Date(),
-			updatedAt: new Date()
+		// 更新条目
+		changelog.content[itemIndex] = {
+			itemTime,
+			itemContent
 		};
 
-		// 保存到数据库
-		const userData = new UserData(timelineItem);
-		await userData.save();
+		await changelog.save();
 
 		res.json({
 			success: true,
-			message: '时间轴项添加成功',
-			data: {
-				id: userData._id,
-				title: title,
-				time: time,
-				private: isPrivate || false
-			}
+			message: '条目更新成功',
+			data: changelog
 		});
-
 	} catch (error) {
-		console.error('添加时间轴项失败:', error);
+		console.error('更新changelog条目失败:', error);
 		res.status(500).json({
 			success: false,
-			message: '服务器内部错误'
-		});
-	}
-});
-
-// 获取用户时间轴数据
-app.get('/api/timeline', authenticateToken, async (req, res) => {
-	try {
-		const userId = req.user._id;
-		const timelineData = await UserData.find({
-			userId: userId,
-			dataType: 'timeline',
-			status: 'active'
-		}).sort({ createdAt: -1 });
-
-		// 转换为前端需要的格式
-		const formattedData = timelineData.map(item => ({
-			id: item._id,
-			title: item.content.title,
-			time: item.content.time,
-			content: item.content.content,
-			images: item.content.images || [],
-			videos: item.content.videos || [],
-			private: item.content.private
-		}));
-
-		res.json({
-			success: true,
-			data: {
-				timeline: formattedData
-			}
-		});
-
-	} catch (error) {
-		console.error('获取时间轴数据失败:', error);
-		res.status(500).json({
-			success: false,
-			message: '服务器内部错误'
-		});
-	}
-});
-
-// 获取公开时间轴数据（无需登录）
-app.get('/api/timeline/public', async (req, res) => {
-	try {
-		const timelineData = await UserData.find({
-			dataType: 'timeline',
-			status: 'active',
-			'content.private': { $ne: true } // 只获取公开的项目
-		}).sort({ createdAt: -1 });
-
-		// 转换为前端需要的格式
-		const formattedData = timelineData.map(item => ({
-			id: item._id,
-			title: item.content.title,
-			time: item.content.time,
-			content: item.content.content,
-			images: item.content.images || [],
-			videos: item.content.videos || [],
-			private: false // 公开项目
-		}));
-
-		res.json({
-			success: true,
-			data: {
-				timeline: formattedData
-			}
-		});
-
-	} catch (error) {
-		console.error('获取公开时间轴数据失败:', error);
-		res.status(500).json({
-			success: false,
-			message: '服务器内部错误'
-		});
-	}
-});
-
-// 删除时间轴项
-app.delete('/api/timeline/:id', authenticateToken, async (req, res) => {
-	try {
-		const timelineId = req.params.id;
-		const userId = req.user._id;
-
-		// 验证权限（只能删除自己的时间轴项）
-		const timelineItem = await UserData.findOne({
-			_id: timelineId,
-			userId: userId,
-			dataType: 'timeline'
-		});
-
-		if (!timelineItem) {
-			return res.status(404).json({
-				success: false,
-				message: '时间轴项不存在或无权限删除'
-			});
-		}
-
-		// 软删除（标记为inactive）
-		timelineItem.status = 'inactive';
-		timelineItem.updatedAt = new Date();
-		await timelineItem.save();
-
-		res.json({
-			success: true,
-			message: '时间轴项删除成功'
-		});
-
-	} catch (error) {
-		console.error('删除时间轴项失败:', error);
-		res.status(500).json({
-			success: false,
-			message: '服务器内部错误'
-		});
-	}
-});
-
-// 更新时间轴项
-app.put('/api/timeline/:id', authenticateToken, async (req, res) => {
-	try {
-		const timelineId = req.params.id;
-		const userId = req.user._id;
-		const { title, time, content, images, videos, private: isPrivate } = req.body;
-
-		// 验证必填字段
-		if (!title || !time || !content) {
-			return res.status(400).json({
-				success: false,
-				message: '标题、时间和内容为必填字段'
-			});
-		}
-
-		// 验证权限（只能更新自己的时间轴项）
-		const timelineItem = await UserData.findOne({
-			_id: timelineId,
-			userId: userId,
-			dataType: 'timeline'
-		});
-
-		if (!timelineItem) {
-			return res.status(404).json({
-				success: false,
-				message: '时间轴项不存在或无权限更新'
-			});
-		}
-
-		// 更新时间轴项
-		timelineItem.name = title;
-		timelineItem.content = {
-			title: title,
-			time: time,
-			content: content,
-			images: images || timelineItem.content.images || [],
-			videos: videos || timelineItem.content.videos || [],
-			private: isPrivate || false
-		};
-		timelineItem.updatedAt = new Date();
-
-		await timelineItem.save();
-
-		res.json({
-			success: true,
-			message: '时间轴项更新成功',
-			data: {
-				id: timelineItem._id,
-				title: title,
-				time: time,
-				private: isPrivate || false
-			}
-		});
-
-	} catch (error) {
-		console.error('更新时间轴项失败:', error);
-		res.status(500).json({
-			success: false,
-			message: '服务器内部错误'
+			message: '更新条目失败'
 		});
 	}
 });
 
 // ========================================
-// 测试API路由
+// Timeline数据API
 // ========================================
 
-// 测试API - 检查当前用户信息
-app.get('/api/test/user', authenticateToken, async (req, res) => {
+// 获取timeline数据
+app.get('/api/timeline-data/:type', async (req, res) => {
 	try {
+		const { type } = req.params;
+		
+		// 模拟数据
+		const mockData = {
+			myPast: [
+				{
+					id: '1',
+					title: '大学毕业',
+					time: '2020-06-15',
+					content: [{ itemContent: '完成了计算机科学学士学位' }],
+					images: [],
+					videos: []
+				},
+				{
+					id: '2',
+					title: '第一份工作',
+					time: '2020-08-01',
+					content: [{ itemContent: '开始在一家科技公司担任软件工程师' }],
+					images: [],
+					videos: []
+				}
+			],
+			health: [
+				{
+					id: '1',
+					title: '年度体检',
+					time: '2024-01-15',
+					content: [{ itemContent: '完成年度健康检查，各项指标正常' }],
+					images: [],
+					videos: []
+				},
+				{
+					id: '2',
+					title: '健身计划',
+					time: '2024-03-01',
+					content: [{ itemContent: '开始每周三次的健身计划' }],
+					images: [],
+					videos: []
+				}
+			]
+		};
+
+		const data = mockData[type] || [];
+
 		res.json({
 			success: true,
-			user: req.user,
-			message: '当前用户信息'
+			data: data
 		});
 	} catch (error) {
+		console.error('获取timeline数据失败:', error);
 		res.status(500).json({
 			success: false,
-			message: '获取用户信息失败'
+			message: '获取timeline数据失败'
 		});
 	}
-});
-
-// 测试管理员权限
-app.get('/api/test/admin', requireAdmin, async (req, res) => {
-	try {
-		res.json({
-			success: true,
-			user: req.user,
-			message: '管理员权限验证成功'
-		});
-	} catch (error) {
-		res.status(500).json({
-			success: false,
-			message: '管理员权限验证失败'
-		});
-	}
-});
-
-// 404错误处理 - 当访问不存在的路由时
-app.use('*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    message: '请求的路径不存在',
-    path: req.originalUrl
-  });
-});
-
-// 全局错误处理中间件
-app.use((err, req, res, next) => {
-	console.error('服务器错误:', err);
-
-	res.status(500).json({
-		success: false,
-		message: '服务器内部错误',
-		error: process.env.NODE_ENV === 'development' ? err.message : '请稍后重试'
-  });
 });
 
 // ========================================
 // 启动服务器
 // ========================================
 
+// 启动服务器函数
 const startServer = async () => {
 	try {
 		// 连接数据库
@@ -2536,13 +2456,11 @@ const startServer = async () => {
 		app.listen(PORT, () => {
 			console.log('🚀 OneLove 后端服务器启动成功！');
 			console.log(`📡 服务器地址: http://localhost:${PORT}`);
-			console.log(`🌐 API文档: http://localhost:${PORT}/api/info`);
-			console.log(`💾 数据库状态: ${dbConnected ? '已连接' : '未连接（使用模拟模式）'}`);
-			console.log(`🔧 环境: ${process.env.NODE_ENV || 'development'}`);
-			console.log(`📦 版本: ${APP_VERSION}`);
+			console.log(`🌐 API地址: http://localhost:${PORT}/api`);
+			console.log(`📊 数据库状态: ${dbConnected ? '已连接' : '未连接（使用模拟数据）'}`);
+			console.log(`⏰ 启动时间: ${new Date().toLocaleString()}`);
 			console.log('='.repeat(50));
 		});
-
 	} catch (error) {
 		console.error('❌ 服务器启动失败:', error);
 		process.exit(1);
@@ -2551,4 +2469,3 @@ const startServer = async () => {
 
 // 启动服务器
 startServer();
-

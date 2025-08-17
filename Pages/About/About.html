@@ -6,6 +6,7 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>祁富强 - 壹比零</title>
+	<link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
 	<meta name="description" content="描述">
 	<meta name="keywords" content="关键词,祁富强,Re01成员,元岛社区管理员,甘肃不大,创造神话,DAO,梗">
 	<meta name="copyright" content="祁富强">
@@ -147,6 +148,20 @@
 			text-align: left;
 		}
 
+		/* Changelog编辑按钮悬停样式 */
+		.changelog-item-with-edit {
+			position: relative;
+		}
+
+		.changelog-edit-button {
+			opacity: 0;
+			transition: opacity 0.3s ease;
+		}
+
+		.changelog-item-with-edit:hover .changelog-edit-button {
+			opacity: 1;
+		}
+
 		/* 时间轴样式 - 恢复到之前的设计 */
 		.timeline {
 			position: relative;
@@ -160,6 +175,10 @@
 			margin-top: 50px;
 			display: flex;
 			flex-wrap: nowrap;
+		}
+
+		.timeline .item:first-of-type {
+			margin-top: 0;
 		}
 
 		.timeline .item .left {
@@ -231,15 +250,18 @@
 		}
 
 		.timeline .item .right .images img {
-			width: 100vmin;
-			height: 98vmin;
-			object-fit: cover;
+			max-width: 90vmin;
+			max-height: 88vmin;
+			width: auto;
+			height: auto;
 			border-radius: 8px;
 			border: 2px solid #ddd;
 		}
 
 		.timeline .item .right .videos {
-			margin: 10px;
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
 		}
 
 		.timeline .item .right .content video {
@@ -318,7 +340,7 @@
 			}
 		}
 		/* 修复按钮样式冲突 */
-		.timeline button,
+		.timeline button:not(.timeline-actions button),
 		.add-timeline-form button,
 		.edit-timeline-form button {
 			width: auto !important;
@@ -445,16 +467,37 @@
 		<br />
 		<!-- 时间轴 -->
 		<h3 id="MyPast">. My past .</h3>
+		<div style="text-align: right; margin-bottom: 10px;">
+			<button id="addMyPastBtn" style="display: none; background: #16A085; color: white; border: none; box-sizing: content-box; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
+				➕ 添加新项目
+			</button>
+			<button onclick="checkTokenContent()" style="background: #3498db; color: white; border: none; box-sizing: content-box; padding: 8px 16px; border-radius: 5px; cursor: pointer; margin-left: 10px;">
+				🔍 检查用户信息
+			</button>
+			<button onclick="clearAllCache()" style="background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; margin-left: 10px;">
+				🗑️ 清除缓存
+			</button>
+		</div>
 		<div class="timeline" id="myPastContainer">
 			<!-- 动态渲染内容 -->
 		</div>
 		<!-- 汉子调经 - E6KB -->
 		<h3 id="汉子调经">. 调经 .</h3>
+		<div style="text-align: right; margin-bottom: 10px;">
+			<button id="addHealthBtn" style="display: none; background: #16A085; color: white; box-sizing: content-box; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
+				➕ 添加新项目
+			</button>
+		</div>
 		<div class="timeline" id="healthContainer">
 			<!-- 动态渲染内容 -->
 		</div>
 		<!-- 历史更新 -->
 		<h3 id="更新日志">. 更新日志 .</h3>
+		<div style="text-align: right; margin-bottom: 10px;">
+			<button id="addChangelogBtn" style="display: none; background: #16A085; color: white; border: none; box-sizing: content-box; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
+				➕ 添加新版本
+			</button>
+		</div>
 		<div class="timeline">
 			<div id="versionLogContainer">
 				<div style="text-align: center; padding: 20px;">
@@ -462,26 +505,22 @@
 				</div>
 			</div>
 		</div>
-		<script src="./config.js"></script>
 		<script>
+			// 配置API基础URL
+			window.OneLoveConfig = { apiBaseUrl: '/api' };
+			
 			/**
 			 * 从API获取changelog数据
 			 */
 			async function loadChangelogFromAPI() {
 				try {
-					const apiBaseUrl = window.AboutConfig?.apiBaseUrl || '/api';
+					const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
 					const response = await fetch(`${apiBaseUrl}/changelog?limit=100`);
 					const result = await response.json();
 					
 					if (result.success && result.data.changelogs) {
 						const versionLogs = result.data.changelogs;
-						renderTimeline('versionLogContainer', versionLogs, {
-							isVersionLog: true,
-							versionLogs: versionLogs,
-							titleField: 'version',
-							timeField: 'time',
-							contentField: 'content'
-						});
+						return versionLogs; // 只返回数据，不渲染
 					} else {
 						throw new Error('获取版本信息失败');
 					}
@@ -491,6 +530,35 @@
 						'<div style="text-align: center; padding: 20px; color: #ff6b6b;">' +
 						'<i class="fas fa-exclamation-triangle"></i> 加载版本信息失败，请稍后重试' +
 						'</div>';
+					throw error; // 重新抛出错误
+				}
+			}
+
+			/**
+			 * 从API获取最大的order值
+			 */
+			async function getMaxOrderValue() {
+				try {
+					const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
+					const response = await fetch(`${apiBaseUrl}/changelog?limit=100`);
+					const result = await response.json();
+					
+					if (result.success && result.data.changelogs) {
+						const changelogs = result.data.changelogs;
+						let maxOrder = 0;
+						
+						changelogs.forEach(item => {
+							if (typeof item.order === 'number' && item.order > maxOrder) {
+								maxOrder = item.order;
+							}
+						});
+						
+						return maxOrder;
+					}
+					return 0;
+				} catch (error) {
+					console.error('获取最大order值失败:', error);
+					return 0;
 				}
 			}
 
@@ -499,13 +567,20 @@
 			 */
 			async function loadTimelineData(type) {
 				try {
-					const apiBaseUrl = window.AboutConfig?.apiBaseUrl || '/api';
-					const response = await fetch(`${apiBaseUrl}/timeline-data/${type}`);
-					const result = await response.json();
+					const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
+					console.log(`正在加载${type}数据，API地址: ${apiBaseUrl}/timeline-data/${type}`);
 					
-					if (result.success && result.data.timeline) {
-						return result.data.timeline;
+					const response = await fetch(`${apiBaseUrl}/timeline-data/${type}`);
+					console.log(`${type} API响应状态:`, response.status);
+					
+					const result = await response.json();
+					console.log(`${type} API返回数据:`, result);
+					
+					if (result.success && result.data) {
+						console.log(`${type} 数据加载成功，数据项数量:`, result.data.length);
+						return result.data; // 直接返回result.data，不需要.timeline
 					} else {
+						console.error(`${type} API返回失败:`, result);
 						throw new Error(`获取${type}数据失败`);
 					}
 				} catch (error) {
@@ -580,8 +655,9 @@
 							// 版本日志使用有序列表
 							const ol = document.createElement('ol');
 
-							item[contentField].forEach(content => {
+							item[contentField].forEach((content, index) => {
 								const li = document.createElement('li');
+								li.style.position = 'relative'; // 为编辑按钮定位
 
 								const strong = document.createElement('strong');
 								strong.className = 'Ttime';
@@ -590,9 +666,41 @@
 								li.appendChild(strong);
 								li.appendChild(document.createTextNode(' '));
 							
-							const contentSpan = document.createElement('span');
-							contentSpan.innerHTML = content.itemContent || '';
-							li.appendChild(contentSpan);
+								const contentSpan = document.createElement('span');
+								contentSpan.innerHTML = content.itemContent || '';
+								li.appendChild(contentSpan);
+
+								// 为每个子条目添加编辑按钮（鼠标悬停显示）
+								if (isUserLoggedIn() && (globalHasEditPermission || globalUserRole === 'developer' || globalUserRole === 'admin')) {
+									// 为li元素添加CSS类，用于CSS悬停效果
+									li.className = 'changelog-item-with-edit';
+									
+									const editItemButton = document.createElement('button');
+									editItemButton.textContent = '✏️';
+									editItemButton.title = '编辑此条目';
+									editItemButton.className = 'changelog-edit-button';
+									editItemButton.style.cssText = `
+										position: absolute;
+										right: 0;
+										top: 50%;
+										transform: translateY(-50%);
+										background: #3498db;
+										color: white;
+										border: none;
+										border-radius: 3px;
+										padding: 2px 6px;
+										font-size: 12px;
+										cursor: pointer;
+										opacity: 0;
+										transition: opacity 0.3s ease;
+										z-index: 10;
+									`;
+									
+									// 编辑按钮点击事件
+									editItemButton.onclick = () => showEditChangelogItemForm(item._id, item.version, index, content);
+									
+									li.appendChild(editItemButton);
+								}
 
 								ol.appendChild(li);
 							});
@@ -668,6 +776,45 @@
 						contentDiv.appendChild(videosDiv);
 					}
 
+										// 添加编辑按钮（使用全局权限状态）
+					try {
+						if (isUserLoggedIn() && canEdit()) {
+							// 创建按钮容器
+							const actionsDiv = document.createElement('div');
+							actionsDiv.className = 'timeline-actions';
+							actionsDiv.style.display = 'flex'; // 直接显示
+							
+							// 如果是版本日志，添加"添加条目"按钮
+							if (isVersionLog) {
+								const addItemButton = document.createElement('button');
+								addItemButton.textContent = '➕ 添加条目';
+								addItemButton.style.background = '#27ae60';
+								addItemButton.style.marginRight = '10px';
+								addItemButton.onclick = () => showAddChangelogItemForm(item._id, item.version);
+								actionsDiv.appendChild(addItemButton);
+							}
+							
+							const editButton = document.createElement('button');
+							editButton.textContent = '编辑';
+							editButton.onclick = () => editTimelineItem(item, containerId);
+							
+							const deleteButton = document.createElement('button');
+							deleteButton.textContent = '删除';
+							deleteButton.onclick = () => deleteTimelineItem(item, containerId);
+							
+							actionsDiv.appendChild(editButton);
+							actionsDiv.appendChild(deleteButton);
+							rightDiv.appendChild(actionsDiv);
+							
+							// 管理员只能看到编辑按钮和添加条目按钮
+							if (globalUserRole === 'admin') {
+								deleteButton.style.display = 'none';
+							}
+						}
+					} catch (error) {
+						console.error('添加编辑按钮失败:', error);
+					}
+
 					// 组装时间轴项
 						timelineItem.appendChild(leftDiv);
 						timelineItem.appendChild(rightDiv);
@@ -686,24 +833,113 @@
 							lastTimelineItem.style.fontStyle = 'italic';
 						}
 					}
+					
+					// 为ExpectTheNextVersion设置ID为ExpectTheNextVersion
+					// 为order数字类型最大的元素设置ID为lastUpdate
+					if (isVersionLog && data && data.length > 0) {
+						const timelineItems = container.querySelectorAll('.item');
+						
+						// 找到order数字类型最大的元素
+						let maxOrderItem = null;
+						let maxOrder = -Infinity;
+						
+						data.forEach((item, index) => {
+							// 检查是否为ExpectTheNextVersion
+							if (item.version === 'ExpectTheNextVersion') {
+								timelineItems[index].id = 'ExpectTheNextVersion';
+							}
+							// 检查order是否为数字类型且最大
+							else if (typeof item.order === 'number') {
+								if (item.order > maxOrder) {
+									maxOrder = item.order;
+									maxOrderItem = { item, index };
+								}
+							}
+						});
+						
+						// 如果找到了order最大的元素，设置其ID为lastUpdate
+						if (maxOrderItem) {
+							timelineItems[maxOrderItem.index].id = 'lastUpdate';
+						}
+					}
 				}
 			}
+
+			// 全局用户权限状态
+			let globalUserRole = 'guest';
+			let globalHasEditPermission = false;
+			let globalHasDeletePermission = false;
 
 			// 页面加载完成后执行
 			document.addEventListener('DOMContentLoaded', async function() {
 				console.log('页面加载完成');
 				
-				// 加载changelog数据
-				loadChangelogFromAPI();
-
-				// 从云端加载timeline数据
-				try {
-					// 加载My Past数据
-					const myPastData = await loadTimelineData('myPast');
-					console.log('My Past数据:', myPastData);
+				// 第一步：检查用户权限
+				globalUserRole = await getUserRole();
+				globalHasEditPermission = await hasEditPermission();
+				globalHasDeletePermission = await hasDeletePermission();
+				console.log('用户角色:', globalUserRole, '编辑权限:', globalHasEditPermission, '删除权限:', globalHasDeletePermission);
+				
+				// 第二步：显示/隐藏管理按钮
+				if (canEdit()) {
+					document.getElementById('addMyPastBtn').style.display = 'inline-block';
+					document.getElementById('addHealthBtn').style.display = 'inline-block';
+					document.getElementById('addChangelogBtn').style.display = 'inline-block';
+					console.log('显示管理按钮 - 用户角色:', globalUserRole);
 					
-					if (myPastData.length > 0) {
-						renderTimeline('myPastContainer', myPastData, {
+					// 添加按钮事件监听器
+					document.getElementById('addMyPastBtn').onclick = () => showAddForm('myPastData');
+					document.getElementById('addHealthBtn').onclick = () => showAddForm('healthData');
+					document.getElementById('addChangelogBtn').onclick = () => showAddChangelogForm();
+				} else {
+					console.log('隐藏管理按钮 - 用户角色:', globalUserRole);
+				}
+				
+				// 第三步：加载所有数据
+				await loadAllData();
+				
+				// 第四步：处理锚点跳转
+				handleAnchorNavigation();
+				
+				// 第五步：添加防重复点击机制的更新日志
+				addChangelogEntry();
+				
+				// 监听URL变化，处理锚点跳转
+				window.addEventListener('hashchange', function() {
+					console.log('URL锚点变化，重新处理跳转');
+					handleAnchorNavigation();
+				});
+			});
+			
+			// 加载所有数据的函数
+			async function loadAllData() {
+				try {
+					// 并行加载所有数据
+					const [changelogPromise, myPastPromise, healthPromise] = await Promise.allSettled([
+						loadChangelogFromAPI(),
+						loadTimelineData('myPast'),
+						loadTimelineData('health')
+					]);
+					
+					// 处理changelog数据
+					if (changelogPromise.status === 'fulfilled') {
+						console.log('Changelog数据加载完成');
+						// 在权限检查之后渲染changelog
+						renderTimeline('versionLogContainer', changelogPromise.value, {
+							isVersionLog: true,
+							versionLogs: changelogPromise.value,
+							titleField: 'version',
+							timeField: 'time',
+							contentField: 'content'
+						});
+					} else {
+						console.error('Changelog数据加载失败:', changelogPromise.reason);
+					}
+					
+					// 处理My Past数据
+					if (myPastPromise.status === 'fulfilled' && myPastPromise.value.length > 0) {
+						console.log('My Past数据:', myPastPromise.value);
+						renderTimeline('myPastContainer', myPastPromise.value, {
 							iconText: '📅',
 							titleField: 'title',
 							timeField: 'time',
@@ -713,12 +949,10 @@
 						});
 					}
 
-					// 加载Health数据
-					const healthData = await loadTimelineData('health');
-					console.log('Health数据:', healthData);
-					
-					if (healthData.length > 0) {
-						renderTimeline('healthContainer', healthData, {
+					// 处理Health数据
+					if (healthPromise.status === 'fulfilled' && healthPromise.value.length > 0) {
+						console.log('Health数据:', healthPromise.value);
+						renderTimeline('healthContainer', healthPromise.value, {
 							iconText: '🏥',
 							titleField: 'title',
 							timeField: 'time',
@@ -727,15 +961,1468 @@
 							videosField: 'videos'
 						});
 					}
+					
+					console.log('所有数据加载完成');
 				} catch (error) {
-					console.error('加载timeline数据失败:', error);
+					console.error('加载数据失败:', error);
 				}
-			});
+			}
+			
+			// 处理锚点跳转的函数
+			function handleAnchorNavigation() {
+				// 获取URL中的锚点
+				const hash = window.location.hash;
+				if (hash) {
+					console.log('检测到锚点:', hash);
+					
+					// 延迟执行，确保DOM完全渲染
+					setTimeout(() => {
+						const targetElement = document.querySelector(hash);
+						if (targetElement) {
+							console.log('找到目标元素，执行跳转:', targetElement);
+							targetElement.scrollIntoView({
+								behavior: 'smooth',
+								block: 'start'
+							});
+							
+							// 添加高亮效果
+							targetElement.style.transition = 'background-color 0.3s ease';
+							targetElement.style.backgroundColor = 'rgba(22, 160, 133, 0.2)';
+							setTimeout(() => {
+								targetElement.style.backgroundColor = '';
+							}, 2000);
+						} else {
+							console.log('未找到目标元素:', hash);
+						}
+					}, 500); // 等待500ms确保DOM渲染完成
+				}
+			}
+			
+			// 添加更新日志条目的函数
+			async function addChangelogEntry() {
+				try {
+					// 检查是否已经添加过这个条目（避免重复添加）
+					const existingEntry = localStorage.getItem('changelog_antiduplicate_added');
+					if (existingEntry) {
+						console.log('更新日志条目已存在，跳过添加');
+						return;
+					}
+					
+					const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+					if (!token) {
+						console.log('未找到token，跳过添加更新日志');
+						return; // 如果没有token，不添加条目
+					}
 
-			// 检查用户是否已登录
+					// 检查用户权限，只有开发者才自动添加
+					if (globalUserRole !== 'developer') {
+						console.log('用户不是开发者，跳过自动添加更新日志');
+						localStorage.setItem('changelog_antiduplicate_added', 'true');
+						return;
+					}
+					
+					const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
+					
+					// 获取最新的版本ID（ExpectTheNextVersion）
+					const response = await fetch(`${apiBaseUrl}/changelog?limit=100`);
+					const result = await response.json();
+					
+					if (result.success && result.data.changelogs) {
+						const changelogs = result.data.changelogs;
+						const expectNextVersion = changelogs.find(item => item.version === 'ExpectTheNextVersion');
+						
+						if (expectNextVersion) {
+							const newEntry = {
+								itemTime: '2025-01-17 19:58:52',
+								itemContent: '添加防重复点击机制：为所有网络请求操作（添加版本、提交条目、编辑等）添加按钮禁用状态管理，防止用户在网络请求慢的情况下多次点击，提升用户体验并减少服务器压力。'
+							};
+							
+							// 调试信息
+							console.log('自动添加更新日志 - 请求数据:', {
+								versionId: expectNextVersion._id,
+								itemContent: newEntry.itemContent,
+								itemTime: newEntry.itemTime,
+								token: token ? '存在' : '不存在'
+							});
+
+							// 使用与手动添加条目完全相同的请求格式
+							const requestData = {
+								itemContent: newEntry.itemContent
+							};
+
+							// 检查是否为开发者且选择手动设置时间
+							const isDeveloper = globalUserRole === 'developer';
+							if (isDeveloper) {
+								// 开发者可以选择手动设置时间
+								requestData.itemTime = newEntry.itemTime;
+								requestData.useAutoTime = false;
+							} else {
+								// 非开发者只能使用自动时间
+								requestData.useAutoTime = true;
+							}
+
+							console.log('最终请求数据:', requestData);
+
+							const addResponse = await fetch(`${apiBaseUrl}/changelog/${expectNextVersion._id}/items`, {
+								method: 'POST',
+								headers: {
+									'Authorization': `Bearer ${token}`,
+									'Content-Type': 'application/json'
+								},
+								body: JSON.stringify(requestData)
+							});
+
+							// 调试响应信息
+							console.log('自动添加更新日志 - 服务器响应:', {
+								status: addResponse.status,
+								statusText: addResponse.statusText,
+								ok: addResponse.ok
+							});
+
+							if (!addResponse.ok) {
+								const errorText = await addResponse.text();
+								console.error('自动添加更新日志失败:', errorText);
+							}
+							
+							if (addResponse.ok) {
+								// 标记已添加，避免重复添加
+								localStorage.setItem('changelog_antiduplicate_added', 'true');
+								console.log('防重复点击机制更新日志已添加');
+							} else {
+								// 即使失败也标记为已添加，避免重复尝试
+								localStorage.setItem('changelog_antiduplicate_added', 'true');
+								console.log('防重复点击机制更新日志添加失败，但已标记为已添加');
+								
+								// 在控制台提供手动添加的提示
+								console.log('如需手动添加此条目，请使用以下内容：');
+								console.log('时间:', newEntry.itemTime);
+								console.log('内容:', newEntry.itemContent);
+							}
+						}
+					}
+				} catch (error) {
+					console.error('添加更新日志条目失败:', error);
+					// 即使失败也标记为已添加，避免重复尝试
+					localStorage.setItem('changelog_antiduplicate_added', 'true');
+					console.log('由于错误，已标记更新日志为已添加状态');
+				}
+			}
+			
+			// 显示加载状态消息
+			function showLoadingMessage(message) {
+				// 移除已存在的加载消息
+				hideLoadingMessage();
+				
+				const loadingDiv = document.createElement('div');
+				loadingDiv.id = 'loadingMessage';
+				loadingDiv.style.cssText = `
+					position: fixed;
+					top: 50%;
+					left: 50%;
+					transform: translate(-50%, -50%);
+					background: rgba(0, 0, 0, 0.8);
+					color: white;
+					padding: 20px 30px;
+					border-radius: 10px;
+					z-index: 10000;
+					font-size: 16px;
+					text-align: center;
+					box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+				`;
+				loadingDiv.innerHTML = `
+					<div style="margin-bottom: 10px;">
+						<span style="animation: spin 1s linear infinite;">⏳</span>
+					</div>
+					<div>${message}</div>
+				`;
+				
+				// 添加旋转动画样式
+				const style = document.createElement('style');
+				style.textContent = `
+					@keyframes spin {
+						from { transform: rotate(0deg); }
+						to { transform: rotate(360deg); }
+					}
+				`;
+				document.head.appendChild(style);
+				
+				document.body.appendChild(loadingDiv);
+			}
+			
+			// 隐藏加载状态消息
+			function hideLoadingMessage() {
+				const loadingDiv = document.getElementById('loadingMessage');
+				if (loadingDiv) {
+					loadingDiv.remove();
+				}
+			}
+			
+			// 显示成功消息
+			function showSuccessMessage(message) {
+				// 移除已存在的成功消息
+				const existingSuccess = document.getElementById('successMessage');
+				if (existingSuccess) {
+					existingSuccess.remove();
+				}
+				
+				const successDiv = document.createElement('div');
+				successDiv.id = 'successMessage';
+				successDiv.style.cssText = `
+					position: fixed;
+					top: 50%;
+					left: 50%;
+					transform: translate(-50%, -50%);
+					background: rgba(40, 167, 69, 0.9);
+					color: white;
+					padding: 20px 30px;
+					border-radius: 10px;
+					z-index: 10000;
+					font-size: 16px;
+					text-align: center;
+					box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+					animation: fadeInOut 3s ease-in-out;
+				`;
+				successDiv.innerHTML = `
+					<div style="margin-bottom: 10px; font-size: 24px;">✅</div>
+					<div>${message}</div>
+				`;
+				
+				// 添加淡入淡出动画样式
+				const style = document.createElement('style');
+				style.textContent = `
+					@keyframes fadeInOut {
+						0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+						20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+						80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+						100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+					}
+				`;
+				document.head.appendChild(style);
+				
+				document.body.appendChild(successDiv);
+				
+				// 3秒后自动移除
+				setTimeout(() => {
+					if (successDiv.parentNode) {
+						successDiv.remove();
+					}
+				}, 3000);
+			}
+
+			// 编辑时间轴项
+			async function editTimelineItem(item, containerId) {
+				console.log('编辑项目:', item, '用户角色:', globalUserRole, '编辑权限:', globalHasEditPermission);
+				
+				if (canEdit()) {
+					// 根据容器类型确定编辑类型
+					if (containerId === 'versionLogContainer') {
+						showEditChangelogForm(item);
+					} else {
+						showEditTimelineForm(item, containerId);
+					}
+				} else {
+					alert('权限不足，只有开发者和管理员可以编辑');
+				}
+			}
+
+			// 显示编辑时间轴表单
+			function showEditTimelineForm(item, containerId) {
+				const formHtml = `
+					<div id="editFormOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; justify-content: center; align-items: center;">
+						<div style="background: white; padding: 20px; border-radius: 10px; width: 80%; max-width: 500px; max-height: 80vh; overflow-y: auto;">
+							<h3>编辑条目</h3>
+							<form id="editItemForm">
+								<input type="hidden" id="editItemId" value="${item._id}">
+								<input type="hidden" id="editContainerId" value="${containerId}">
+								<div style="margin-bottom: 15px;">
+									<label>标题:</label><br>
+									<input type="text" id="editTitle" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" value="${item.title || ''}">
+								</div>
+								<div style="margin-bottom: 15px;">
+									<label>时间:</label><br>
+									<input type="text" id="editTime" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" value="${item.time || ''}" placeholder="格式: YYYY-MM-DD HH:MM:SS">
+								</div>
+								<div style="margin-bottom: 15px;">
+									<label>内容:</label><br>
+									<textarea id="editContent" required style="width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" placeholder="请输入内容...">${item.content && item.content[0] ? item.content[0].itemContent : ''}</textarea>
+								</div>
+								<div style="margin-bottom: 15px;">
+									<label>图片URL (可选，多个用逗号分隔):</label><br>
+									<input type="text" id="editImages" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" value="${item.images ? item.images.join(', ') : ''}" placeholder="例如: /images/photo1.jpg, /images/photo2.jpg">
+								</div>
+								<div style="margin-bottom: 15px;">
+									<label>视频URL (可选，多个用逗号分隔):</label><br>
+									<input type="text" id="editVideos" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" value="${item.videos ? item.videos.join(', ') : ''}" placeholder="例如: /videos/video1.mp4, /videos/video2.mp4">
+								</div>
+								<div style="text-align: right;">
+									<button type="button" onclick="closeEditForm()" style="background: #95a5a6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 10px;">取消</button>
+									<button type="submit" style="background: #16A085; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">保存</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				`;
+				
+				document.body.insertAdjacentHTML('beforeend', formHtml);
+				
+				// 添加ESC键关闭功能
+				const overlay = document.getElementById('editFormOverlay');
+				overlay.addEventListener('keydown', function(e) {
+					if (e.key === 'Escape') {
+						closeEditForm();
+					}
+				});
+				
+				// 添加表单提交事件
+				document.getElementById('editItemForm').onsubmit = (e) => {
+					e.preventDefault();
+					submitEditTimeline();
+				};
+			}
+
+			// 显示编辑版本表单
+			function showEditChangelogForm(item) {
+				const formHtml = `
+					<div id="editChangelogFormOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; justify-content: center; align-items: center;">
+						<div style="background: white; padding: 20px; border-radius: 10px; width: 80%; max-width: 500px; max-height: 80vh; overflow-y: auto;">
+							<h3>编辑版本</h3>
+							<form id="editChangelogForm">
+								<input type="hidden" id="editChangelogId" value="${item._id}">
+								<div style="margin-bottom: 15px;">
+									<label>版本号:</label><br>
+									<input type="text" id="editVersion" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" value="${item.version || ''}" placeholder="例如: v5.0.5">
+								</div>
+								<div style="margin-bottom: 15px;">
+									<label>时间:</label><br>
+									<input type="text" id="editChangelogTime" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" value="${item.time || ''}" placeholder="格式: YYYY-MM-DD HH:MM:SS">
+								</div>
+								<div style="text-align: right;">
+									<button type="button" onclick="closeEditChangelogForm()" style="background: #95a5a6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 10px;">取消</button>
+									<button type="submit" style="background: #16A085; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">保存</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				`;
+				
+				document.body.insertAdjacentHTML('beforeend', formHtml);
+				
+				// 添加ESC键关闭功能
+				const overlay = document.getElementById('editChangelogFormOverlay');
+				overlay.addEventListener('keydown', function(e) {
+					if (e.key === 'Escape') {
+						closeEditChangelogForm();
+					}
+				});
+				
+				// 添加表单提交事件
+				document.getElementById('editChangelogForm').onsubmit = (e) => {
+					e.preventDefault();
+					submitEditChangelog();
+				};
+			}
+
+			// 关闭编辑表单
+			function closeEditForm() {
+				const overlay = document.getElementById('editFormOverlay');
+				if (overlay) {
+					overlay.remove();
+				}
+			}
+
+			// 关闭编辑版本表单
+			function closeEditChangelogForm() {
+				const overlay = document.getElementById('editChangelogFormOverlay');
+				if (overlay) {
+					overlay.remove();
+				}
+			}
+
+			// 显示编辑子条目表单
+			function showEditChangelogItemForm(changelogId, version, itemIndex, content) {
+				const formHtml = `
+					<div id="editChangelogItemFormOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; justify-content: center; align-items: center;">
+						<div style="background: white; padding: 20px; border-radius: 10px; width: 80%; max-width: 500px; max-height: 80vh; overflow-y: auto;">
+							<h3>编辑子条目 - ${version}</h3>
+							<form id="editChangelogItemForm">
+								<input type="hidden" id="editChangelogItemId" value="${changelogId}">
+								<input type="hidden" id="editChangelogItemIndex" value="${itemIndex}">
+								<div style="margin-bottom: 15px;">
+									<label>时间:</label><br>
+									<input type="text" id="editChangelogItemTime" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" value="${content.itemTime || ''}" placeholder="格式: [YYYY/MM/DD HH:MM:SS]">
+								</div>
+								<div style="margin-bottom: 15px;">
+									<label>内容:</label><br>
+									<textarea id="editChangelogItemContent" required style="width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" placeholder="请输入内容...">${content.itemContent || ''}</textarea>
+								</div>
+								<div style="text-align: right;">
+									<button type="button" onclick="closeEditChangelogItemForm()" style="background: #95a5a6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 10px;">取消</button>
+									<button type="submit" style="background: #16A085; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">保存</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				`;
+				
+				document.body.insertAdjacentHTML('beforeend', formHtml);
+				
+				// 添加ESC键关闭功能
+				const overlay = document.getElementById('editChangelogItemFormOverlay');
+				overlay.addEventListener('keydown', function(e) {
+					if (e.key === 'Escape') {
+						closeEditChangelogItemForm();
+					}
+				});
+				
+				// 添加表单提交事件
+				document.getElementById('editChangelogItemForm').onsubmit = (e) => {
+					e.preventDefault();
+					submitEditChangelogItem();
+				};
+			}
+
+			// 关闭编辑子条目表单
+			function closeEditChangelogItemForm() {
+				const overlay = document.getElementById('editChangelogItemFormOverlay');
+				if (overlay) {
+					overlay.remove();
+				}
+			}
+
+			// 提交编辑时间轴
+			async function submitEditTimeline() {
+				// 防止重复提交
+				const submitBtn = document.querySelector('#editItemForm button[type="submit"]');
+				if (submitBtn) {
+					submitBtn.disabled = true;
+					submitBtn.textContent = '⏳ 保存中...';
+				}
+				
+				try {
+					const itemId = document.getElementById('editItemId').value;
+					const containerId = document.getElementById('editContainerId').value;
+					const title = document.getElementById('editTitle').value.trim();
+					const time = document.getElementById('editTime').value.trim();
+					const content = document.getElementById('editContent').value.trim();
+					const images = document.getElementById('editImages').value.trim();
+					const videos = document.getElementById('editVideos').value.trim();
+
+					if (!title || !time || !content) {
+						alert('请填写必填字段');
+						return;
+					}
+
+					const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+					const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
+
+					const requestData = {
+						title: title,
+						time: time,
+						content: [{
+							itemContent: content
+						}],
+						images: images ? images.split(',').map(url => url.trim()) : [],
+						videos: videos ? videos.split(',').map(url => url.trim()) : []
+					};
+
+					const response = await fetch(`${apiBaseUrl}/timeline-data/${itemId}`, {
+						method: 'PUT',
+						headers: {
+							'Authorization': `Bearer ${token}`,
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(requestData)
+					});
+
+					const result = await response.json();
+
+					if (result.success) {
+						// 关闭表单
+						closeEditForm();
+						
+						// 显示加载状态
+						showLoadingMessage('编辑成功，正在刷新数据...');
+						
+						// 重新加载数据
+						const type = containerId === 'myPastContainer' ? 'myPast' : 'health';
+						const data = await loadTimelineData(type);
+						renderTimeline(containerId, data, {
+							iconText: containerId === 'myPastContainer' ? '📅' : '🏥',
+							titleField: 'title',
+							timeField: 'time',
+							contentField: 'content',
+							imagesField: 'images',
+							videosField: 'videos'
+						});
+						
+						// 隐藏加载状态
+						hideLoadingMessage();
+						
+						// 显示成功提示
+						showSuccessMessage('编辑成功！');
+					} else {
+						alert('编辑失败: ' + result.message);
+					}
+				} catch (error) {
+					console.error('编辑失败:', error);
+					alert('编辑失败，请稍后重试');
+				} finally {
+					// 恢复按钮状态
+					const submitBtn = document.querySelector('#editItemForm button[type="submit"]');
+					if (submitBtn) {
+						submitBtn.disabled = false;
+						submitBtn.textContent = '保存';
+					}
+				}
+			}
+
+			// 提交编辑版本
+			async function submitEditChangelog() {
+				try {
+					const changelogId = document.getElementById('editChangelogId').value;
+					const version = document.getElementById('editVersion').value.trim();
+					const time = document.getElementById('editChangelogTime').value.trim();
+
+					if (!version || !time) {
+						alert('请填写必填字段');
+						return;
+					}
+
+					const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+					const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
+
+					const requestData = {
+						version: version,
+						time: time
+					};
+
+					const response = await fetch(`${apiBaseUrl}/changelog/${changelogId}`, {
+						method: 'PUT',
+						headers: {
+							'Authorization': `Bearer ${token}`,
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(requestData)
+					});
+
+					const result = await response.json();
+
+					if (result.success) {
+						// 关闭表单
+						closeEditChangelogForm();
+						
+						// 显示加载状态
+						showLoadingMessage('编辑成功，正在刷新数据...');
+						
+						// 重新加载数据
+						await loadChangelogFromAPI();
+						
+						// 重新处理锚点跳转
+						handleAnchorNavigation();
+						
+						// 隐藏加载状态
+						hideLoadingMessage();
+						
+						// 显示成功提示
+						showSuccessMessage('编辑成功！');
+					} else {
+						alert('编辑失败: ' + result.message);
+					}
+				} catch (error) {
+					console.error('编辑失败:', error);
+					alert('编辑失败，请稍后重试');
+				}
+			}
+
+			// 提交编辑子条目
+			async function submitEditChangelogItem() {
+				try {
+					const changelogId = document.getElementById('editChangelogItemId').value;
+					const itemIndex = parseInt(document.getElementById('editChangelogItemIndex').value);
+					const itemTime = document.getElementById('editChangelogItemTime').value.trim();
+					const itemContent = document.getElementById('editChangelogItemContent').value.trim();
+
+					if (!itemTime || !itemContent) {
+						alert('请填写必填字段');
+						return;
+					}
+
+					const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+					const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
+
+					// 首先获取当前的changelog数据
+					const getResponse = await fetch(`${apiBaseUrl}/changelog/${changelogId}`);
+					const getResult = await getResponse.json();
+
+					if (!getResult.success) {
+						alert('获取数据失败: ' + getResult.message);
+						return;
+					}
+
+					const changelog = getResult.data;
+					const content = changelog.content || [];
+
+					// 更新指定索引的子条目
+					if (content[itemIndex]) {
+						content[itemIndex] = {
+							itemTime: itemTime,
+							itemContent: itemContent
+						};
+					} else {
+						alert('子条目索引无效');
+						return;
+					}
+
+					// 发送更新请求
+					const requestData = {
+						content: content
+					};
+
+					const response = await fetch(`${apiBaseUrl}/changelog/${changelogId}`, {
+						method: 'PUT',
+						headers: {
+							'Authorization': `Bearer ${token}`,
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(requestData)
+					});
+
+					const result = await response.json();
+
+					if (result.success) {
+						// 关闭表单
+						closeEditChangelogItemForm();
+						
+						// 显示加载状态
+						showLoadingMessage('编辑成功，正在刷新数据...');
+						
+						// 重新加载数据
+						await loadChangelogFromAPI();
+						
+						// 重新处理锚点跳转
+						handleAnchorNavigation();
+						
+						// 隐藏加载状态
+						hideLoadingMessage();
+						
+						// 显示成功提示
+						showSuccessMessage('编辑成功！');
+					} else {
+						alert('编辑失败: ' + result.message);
+					}
+				} catch (error) {
+					console.error('编辑失败:', error);
+					alert('编辑失败，请稍后重试');
+				}
+			}
+
+			// 删除时间轴项
+			async function deleteTimelineItem(item, containerId) {
+				console.log('删除项目:', item, '用户角色:', globalUserRole, '删除权限:', globalHasDeletePermission);
+				
+				if (globalHasDeletePermission) {
+					if (confirm('确定要删除这个项目吗？此操作不可恢复！')) {
+						try {
+							const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+							const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
+							
+							// 根据容器类型确定删除的API端点
+							let deleteUrl;
+							if (containerId === 'versionLogContainer') {
+								deleteUrl = `${apiBaseUrl}/changelog/${item._id}`;
+							} else {
+								deleteUrl = `${apiBaseUrl}/timeline-data/${item._id}`;
+							}
+							
+							const response = await fetch(deleteUrl, {
+								method: 'DELETE',
+								headers: {
+									'Authorization': `Bearer ${token}`,
+									'Content-Type': 'application/json'
+								}
+							});
+							
+							const result = await response.json();
+							
+							if (result.success) {
+								// 显示加载状态
+								showLoadingMessage('删除成功，正在刷新数据...');
+								
+								// 重新加载数据
+								if (containerId === 'versionLogContainer') {
+									await loadChangelogFromAPI();
+								} else {
+									const type = containerId === 'myPastContainer' ? 'myPast' : 'health';
+									const data = await loadTimelineData(type);
+									renderTimeline(containerId, data, {
+										iconText: containerId === 'myPastContainer' ? '📅' : '🏥',
+										titleField: 'title',
+										timeField: 'time',
+										contentField: 'content',
+										imagesField: 'images',
+										videosField: 'videos'
+									});
+								}
+								
+								// 重新处理锚点跳转
+								handleAnchorNavigation();
+								
+								// 隐藏加载状态
+								hideLoadingMessage();
+								
+								// 显示成功提示
+								showSuccessMessage('删除成功！');
+							} else {
+								alert('删除失败: ' + result.message);
+							}
+						} catch (error) {
+							console.error('删除失败:', error);
+							alert('删除失败，请稍后重试');
+						}
+					}
+				} else {
+					alert('权限不足，只有开发者可以删除项目');
+				}
+			}
+
+			// 用户角色缓存
+			let userRoleCache = null;
+			let userRoleTimestamp = 0;
+			const ROLE_CACHE_DURATION = 5 * 60 * 1000; // 5分钟缓存
+
+			// 获取用户角色（带缓存，减少日志输出）
+			async function getUserRole() {
+				try {
+					const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+					if (!token) {
+						return 'guest';
+					}
+					
+					// 检查缓存
+					const now = Date.now();
+					if (userRoleCache && (now - userRoleTimestamp) < ROLE_CACHE_DURATION) {
+						return userRoleCache;
+					}
+					
+					// 从API获取用户信息
+					const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
+					const response = await fetch(`${apiBaseUrl}/test/user`, {
+						headers: {
+							'Authorization': `Bearer ${token}`,
+							'Content-Type': 'application/json'
+						}
+					});
+					
+					if (response.ok) {
+						const result = await response.json();
+						if (result.success && result.data && result.data.user) {
+							const user = result.data.user;
+							const username = user.username || user.name || '';
+							const role = user.role || '';
+							
+							console.log('从API获取用户信息:', username, '角色:', role);
+							
+							// 确定最终角色
+							let finalRole = 'guest';
+							if (role) {
+								if (role === 'developer' || role === 'dev') finalRole = 'developer';
+								else if (role === 'admin' || role === 'administrator') finalRole = 'admin';
+								else if (role === 'user' || role === 'normal') finalRole = 'user';
+							}
+							
+							// 更新缓存
+							userRoleCache = finalRole;
+							userRoleTimestamp = now;
+							
+							return finalRole;
+						}
+					}
+					
+					return 'guest';
+				} catch (error) {
+					console.error('获取用户角色失败:', error);
+					return 'guest';
+				}
+			}
+
+			// 检查用户是否是开发者
+			async function isDeveloper() {
+				const role = await getUserRole();
+				return role === 'developer';
+			}
+
+			// 检查用户是否是管理员
+			async function isAdmin() {
+				const role = await getUserRole();
+				return role === 'admin';
+			}
+
+			// 检查用户是否有编辑权限（开发者和管理员）
+			async function hasEditPermission() {
+				const role = await getUserRole();
+				return role === 'developer' || role === 'admin';
+			}
+
+			// 检查用户是否有删除权限（只有开发者）
+			async function hasDeletePermission() {
+				const role = await getUserRole();
+				return role === 'developer';
+			}
+
+			// 简化的权限检查函数
+			function canEdit() {
+				return globalUserRole === 'developer' || globalUserRole === 'admin';
+			}
+
+			function canDelete() {
+				return globalUserRole === 'developer';
+			}
+
+			// 登录状态缓存
+			let loginStatusCache = null;
+			let loginStatusTimestamp = 0;
+			const LOGIN_CACHE_DURATION = 30 * 1000; // 30秒缓存
+
+			// 检查用户是否已登录（带缓存，减少日志输出）
 			function isUserLoggedIn() {
+				// 检查缓存
+				const now = Date.now();
+				if (loginStatusCache !== null && (now - loginStatusTimestamp) < LOGIN_CACHE_DURATION) {
+					return loginStatusCache;
+				}
+				
+				const localToken = localStorage.getItem('token');
+				const sessionToken = sessionStorage.getItem('token');
+				const token = localToken || sessionToken;
+				const hasToken = !!token;
+				
+				// 只在第一次检查时输出详细信息
+				if (loginStatusCache === null) {
+					console.log('=== 登录状态检查 ===');
+					console.log('localStorage token:', localToken ? `存在 (${localToken.length}字符)` : '不存在');
+					console.log('sessionStorage token:', sessionToken ? `存在 (${sessionToken.length}字符)` : '不存在');
+					console.log('最终使用token:', token ? `存在 (${token.length}字符)` : '不存在');
+					console.log('登录状态:', hasToken);
+					console.log('========================');
+				}
+				
+				// 更新缓存
+				loginStatusCache = hasToken;
+				loginStatusTimestamp = now;
+				
+				return hasToken;
+			}
+
+			// 清除所有缓存
+			function clearAllCache() {
+				loginStatusCache = null;
+				loginStatusTimestamp = 0;
+				userRoleCache = null;
+				userRoleTimestamp = 0;
+				console.log('所有缓存已清除');
+			}
+
+			// 手动检查用户信息（调试用）
+			async function checkTokenContent() {
+				const localToken = localStorage.getItem('token');
+				const sessionToken = sessionStorage.getItem('token');
+				const token = localToken || sessionToken;
+				
+				console.log('=== 用户信息检查 ===');
+				if (token) {
+					console.log('Token存在，长度:', token.length);
+					
+					// 显示当前缓存状态
+					console.log('登录状态缓存:', loginStatusCache);
+					console.log('用户角色缓存:', userRoleCache);
+					
+					try {
+						// 清除缓存，强制重新获取
+						clearAllCache();
+						
+						// 从API获取用户信息
+						const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
+						const response = await fetch(`${apiBaseUrl}/test/user`, {
+							headers: {
+								'Authorization': `Bearer ${token}`,
+								'Content-Type': 'application/json'
+							}
+						});
+						
+						if (response.ok) {
+							const result = await response.json();
+							if (result.success && result.data && result.data.user) {
+								console.log('API返回的用户信息:', result.data.user);
+								console.log('用户名:', result.data.user.username || result.data.user.name || '未找到');
+								console.log('角色:', result.data.user.role || '未找到');
+								console.log('邮箱:', result.data.user.email || '未找到');
+							} else {
+								console.log('API返回数据格式错误:', result);
+							}
+						} else {
+							console.log('API请求失败，状态码:', response.status);
+							const errorText = await response.text();
+							console.log('错误信息:', errorText);
+						}
+					} catch (error) {
+						console.log('API请求异常:', error);
+					}
+				} else {
+					console.log('没有找到token');
+				}
+				console.log('==================');
+			}
+
+			// 显示添加表单
+			function showAddForm(type) {
+				const formHtml = `
+					<div id="addFormOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; justify-content: center; align-items: center;">
+						<div style="background: white; padding: 20px; border-radius: 10px; width: 80%; max-width: 500px; max-height: 80vh; overflow-y: auto;">
+							<h3>添加新条目 (${type === 'myPastData' ? 'My Past' : 'Health'})</h3>
+							<form id="addItemForm">
+								<div style="margin-bottom: 15px;">
+									<label>标题:</label><br>
+									<input type="text" id="addTitle" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+								</div>
+								<div style="margin-bottom: 15px;">
+									<label>时间:</label><br>
+									<input type="text" value="自动使用创建时间" disabled style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background-color: #f5f5f5; color: #666;">
+								</div>
+								<div style="margin-bottom: 15px;">
+									<label>内容:</label><br>
+									<textarea id="addContent" required style="width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" placeholder="请输入内容..."></textarea>
+								</div>
+								<div style="margin-bottom: 15px;">
+									<label>图片URL (可选，多个用逗号分隔):</label><br>
+									<input type="text" id="addImages" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" placeholder="例如: /images/photo1.jpg, /images/photo2.jpg">
+								</div>
+								<div style="margin-bottom: 15px;">
+									<label>视频URL (可选，多个用逗号分隔):</label><br>
+									<input type="text" id="addVideos" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" placeholder="例如: /videos/video1.mp4, /videos/video2.mp4">
+								</div>
+								<div style="text-align: right;">
+									<button type="button" onclick="closeAddForm()" style="background: #95a5a6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 10px;">取消</button>
+									<button type="submit" style="background: #16A085; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">添加</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				`;
+				
+				document.body.insertAdjacentHTML('beforeend', formHtml);
+				
+				// 添加ESC键关闭功能
+				const overlay = document.getElementById('addFormOverlay');
+				overlay.addEventListener('keydown', function(e) {
+					if (e.key === 'Escape') {
+						closeAddForm();
+					}
+				});
+				
+				// 添加表单提交事件
+				document.getElementById('addItemForm').onsubmit = (e) => {
+					e.preventDefault();
+					submitNewItem(type);
+				};
+			}
+
+			// 显示添加更新日志表单
+			async function showAddChangelogForm() {
+				// 防止重复点击
+				const addBtn = document.getElementById('addChangelogBtn');
+				if (addBtn) {
+					addBtn.disabled = true;
+					addBtn.textContent = '⏳ 加载中...';
+				}
+				
+				try {
+					// 检查是否为开发者
+					const isDeveloper = globalUserRole === 'developer';
+					
+					// 获取最大的order值
+					const maxOrder = await getMaxOrderValue();
+					const defaultOrder = maxOrder + 1;
+				
+				const timeSection = isDeveloper ? `
+					<div style="margin-bottom: 15px;">
+						<label>时间设置:</label><br>
+						<select id="versionTimeSetting" onchange="toggleVersionTimeInput()" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px;">
+							<option value="auto">自动设置时间（UTC+8）</option>
+							<option value="manual">手动设置时间</option>
+						</select>
+						<input type="datetime-local" id="versionManualTimeInput" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; display: none;" placeholder="选择时间">
+					</div>
+				` : `
+					<div style="margin-bottom: 15px;">
+						<label>时间:</label><br>
+						<input type="text" value="自动使用创建时间（UTC+8）" disabled style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background-color: #f5f5f5; color: #666;">
+					</div>
+				`;
+
+				const formHtml = `
+					<div id="addChangelogFormOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; justify-content: center; align-items: center;">
+						<div style="background: white; padding: 20px; border-radius: 10px; width: 80%; max-width: 500px; max-height: 80vh; overflow-y: auto;">
+							<h3>添加新版本</h3>
+							<form id="addChangelogForm">
+								<div style="margin-bottom: 15px;">
+									<label>版本号:</label><br>
+									<input type="text" id="addVersion" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" placeholder="例如: v5.0.5">
+								</div>
+								<div style="margin-bottom: 15px;">
+									<label>排序值 (当前最大: ${maxOrder}):</label><br>
+									<input type="number" id="addOrder" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" value="${defaultOrder}" min="1" placeholder="请输入排序值">
+								</div>
+								${timeSection}
+								<div style="text-align: right;">
+									<button type="button" onclick="closeAddChangelogForm()" style="background: #95a5a6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 10px;">取消</button>
+									<button type="submit" style="background: #16A085; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">添加版本</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				`;
+				
+				document.body.insertAdjacentHTML('beforeend', formHtml);
+				
+				// 添加ESC键关闭功能
+				const overlay = document.getElementById('addChangelogFormOverlay');
+				overlay.addEventListener('keydown', function(e) {
+					if (e.key === 'Escape') {
+						closeAddChangelogForm();
+					}
+				});
+				
+				// 添加表单提交事件
+				document.getElementById('addChangelogForm').onsubmit = (e) => {
+					e.preventDefault();
+					submitNewChangelog();
+				};
+				} catch (error) {
+					console.error('加载表单失败:', error);
+					alert('加载表单失败，请稍后重试');
+				} finally {
+					// 恢复按钮状态
+					const addBtn = document.getElementById('addChangelogBtn');
+					if (addBtn) {
+						addBtn.disabled = false;
+						addBtn.textContent = '➕ 添加新版本';
+					}
+				}
+			}
+
+			// 显示添加条目表单
+			function showAddChangelogItemForm(versionId, versionName) {
+				// 检查是否为开发者
+				const isDeveloper = globalUserRole === 'developer';
+				
+				const timeSection = isDeveloper ? `
+					<div style="margin-bottom: 15px;">
+						<label>时间设置:</label><br>
+						<select id="timeSetting" onchange="toggleTimeInput()" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px;">
+							<option value="auto">自动设置时间（UTC+8）</option>
+							<option value="manual">手动设置时间</option>
+						</select>
+						<input type="datetime-local" id="manualTimeInput" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; display: none;" placeholder="选择时间">
+					</div>
+				` : `
+					<div style="margin-bottom: 15px;">
+						<label>时间:</label><br>
+						<input type="text" value="自动使用创建时间（UTC+8）" disabled style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background-color: #f5f5f5; color: #666;">
+					</div>
+				`;
+
+				const formHtml = `
+					<div id="addChangelogItemFormOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; justify-content: center; align-items: center;">
+						<div style="background: white; padding: 20px; border-radius: 10px; width: 80%; max-width: 500px; max-height: 80vh; overflow-y: auto;">
+							<h3>添加条目到 ${versionName}</h3>
+							<form id="addChangelogItemForm">
+								<input type="hidden" id="addItemVersionId" value="${versionId}">
+								<div style="margin-bottom: 15px;">
+									<label>条目内容:</label><br>
+									<textarea id="addChangelogItemContent" required style="width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" placeholder="请输入条目内容..."></textarea>
+								</div>
+								${timeSection}
+								<div style="text-align: right;">
+									<button type="button" onclick="closeAddChangelogItemForm()" style="background: #95a5a6; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 10px;">取消</button>
+									<button type="submit" style="background: #16A085; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer;">添加条目</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				`;
+
+				document.body.insertAdjacentHTML('beforeend', formHtml);
+
+				// 添加ESC键关闭功能
+				const overlay = document.getElementById('addChangelogItemFormOverlay');
+				overlay.addEventListener('keydown', function(e) {
+					if (e.key === 'Escape') {
+						closeAddChangelogItemForm();
+					}
+				});
+
+				// 添加表单提交事件
+				document.getElementById('addChangelogItemForm').onsubmit = (e) => {
+					e.preventDefault();
+					submitNewChangelogItem();
+				};
+			}
+
+			// 关闭添加表单
+			function closeAddForm() {
+				const overlay = document.getElementById('addFormOverlay');
+				if (overlay) {
+					overlay.remove();
+				}
+			}
+
+			// 关闭添加更新日志表单
+			function closeAddChangelogForm() {
+				const overlay = document.getElementById('addChangelogFormOverlay');
+				if (overlay) {
+					overlay.remove();
+				}
+			}
+
+			// 切换时间输入显示
+			function toggleTimeInput() {
+				const timeSetting = document.getElementById('timeSetting');
+				const manualTimeInput = document.getElementById('manualTimeInput');
+				
+				if (timeSetting && manualTimeInput) {
+					if (timeSetting.value === 'manual') {
+						manualTimeInput.style.display = 'block';
+						// 设置默认值为当前时间（UTC+8）
+						const now = new Date();
+						const utc8Time = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+						manualTimeInput.value = utc8Time.toISOString().slice(0, 16);
+					} else {
+						manualTimeInput.style.display = 'none';
+					}
+				}
+			}
+
+			// 切换版本时间输入显示
+			function toggleVersionTimeInput() {
+				const versionTimeSetting = document.getElementById('versionTimeSetting');
+				const versionManualTimeInput = document.getElementById('versionManualTimeInput');
+				
+				if (versionTimeSetting && versionManualTimeInput) {
+					if (versionTimeSetting.value === 'manual') {
+						versionManualTimeInput.style.display = 'block';
+						// 设置默认值为当前时间（UTC+8）
+						const now = new Date();
+						const utc8Time = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+						versionManualTimeInput.value = utc8Time.toISOString().slice(0, 16);
+					} else {
+						versionManualTimeInput.style.display = 'none';
+					}
+				}
+			}
+
+			// 关闭添加条目表单
+			function closeAddChangelogItemForm() {
+				const overlay = document.getElementById('addChangelogItemFormOverlay');
+				if (overlay) {
+					overlay.remove();
+				}
+			}
+
+			// 提交新条目
+			async function submitNewItem(type) {
+				try {
+					const title = document.getElementById('addTitle').value.trim();
+					const content = document.getElementById('addContent').value.trim();
+					const images = document.getElementById('addImages').value.trim();
+					const videos = document.getElementById('addVideos').value.trim();
+
+					if (!title || !content) {
+						alert('请填写必填字段');
+						return;
+					}
+
 				const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-				return !!token;
+					const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
+
+					const requestData = {
+						type: type,
+						title: title,
+						content: [{
+							itemContent: content
+						}],
+						images: images ? images.split(',').map(url => url.trim()) : [],
+						videos: videos ? videos.split(',').map(url => url.trim()) : []
+					};
+
+					const response = await fetch(`${apiBaseUrl}/timeline-data`, {
+						method: 'POST',
+						headers: {
+							'Authorization': `Bearer ${token}`,
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(requestData)
+					});
+
+					const result = await response.json();
+
+					if (result.success) {
+						// 关闭表单
+						closeAddForm();
+						
+						// 显示加载状态
+						showLoadingMessage('添加成功，正在刷新数据...');
+						
+						// 重新加载数据
+						const data = await loadTimelineData(type === 'myPastData' ? 'myPast' : 'health');
+						const containerId = type === 'myPastData' ? 'myPastContainer' : 'healthContainer';
+						renderTimeline(containerId, data, {
+							iconText: type === 'myPastData' ? '📅' : '🏥',
+							titleField: 'title',
+							timeField: 'time',
+							contentField: 'content',
+							imagesField: 'images',
+							videosField: 'videos'
+						});
+						
+						// 隐藏加载状态
+						hideLoadingMessage();
+						
+						// 显示成功提示
+						showSuccessMessage('添加成功！');
+					} else {
+						alert('添加失败: ' + result.message);
+					}
+				} catch (error) {
+					console.error('添加失败:', error);
+					alert('添加失败，请稍后重试');
+				}
+			}
+
+			// 提交新更新日志版本
+			async function submitNewChangelog() {
+				// 防止重复提交
+				const submitBtn = document.querySelector('#addChangelogForm button[type="submit"]');
+				if (submitBtn) {
+					submitBtn.disabled = true;
+					submitBtn.textContent = '⏳ 提交中...';
+				}
+				
+				try {
+					const version = document.getElementById('addVersion').value.trim();
+					const order = parseInt(document.getElementById('addOrder').value);
+
+					if (!version) {
+						alert('请填写版本号');
+						return;
+					}
+
+					if (!order || order < 1) {
+						alert('请填写有效的排序值');
+						return;
+					}
+
+					const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+					const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
+
+					const requestData = {
+						version: version,
+						order: order
+					};
+
+					// 检查是否为开发者且选择手动设置时间
+					const isDeveloper = globalUserRole === 'developer';
+					if (isDeveloper) {
+						const versionTimeSetting = document.getElementById('versionTimeSetting');
+						const versionManualTimeInput = document.getElementById('versionManualTimeInput');
+						
+						if (versionTimeSetting && versionTimeSetting.value === 'manual' && versionManualTimeInput && versionManualTimeInput.value) {
+							// 开发者选择手动设置时间
+							const selectedTime = new Date(versionManualTimeInput.value);
+							const utc8Time = new Date(selectedTime.getTime() + (8 * 60 * 60 * 1000));
+							requestData.time = utc8Time.toISOString().slice(0, 19).replace('T', ' ');
+							requestData.useAutoTime = false;
+						} else {
+							// 开发者选择自动设置时间
+							requestData.useAutoTime = true;
+						}
+					} else {
+						// 非开发者只能使用自动时间
+						requestData.useAutoTime = true;
+					}
+
+					const response = await fetch(`${apiBaseUrl}/changelog`, {
+						method: 'POST',
+						headers: {
+							'Authorization': `Bearer ${token}`,
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(requestData)
+					});
+
+					const result = await response.json();
+
+					if (result.success) {
+						// 显示成功提示并关闭表单
+						closeAddChangelogForm();
+						
+						// 显示加载状态
+						showLoadingMessage('版本添加成功，正在刷新数据...');
+						
+						// 重新加载数据
+						await loadChangelogFromAPI();
+						
+						// 重新处理锚点跳转
+						handleAnchorNavigation();
+						
+						// 隐藏加载状态
+						hideLoadingMessage();
+						
+						// 显示成功提示
+						showSuccessMessage('版本添加成功！');
+					} else {
+						alert('添加失败: ' + result.message);
+					}
+				} catch (error) {
+					console.error('添加失败:', error);
+					alert('添加失败，请稍后重试');
+				} finally {
+					// 恢复按钮状态
+					const submitBtn = document.querySelector('#addChangelogForm button[type="submit"]');
+					if (submitBtn) {
+						submitBtn.disabled = false;
+						submitBtn.textContent = '添加版本';
+					}
+				}
+			}
+
+			// 提交新条目
+			async function submitNewChangelogItem() {
+				// 防止重复提交
+				const submitBtn = document.querySelector('#addChangelogItemForm button[type="submit"]');
+				if (submitBtn) {
+					submitBtn.disabled = true;
+					submitBtn.textContent = '⏳ 提交中...';
+				}
+				
+				try {
+					const versionId = document.getElementById('addItemVersionId').value;
+					const itemContent = document.getElementById('addChangelogItemContent').value.trim();
+
+					if (!itemContent) {
+						alert('请填写条目内容');
+						return;
+					}
+
+					if (!versionId) {
+						alert('版本ID无效');
+						return;
+					}
+
+					if (!token) {
+						alert('请先登录');
+						return;
+					}
+
+					const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+					const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
+
+					// 构建请求数据
+					const requestData = {
+						itemContent: itemContent
+					};
+
+					// 验证请求数据格式
+					console.log('请求数据验证:', {
+						itemContent: typeof itemContent,
+						itemContentLength: itemContent.length,
+						requestData: requestData
+					});
+
+					// 检查是否为开发者且选择手动设置时间
+					const isDeveloper = globalUserRole === 'developer';
+					if (isDeveloper) {
+						const timeSetting = document.getElementById('timeSetting');
+						const manualTimeInput = document.getElementById('manualTimeInput');
+						
+						if (timeSetting && timeSetting.value === 'manual' && manualTimeInput && manualTimeInput.value) {
+							// 开发者选择手动设置时间
+							const selectedTime = new Date(manualTimeInput.value);
+							const utc8Time = new Date(selectedTime.getTime() + (8 * 60 * 60 * 1000));
+							requestData.itemTime = utc8Time.toISOString().slice(0, 19).replace('T', ' ');
+							requestData.useAutoTime = false;
+						} else {
+							// 开发者选择自动设置时间
+							requestData.useAutoTime = true;
+						}
+					} else {
+						// 非开发者只能使用自动时间
+						requestData.useAutoTime = true;
+					}
+
+					// 调试信息
+					console.log('发送请求数据:', {
+						url: `${apiBaseUrl}/changelog/${versionId}/items`,
+						requestData: requestData,
+						token: token ? '存在' : '不存在',
+						userRole: globalUserRole
+					});
+
+					const response = await fetch(`${apiBaseUrl}/changelog/${versionId}/items`, {
+						method: 'POST',
+						headers: {
+							'Authorization': `Bearer ${token}`,
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(requestData)
+					});
+
+					// 调试响应信息
+					console.log('服务器响应:', {
+						status: response.status,
+						statusText: response.statusText,
+						ok: response.ok
+					});
+
+					if (!response.ok) {
+						const errorText = await response.text();
+						console.error('服务器错误详情:', errorText);
+						throw new Error(`服务器错误 (${response.status}): ${errorText}`);
+					}
+
+					const result = await response.json();
+
+					if (result.success) {
+						// 显示成功提示并关闭表单
+						closeAddChangelogItemForm();
+						
+						// 显示加载状态
+						showLoadingMessage('条目添加成功，正在刷新数据...');
+						
+						// 重新加载数据
+						await loadChangelogFromAPI();
+						
+						// 重新处理锚点跳转
+						handleAnchorNavigation();
+						
+						// 隐藏加载状态
+						hideLoadingMessage();
+						
+						// 显示成功提示
+						showSuccessMessage('条目添加成功！');
+					} else {
+						alert('添加失败: ' + result.message);
+					}
+				} catch (error) {
+					console.error('添加失败:', error);
+					alert('添加失败，请稍后重试');
+				} finally {
+					// 恢复按钮状态
+					const submitBtn = document.querySelector('#addChangelogItemForm button[type="submit"]');
+					if (submitBtn) {
+						submitBtn.disabled = false;
+						submitBtn.textContent = '添加条目';
+					}
+				}
 			}
 			</script>
 		</div>
