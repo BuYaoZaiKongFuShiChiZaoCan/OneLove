@@ -1,6 +1,6 @@
 {
   "name": "onelove-backend",
-  "version": "5.0.4",
+  "version": "5.0.2",
   "description": "OneLove Backend API Server",
   "main": "server.js",
   "scripts": {

@@ -2528,74 +2528,27 @@ app.use((err, req, res, next) => {
 // ========================================
 
 const startServer = async () => {
-	// 尝试连接数据库
-	const dbConnected = await connectDB();
-    
-    // 启动服务器
-    app.listen(PORT, () => {
-		console.log(`🚀 服务器已启动！`);
-		console.log(`📍 本地访问地址: http://localhost:${PORT}`);
-		console.log(`🌐 健康检查: http://localhost:${PORT}/api/health`);
-		console.log(`🔐 认证API: http://localhost:${PORT}/api/auth`);
-		console.log(`📊 环境: ${process.env.NODE_ENV || 'development'}`);
-		console.log(`⏰ 启动时间: ${new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai' })}`);
-		console.log(`📦 版本: ${APP_VERSION}`);
-		console.log(`💾 数据库状态: ${dbConnected ? '已连接' : '未连接（模拟模式）'}`);
-	});
-};
-
-startServer();
-
-// 优雅关闭处理
-process.on('SIGTERM', () => {
-	console.log('收到SIGTERM信号，正在关闭服务器...');
-    process.exit(0);
-});
-
-process.on('SIGINT', () => {
-	console.log('收到SIGINT信号，正在关闭服务器...');
-    process.exit(0);
-  });
-
-// 获取timeline数据（My Past和Health）
-app.get('/api/timeline-data/:type', async (req, res) => {
 	try {
-		const { type } = req.params;
+		// 连接数据库
+		const dbConnected = await connectDB();
 		
-		if (!['myPast', 'health'].includes(type)) {
-			return res.status(400).json({
-				success: false,
-				message: '无效的数据类型'
-			});
-		}
-
-		const timelineData = await TimelineData.find({
-			dataType: type,
-			status: 'active'
-		}).sort({ createdAt: -1 });
-
-		// 转换为前端需要的格式
-		const formattedData = timelineData.map(item => ({
-			id: item._id,
-			title: item.title,
-			time: item.time,
-			content: item.content,
-			images: item.images || [],
-			videos: item.videos || []
-		}));
-
-		res.json({
-			success: true,
-			data: {
-				timeline: formattedData
-			}
+		// 启动服务器
+		app.listen(PORT, () => {
+			console.log('🚀 OneLove 后端服务器启动成功！');
+			console.log(`📡 服务器地址: http://localhost:${PORT}`);
+			console.log(`🌐 API文档: http://localhost:${PORT}/api/info`);
+			console.log(`💾 数据库状态: ${dbConnected ? '已连接' : '未连接（使用模拟模式）'}`);
+			console.log(`🔧 环境: ${process.env.NODE_ENV || 'development'}`);
+			console.log(`📦 版本: ${APP_VERSION}`);
+			console.log('='.repeat(50));
 		});
 
 	} catch (error) {
-		console.error('获取timeline数据失败:', error);
-		res.status(500).json({
-			success: false,
-			message: '服务器内部错误'
-		});
+		console.error('❌ 服务器启动失败:', error);
+		process.exit(1);
 	}
-});
+};
+
+// 启动服务器
+startServer();
+

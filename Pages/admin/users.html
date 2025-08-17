@@ -348,7 +348,7 @@
 
 		// 获取认证令牌
 		function getAuthToken() {
-			return sessionStorage.getItem('token');
+			return localStorage.getItem('token') || sessionStorage.getItem('token');
 		}
 
 		// 检查管理员权限
