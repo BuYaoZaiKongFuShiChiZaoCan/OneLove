@@ -49,9 +49,8 @@ const requireDeveloperOrAdmin = async (req, res, next) => {
 
 // 导入数据模型
 const User = require('./models/User');
-const Password = require('./models/Password');
-const Phone = require('./models/Phone');
 const Changelog = require('./models/Changelog');
+// Password和Phone模型在下方定义
 // TimelineData模型已删除，直接使用模拟数据
 
 // 创建Express应用实例
