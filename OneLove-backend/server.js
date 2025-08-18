@@ -2466,5 +2466,18 @@ const startServer = async () => {
 	}
 };
 
-// 启动服务器
-startServer();
+// 如果作为独立服务器运行，则启动监听；在无服务器环境（Netlify Functions）中仅导出 app
+if (require.main === module) {
+  // 启动服务器
+  startServer();
+} else {
+  // Functions/Serverless 环境：初始化数据库连接（只在首次加载时调用）
+  // 忽略连接失败，代码会在部分路由使用模拟模式
+  (async () => {
+    try {
+      await connectDB();
+    } catch (_) {}
+  })();
+}
+
+module.exports = app;
