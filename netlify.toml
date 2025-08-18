@@ -18,7 +18,7 @@
   status = 200
 
 [dev]
-  command = "cd OneLove-backend ;node server.js"
+  command = ""
   port = 3000
   publish = "."
   framework = "#static" 

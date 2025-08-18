@@ -158,8 +158,27 @@
 			transition: opacity 0.3s ease;
 		}
 
+		/* 悬停时显示编辑/删除按钮 */
 		.changelog-item-with-edit:hover .changelog-edit-button {
 			opacity: 1;
+		}
+
+		/* 时间显示样式 */
+		.Ttime,
+		.itemTime {
+			display: inline-block;
+			min-width: 140px;
+			margin-right: 10px;
+			padding: 2px 6px;
+			border-radius: 4px;
+			background: rgba(149,165,166,0.18);
+			color: #ecf0f1;
+			font-size: 0.9em;
+		}
+
+		.changelog-item-with-edit:hover .changelog-edit-button { opacity: 1; }
+		.changelog-edit-button {
+			box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 		}
 
 		/* 时间轴样式 - 恢复到之前的设计 */
@@ -691,7 +710,6 @@
 										padding: 2px 6px;
 										font-size: 12px;
 										cursor: pointer;
-										opacity: 0;
 										transition: opacity 0.3s ease;
 										z-index: 10;
 									`;
@@ -699,7 +717,51 @@
 									// 编辑按钮点击事件
 									editItemButton.onclick = () => showEditChangelogItemForm(item._id, item.version, index, content);
 									
+									// 删除按钮
+									const deleteItemButton = document.createElement('button');
+									deleteItemButton.textContent = '🗑️';
+									deleteItemButton.title = '删除此条目';
+									deleteItemButton.className = 'changelog-edit-button';
+									deleteItemButton.style.cssText = `
+										position: absolute;
+										right: 36px;
+										top: 50%;
+										transform: translateY(-50%);
+										background: #e74c3c;
+										color: white;
+										border: none;
+										border-radius: 3px;
+										padding: 2px 6px;
+										font-size: 12px;
+										cursor: pointer;
+										transition: opacity 0.3s ease;
+										z-index: 10;
+									`;
+									deleteItemButton.onclick = async () => {
+										if (!confirm('确定要删除此条目吗？')) return;
+										try {
+											const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+											const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
+											const resp = await fetch(`${apiBaseUrl}/changelog/${item._id}/items/${index}`, {
+												method: 'DELETE',
+												headers: { 'Authorization': `Bearer ${token}` }
+											});
+											let resJson;
+											try { resJson = await resp.json(); } catch (_) { resJson = { success:false, message: `HTTP ${resp.status}` }; }
+											if (resJson.success) {
+												await loadAllData();
+												showSuccessMessage('删除成功');
+											} else {
+												alert(`删除失败 (${resp.status}): ${resJson.message || ''}`);
+											}
+										} catch (err) {
+											console.error('删除失败:', err);
+											alert('删除失败，请稍后重试');
+										}
+									};
+
 									li.appendChild(editItemButton);
+									li.appendChild(deleteItemButton);
 								}
 
 								ol.appendChild(li);
@@ -1550,41 +1612,14 @@
 					const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 					const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
 
-					// 首先获取当前的changelog数据
-					const getResponse = await fetch(`${apiBaseUrl}/changelog/${changelogId}`);
-					const getResult = await getResponse.json();
-
-					if (!getResult.success) {
-						alert('获取数据失败: ' + getResult.message);
-						return;
-					}
-
-					const changelog = getResult.data;
-					const content = changelog.content || [];
-
-					// 更新指定索引的子条目
-					if (content[itemIndex]) {
-						content[itemIndex] = {
-							itemTime: itemTime,
-							itemContent: itemContent
-						};
-					} else {
-						alert('子条目索引无效');
-						return;
-					}
-
-					// 发送更新请求
-					const requestData = {
-						content: content
-					};
-
-					const response = await fetch(`${apiBaseUrl}/changelog/${changelogId}`, {
+					// 直接调用子条目更新接口
+					const response = await fetch(`${apiBaseUrl}/changelog/${changelogId}/items/${itemIndex}`, {
 						method: 'PUT',
 						headers: {
 							'Authorization': `Bearer ${token}`,
 							'Content-Type': 'application/json'
 						},
-						body: JSON.stringify(requestData)
+						body: JSON.stringify({ itemTime, itemContent })
 					});
 
 					const result = await response.json();
@@ -1593,17 +1628,11 @@
 						// 关闭表单
 						closeEditChangelogItemForm();
 						
-						// 显示加载状态
-						showLoadingMessage('编辑成功，正在刷新数据...');
-						
 						// 重新加载数据
-						await loadChangelogFromAPI();
+						await loadAllData();
 						
 						// 重新处理锚点跳转
 						handleAnchorNavigation();
-						
-						// 隐藏加载状态
-						hideLoadingMessage();
 						
 						// 显示成功提示
 						showSuccessMessage('编辑成功！');
@@ -2318,12 +2347,12 @@
 						return;
 					}
 
+					const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 					if (!token) {
 						alert('请先登录');
 						return;
 					}
 
-					const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 					const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
 
 					// 构建请求数据
@@ -2395,11 +2424,8 @@
 						// 显示成功提示并关闭表单
 						closeAddChangelogItemForm();
 						
-						// 显示加载状态
-						showLoadingMessage('条目添加成功，正在刷新数据...');
-						
-						// 重新加载数据
-						await loadChangelogFromAPI();
+						// 重新加载并渲染全部数据，确保新条目与时间显示
+						await loadAllData();
 						
 						// 重新处理锚点跳转
 						handleAnchorNavigation();

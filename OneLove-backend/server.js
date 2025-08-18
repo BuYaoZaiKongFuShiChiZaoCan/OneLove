@@ -322,8 +322,20 @@ const authenticateToken = async (req, res, next) => {
 		}
 
 		const decoded = jwt.verify(token, JWT_SECRET);
-		const user = await User.findById(decoded.userId).select('-password');
 
+		// 如果数据库未连接，降级到基于令牌的用户信息
+		if (mongoose.connection.readyState !== 1) {
+			req.user = {
+				_id: decoded.userId || 'mock-user-id',
+				role: decoded.role || 'developer',
+				username: decoded.username || 'mock-user',
+				email: decoded.email || 'mock@example.com',
+				isActive: true
+			};
+			return next();
+		}
+
+		const user = await User.findById(decoded.userId).select('-password');
 		if (!user || !user.isActive) {
 			return res.status(401).json({
 				success: false,
@@ -390,6 +402,44 @@ app.get('/api/auth', (req, res) => {
       header: 'Authorization: Bearer <token>'
     }
   });
+});
+
+// 格式化时间为 UTC+8，形如 YYYY-MM-DD HH:mm
+function formatUTC8(date = new Date()) {
+	const utc8 = new Date(date.getTime() + (8 * 60 * 60 * 1000));
+	return utc8.toISOString().slice(0, 16).replace('T', ' ');
+}
+
+// 创建changelog
+app.post('/api/changelog', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
+	try {
+		const { version, order = 0, time, useAutoTime = true } = req.body;
+
+		if (!version) {
+			return res.status(400).json({ success: false, message: '版本号必填' });
+		}
+
+		const exists = await Changelog.findOne({ version });
+		if (exists) {
+			return res.status(400).json({ success: false, message: '该版本已存在' });
+		}
+
+		const changelog = new Changelog({
+			version,
+			order: Number.isFinite(order) ? order : 0,
+			time: useAutoTime ? formatUTC8() : (time || formatUTC8()),
+			content: [],
+			createdBy: req.user?._id,
+			updatedBy: req.user?._id
+		});
+
+		await changelog.save();
+
+		res.status(201).json({ success: true, message: 'Changelog创建成功', data: changelog });
+	} catch (error) {
+		console.error('创建changelog失败:', error);
+		res.status(500).json({ success: false, message: '创建changelog失败' });
+	}
 });
 
 // 健康检查路由 - 用于监控服务状态
@@ -510,7 +560,7 @@ app.post('/api/auth/login', securityAudit, loggerMiddleware('LOGIN', '/api/auth/
 					isActive: true
 				};
 
-				const token = jwt.sign({ userId: mockUser._id }, JWT_SECRET, { expiresIn: '7d' });
+				const token = jwt.sign({ userId: mockUser._id, role: mockUser.role, username: mockUser.username, email: mockUser.email }, JWT_SECRET, { expiresIn: '7d' });
 
 				return res.json({
 					success: true,
@@ -565,7 +615,7 @@ app.post('/api/auth/login', securityAudit, loggerMiddleware('LOGIN', '/api/auth/
 		}
 
 		// 生成JWT令牌
-		const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
+		const token = jwt.sign({ userId: user._id, role: user.role, username: user.username, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
 
 		// 更新最后登录时间
 		user.lastLogin = new Date();
@@ -2299,10 +2349,24 @@ app.put('/api/changelog/:id', authenticateToken, requireDeveloperOrAdmin, async 
 	}
 });
 
+// 删除整个changelog
+app.delete('/api/changelog/:id', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
+	try {
+		const deleted = await Changelog.findByIdAndDelete(req.params.id);
+		if (!deleted) {
+			return res.status(404).json({ success: false, message: 'Changelog不存在' });
+		}
+		res.json({ success: true, message: 'Changelog删除成功' });
+	} catch (error) {
+		console.error('删除changelog失败:', error);
+		res.status(500).json({ success: false, message: '删除changelog失败' });
+	}
+});
+
 // 添加changelog条目
 app.post('/api/changelog/:id/items', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
 	try {
-		const { itemTime, itemContent } = req.body;
+		const { itemTime, itemContent, useAutoTime = true } = req.body;
 		const changelog = await Changelog.findById(req.params.id);
 
 		if (!changelog) {
@@ -2312,11 +2376,9 @@ app.post('/api/changelog/:id/items', authenticateToken, requireDeveloperOrAdmin,
 			});
 		}
 
-		// 添加新条目
-		changelog.content.push({
-			itemTime,
-			itemContent
-		});
+		// 添加新条目（自动时间为空则生成 UTC+8 时间）
+		const finalItemTime = (useAutoTime || !itemTime) ? formatUTC8() : itemTime;
+		changelog.content.push({ itemTime: finalItemTime, itemContent });
 
 		await changelog.save();
 
@@ -2374,6 +2436,36 @@ app.put('/api/changelog/:id/items/:itemIndex', authenticateToken, requireDevelop
 			success: false,
 			message: '更新条目失败'
 		});
+	}
+});
+
+// 删除changelog某个子条目
+app.delete('/api/changelog/:id/items/:itemIndex', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
+	try {
+		const itemIndex = parseInt(req.params.itemIndex);
+		const changelogId = req.params.id;
+		console.log('[DELETE /api/changelog/:id/items/:itemIndex]', { changelogId, itemIndex });
+		const changelog = await Changelog.findById(changelogId);
+
+		if (!changelog) {
+			return res.status(404).json({ success: false, message: `Changelog不存在: ${changelogId}` });
+		}
+
+		if (!Array.isArray(changelog.content)) {
+			return res.status(400).json({ success: false, message: '内容格式无效' });
+		}
+
+		if (Number.isNaN(itemIndex) || itemIndex < 0 || itemIndex >= changelog.content.length) {
+			return res.status(400).json({ success: false, message: `条目索引无效: ${itemIndex}` });
+		}
+
+		changelog.content.splice(itemIndex, 1);
+		await changelog.save();
+
+		res.json({ success: true, message: '条目删除成功', data: { id: changelog._id, remaining: changelog.content.length } });
+	} catch (error) {
+		console.error('删除changelog条目失败:', error);
+		res.status(500).json({ success: false, message: '删除条目失败' });
 	}
 });
 
