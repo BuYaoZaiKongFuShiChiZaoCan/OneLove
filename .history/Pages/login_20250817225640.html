@@ -294,11 +294,8 @@
 						console.log('执行跳转...');
 						// 先判断能不能返回上一页 ../ 不行 那就直接跳转到主页
 						if (window.history.length > 1) {
-							// 返回上一页，并刷新页面
+							// 返回上一页
 							window.history.back();
-							setTimeout(() => {
-								location.reload();
-							}, 3200);
 						} else {
 							// 确保跳转到正确的首页路径
 							window.location.href = window.location.origin;

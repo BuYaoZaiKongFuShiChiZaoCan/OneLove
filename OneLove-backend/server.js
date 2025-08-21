@@ -50,7 +50,12 @@ const requireDeveloperOrAdmin = async (req, res, next) => {
 // 导入数据模型
 const User = require('./models/User');
 const Changelog = require('./models/Changelog');
+<<<<<<< HEAD
 // Password、Phone和TimelineData模型在下方定义
+=======
+const TimelineData = require('./models/TimelineData');
+// Password和Phone模型在下方定义
+>>>>>>> fe36e846b1ba9a0ab05017c191b55ec82d016005
 
 // 创建Express应用实例
 const app = express();
@@ -2398,7 +2403,7 @@ app.post('/api/changelog/:id/items', authenticateToken, requireDeveloperOrAdmin,
 // 更新changelog条目
 app.put('/api/changelog/:id/items/:itemIndex', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
 	try {
-		const { itemTime, itemContent } = req.body;
+		const { itemTime, itemContent, useAutoTime = true } = req.body;
 		const itemIndex = parseInt(req.params.itemIndex);
 		const changelog = await Changelog.findById(req.params.id);
 
@@ -2416,11 +2421,9 @@ app.put('/api/changelog/:id/items/:itemIndex', authenticateToken, requireDevelop
 			});
 		}
 
-		// 更新条目
-		changelog.content[itemIndex] = {
-			itemTime,
-			itemContent
-		};
+		// 更新条目（为空或要求自动，则填充 UTC+8 当前时间）
+		const finalItemTime = (useAutoTime || !itemTime) ? formatUTC8() : itemTime;
+		changelog.content[itemIndex] = { itemTime: finalItemTime, itemContent };
 
 		await changelog.save();
 
@@ -2469,7 +2472,7 @@ app.delete('/api/changelog/:id/items/:itemIndex', authenticateToken, requireDeve
 });
 
 // ========================================
-// Timeline数据API
+// Timeline数据API\n\n// 创建timeline数据\napp.post('/api/timeline-data', authenticateToken, async (req, res) => {\n\ttry {\n\t\tconst { type, title, time, content, images = [], videos = [] } = req.body;\n\t\tconst userId = req.user._id;\n\t\t\n\t\t// 验证必填字段\n\t\tif (!type || !title || !time || !content || !Array.isArray(content)) {\n\t\t\treturn res.status(400).json({\n\t\t\t\tsuccess: false,\n\t\t\t\tmessage: '类型、标题、时间和内容是必填项，且内容必须是数组'\n\t\t\t});\n\t\t}\n\t\t\n\t\t// 验证类型是否有效\n\t\tif (!['myPast', 'health'].includes(type)) {\n\t\t\treturn res.status(400).json({\n\t\t\t\tsuccess: false,\n\t\t\t\tmessage: '无效的数据类型'\n\t\t\t});\n\t\t}\n\t\t\n\t\t// 验证content格式\n\t\tconst isValidContent = content.every(item => item && typeof item === 'object' && 'itemContent' in item);\n\t\tif (!isValidContent) {\n\t\t\treturn res.status(400).json({\n\t\t\t\tsuccess: false,\n\t\t\t\tmessage: '内容格式无效，每个条目必须包含itemContent字段'\n\t\t\t});\n\t\t}\n\t\t\n\t\t// 创建新的timeline数据\n\t\tconst newTimelineData = new TimelineData({\n\t\t\tuserId: userId,\n\t\t\ttype: type,\n\t\t\ttitle: title,\n\t\t\ttime: time,\n\t\t\tcontent: content,\n\t\t\timages: images,\n\t\t\tvideos: videos\n\t\t});\n\t\t\n\t\tawait newTimelineData.save();\n\t\t\n\t\tres.status(201).json({\n\t\t\tsuccess: true,\n\t\t\tmessage: 'Timeline数据创建成功',\n\t\t\tdata: newTimelineData\n\t\t});\n\t} catch (error) {\n\t\tconsole.error('创建timeline数据失败:', error);\n\t\tres.status(500).json({\n\t\t\tsuccess: false,\n\t\t\tmessage: '创建timeline数据失败'\n\t\t});\n\t}\n});
 // ========================================
 
 // Timeline数据模型
@@ -2584,9 +2587,10 @@ app.get('/api/timeline-data-debug', async (req, res) => {
 });
 
 // 获取timeline数据
-app.get('/api/timeline-data/:type', async (req, res) => {
+app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
 	try {
 		const { type } = req.params;
+<<<<<<< HEAD
 		
 		// 验证类型并映射到数据库中的实际值
 		const typeMapping = {
@@ -2744,6 +2748,32 @@ app.get('/api/timeline-data/:type', async (req, res) => {
 		if (timelineItems.length > 0) {
 			console.log(`📝 第一条数据样例:`, JSON.stringify(timelineItems[0], null, 2));
 		}
+=======
+		const userId = req.user._id;
+		const { allUsers } = req.query;
+		const userRole = req.user.role;
+
+		// 验证类型是否有效
+		if (!['myPast', 'health'].includes(type)) {
+			return res.status(400).json({
+				success: false,
+				message: '无效的数据类型'
+			});
+		}
+
+		// 构建查询条件
+		let query = { type: type };
+
+		// 如果不是developer或者没有请求所有用户数据，则只查询当前用户的数据
+		if (userRole !== 'developer' || allUsers !== 'true') {
+			query.userId = userId;
+		} else {
+			console.log(`[${new Date().toISOString()}] 开发者用户请求所有用户的${type}数据`);
+		}
+
+		// 从数据库查询数据
+		const data = await TimelineData.find(query).sort({ time: -1 });
+>>>>>>> fe36e846b1ba9a0ab05017c191b55ec82d016005
 
 		res.json({
 			success: true,

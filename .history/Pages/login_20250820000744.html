@@ -296,9 +296,10 @@
 						if (window.history.length > 1) {
 							// 返回上一页，并刷新页面
 							window.history.back();
+							// 延迟执行刷新，确保导航完成
 							setTimeout(() => {
 								location.reload();
-							}, 3200);
+							}, 500);
 						} else {
 							// 确保跳转到正确的首页路径
 							window.location.href = window.location.origin;
