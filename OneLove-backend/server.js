@@ -50,8 +50,7 @@ const requireDeveloperOrAdmin = async (req, res, next) => {
 // 导入数据模型
 const User = require('./models/User');
 const Changelog = require('./models/Changelog');
-// Password和Phone模型在下方定义
-// TimelineData模型已删除，直接使用模拟数据
+// Password、Phone和TimelineData模型在下方定义
 
 // 创建Express应用实例
 const app = express();
@@ -2473,62 +2472,408 @@ app.delete('/api/changelog/:id/items/:itemIndex', authenticateToken, requireDeve
 // Timeline数据API
 // ========================================
 
+// Timeline数据模型
+const timelineDataSchema = new mongoose.Schema({
+	type: {
+		type: String,
+		enum: ['myPast', 'health'],
+		required: true
+	},
+	title: {
+		type: String,
+		required: true,
+		trim: true
+	},
+	time: {
+		type: String,
+		required: true
+	},
+	content: [{
+		itemContent: {
+			type: String,
+			required: true
+		}
+	}],
+	images: [{
+		type: String,
+		trim: true
+	}],
+	videos: [{
+		type: String,
+		trim: true
+	}],
+	createdBy: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'User'
+	},
+	updatedBy: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'User'
+	}
+}, {
+	timestamps: true
+});
+
+const TimelineData = mongoose.model('TimelineData', timelineDataSchema, 'timelinedatas');
+
+// 调试API - 获取所有timeline数据
+app.get('/api/timeline-data-debug', async (req, res) => {
+	try {
+		console.log('🔍 调试API: 查询所有TimelineData...');
+		
+		// 检查数据库连接
+		console.log('📊 数据库连接状态:', mongoose.connection.readyState);
+		console.log('📊 数据库名称:', mongoose.connection.name);
+		
+		// 检查集合是否存在
+		const collections = await mongoose.connection.db.listCollections().toArray();
+		console.log('📊 数据库中的所有集合:', collections.map(c => c.name));
+		
+		// 检查timelinedatas集合
+		const timelineDataExists = collections.find(c => c.name === 'timelinedatas');
+		console.log('📊 timelinedatas集合是否存在:', !!timelineDataExists);
+		
+		if (timelineDataExists) {
+			// 直接查询原生集合
+			const rawData = await mongoose.connection.db.collection('timelinedatas').find({}).toArray();
+			console.log(`📊 原生查询timelinedatas集合: ${rawData.length}条数据`);
+			
+			if (rawData.length > 0) {
+				console.log('📝 原生数据第一条样例:', JSON.stringify(rawData[0], null, 2));
+			}
+		}
+		
+		// 使用Mongoose模型查询
+		const allData = await TimelineData.find({}).lean();
+		console.log(`📊 Mongoose模型查询结果: ${allData.length}条数据`);
+		
+		// 按类型分组
+		const groupedData = {};
+		allData.forEach(item => {
+			if (!groupedData[item.type]) {
+				groupedData[item.type] = [];
+			}
+			groupedData[item.type].push(item);
+		});
+		
+		console.log('📊 按类型分组的数据:', Object.keys(groupedData).map(type => `${type}: ${groupedData[type].length}条`));
+		
+		res.json({
+			success: true,
+			debug: true,
+			dbStatus: {
+				connected: mongoose.connection.readyState === 1,
+				dbName: mongoose.connection.name,
+				collections: collections.map(c => c.name),
+				timelineDataExists: !!timelineDataExists
+			},
+			total: allData.length,
+			groupedCount: Object.keys(groupedData).map(type => ({ type, count: groupedData[type].length })),
+			data: allData,
+			groupedData,
+			rawDataSample: timelineDataExists ? await mongoose.connection.db.collection('timelinedatas').findOne({}) : null
+		});
+	} catch (error) {
+		console.error('调试API失败:', error);
+		res.status(500).json({
+			success: false,
+			message: '调试API失败',
+			error: error.message
+		});
+	}
+});
+
 // 获取timeline数据
 app.get('/api/timeline-data/:type', async (req, res) => {
 	try {
 		const { type } = req.params;
 		
-		// 模拟数据
-		const mockData = {
-			myPast: [
-				{
-					id: '1',
-					title: '大学毕业',
-					time: '2020-06-15',
-					content: [{ itemContent: '完成了计算机科学学士学位' }],
-					images: [],
-					videos: []
-				},
-				{
-					id: '2',
-					title: '第一份工作',
-					time: '2020-08-01',
-					content: [{ itemContent: '开始在一家科技公司担任软件工程师' }],
-					images: [],
-					videos: []
-				}
-			],
-			health: [
-				{
-					id: '1',
-					title: '年度体检',
-					time: '2024-01-15',
-					content: [{ itemContent: '完成年度健康检查，各项指标正常' }],
-					images: [],
-					videos: []
-				},
-				{
-					id: '2',
-					title: '健身计划',
-					time: '2024-03-01',
-					content: [{ itemContent: '开始每周三次的健身计划' }],
-					images: [],
-					videos: []
-				}
-			]
+		// 验证类型并映射到数据库中的实际值
+		const typeMapping = {
+			'myPast': 'myPastData',
+			'health': 'healthData'
 		};
+		
+		if (!typeMapping[type]) {
+			return res.status(400).json({
+				success: false,
+				message: '无效的数据类型'
+			});
+		}
+		
+		const dbType = typeMapping[type];
 
-		const data = mockData[type] || [];
+		// 检查数据库连接状态
+		if (mongoose.connection.readyState !== 1) {
+			// 数据库未连接，返回模拟数据
+			const mockData = {
+				myPast: [
+					{
+						_id: 'mock-1',
+						title: '大学毕业',
+						time: '2020-06-15 10:00:00',
+						content: [{ itemContent: '完成了计算机科学学士学位，开始人生新的篇章' }],
+						images: [],
+						videos: []
+					},
+					{
+						_id: 'mock-2',
+						title: '第一份工作',
+						time: '2020-08-01 09:00:00',
+						content: [{ itemContent: '开始在一家科技公司担任软件工程师，学习到了很多实用技能' }],
+						images: [],
+						videos: []
+					}
+				],
+				health: [
+					{
+						_id: 'mock-3',
+						title: '年度体检',
+						time: '2024-01-15 08:30:00',
+						content: [{ itemContent: '完成年度健康检查，各项指标正常，继续保持良好的生活习惯' }],
+						images: [],
+						videos: []
+					},
+					{
+						_id: 'mock-4',
+						title: '健身计划',
+						time: '2024-03-01 18:00:00',
+						content: [{ itemContent: '开始每周三次的健身计划，包括有氧运动和力量训练' }],
+						images: [],
+						videos: []
+					}
+				]
+			};
+			
+			console.log(`⚠️ 数据库未连接，返回${type}模拟数据`);
+			return res.json({
+				success: true,
+				data: mockData[type] || [],
+				message: '数据库未连接，返回模拟数据'
+			});
+		}
+
+		// 从数据库获取数据
+		console.log(`🔍 正在查询数据库中的${type}数据...`);
+		
+		// 首先尝试标准查询
+		let timelineItems = await TimelineData.find({ type: dbType })
+			.sort({ time: -1, createdAt: -1 })
+			.lean();
+		
+		console.log(`📊 标准查询结果: 找到${timelineItems.length}条${type}数据`);
+		
+		// 如果标准查询没有结果，尝试模糊匹配
+		if (timelineItems.length === 0) {
+			console.log(`⚠️ 标准查询无结果，尝试模糊匹配...`);
+			
+			// 获取所有数据来分析字段结构
+			const allData = await TimelineData.find({}).lean();
+			console.log(`📊 数据库中总共有${allData.length}条数据`);
+			
+			if (allData.length > 0) {
+				// 分析第一条数据的结构
+				const sampleData = allData[0];
+				console.log(`📝 数据结构分析:`, Object.keys(sampleData));
+				console.log(`📝 第一条数据样例:`, JSON.stringify(sampleData, null, 2));
+				
+				// 尝试不同的字段名和值
+				const possibleFields = ['type', 'category', 'dataType', 'kind', 'dataType', 'section'];
+				const possibleValues = [
+					type, 
+					type.toLowerCase(), 
+					type.charAt(0).toUpperCase() + type.slice(1),
+					'mypast',
+					'MyPast',
+					'MYPAST',
+					'health',
+					'Health',
+					'HEALTH'
+				];
+				
+				for (const field of possibleFields) {
+					if (sampleData.hasOwnProperty(field)) {
+						console.log(`🔍 发现字段: ${field}, 值: ${sampleData[field]}`);
+						
+						for (const value of possibleValues) {
+							const fuzzyQuery = { [field]: value };
+							console.log(`🔍 尝试查询:`, fuzzyQuery);
+							
+							const fuzzyResult = await TimelineData.find(fuzzyQuery).lean();
+							if (fuzzyResult.length > 0) {
+								console.log(`✅ 模糊查询成功! 字段: ${field}, 值: ${value}, 结果: ${fuzzyResult.length}条`);
+								timelineItems = fuzzyResult;
+								break;
+							}
+						}
+						if (timelineItems.length > 0) break;
+					}
+				}
+				
+				// 如果还是没找到，尝试原生查询
+				if (timelineItems.length === 0) {
+					console.log(`🔍 尝试原生数据库查询...`);
+					try {
+						const rawData = await mongoose.connection.db.collection('timelinedatas').find({}).toArray();
+						console.log(`📊 原生查询结果: ${rawData.length}条数据`);
+						
+						if (rawData.length > 0) {
+							console.log(`📝 原生数据第一条样例:`, JSON.stringify(rawData[0], null, 2));
+							
+							// 分析原生数据的结构
+							const rawSample = rawData[0];
+							console.log(`📝 原生数据结构分析:`, Object.keys(rawSample));
+							
+							// 尝试在原生数据中查找匹配的类型
+							for (const item of rawData) {
+								for (const field of possibleFields) {
+									if (item[field]) {
+										console.log(`🔍 原生数据字段 ${field}: ${item[field]}`);
+									}
+								}
+							}
+						}
+					} catch (rawError) {
+						console.log(`❌ 原生查询失败:`, rawError.message);
+					}
+				}
+			}
+		}
+		
+		console.log(`📊 最终查询结果: 找到${timelineItems.length}条${type}数据`);
+		if (timelineItems.length > 0) {
+			console.log(`📝 第一条数据样例:`, JSON.stringify(timelineItems[0], null, 2));
+		}
 
 		res.json({
 			success: true,
-			data: data
+			data: timelineItems
 		});
 	} catch (error) {
 		console.error('获取timeline数据失败:', error);
 		res.status(500).json({
 			success: false,
 			message: '获取timeline数据失败'
+		});
+	}
+});
+
+// 创建timeline数据
+app.post('/api/timeline-data', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
+	try {
+		const { type, title, content, images = [], videos = [] } = req.body;
+		
+		// 验证输入
+		if (!type || !title || !content || !Array.isArray(content) || content.length === 0) {
+			return res.status(400).json({
+				success: false,
+				message: '类型、标题和内容都是必需的'
+			});
+		}
+
+		if (!['myPast', 'health'].includes(type)) {
+			return res.status(400).json({
+				success: false,
+				message: '无效的数据类型'
+			});
+		}
+
+		// 创建新的timeline数据
+		const timelineData = new TimelineData({
+			type,
+			title,
+			time: formatUTC8(),
+			content,
+			images: Array.isArray(images) ? images : [],
+			videos: Array.isArray(videos) ? videos : [],
+			createdBy: req.user?._id,
+			updatedBy: req.user?._id
+		});
+
+		await timelineData.save();
+
+		res.status(201).json({
+			success: true,
+			message: 'Timeline数据创建成功',
+			data: timelineData
+		});
+	} catch (error) {
+		console.error('创建timeline数据失败:', error);
+		res.status(500).json({
+			success: false,
+			message: '创建timeline数据失败'
+		});
+	}
+});
+
+// 更新timeline数据
+app.put('/api/timeline-data/:id', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
+	try {
+		const { title, time, content, images = [], videos = [] } = req.body;
+		
+		// 验证输入
+		if (!title || !time || !content || !Array.isArray(content) || content.length === 0) {
+			return res.status(400).json({
+				success: false,
+				message: '标题、时间和内容都是必需的'
+			});
+		}
+
+		const timelineData = await TimelineData.findByIdAndUpdate(
+			req.params.id,
+			{
+				title,
+				time,
+				content,
+				images: Array.isArray(images) ? images : [],
+				videos: Array.isArray(videos) ? videos : [],
+				updatedBy: req.user?._id
+			},
+			{ new: true }
+		);
+
+		if (!timelineData) {
+			return res.status(404).json({
+				success: false,
+				message: 'Timeline数据不存在'
+			});
+		}
+
+		res.json({
+			success: true,
+			message: 'Timeline数据更新成功',
+			data: timelineData
+		});
+	} catch (error) {
+		console.error('更新timeline数据失败:', error);
+		res.status(500).json({
+			success: false,
+			message: '更新timeline数据失败'
+		});
+	}
+});
+
+// 删除timeline数据
+app.delete('/api/timeline-data/:id', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
+	try {
+		const timelineData = await TimelineData.findByIdAndDelete(req.params.id);
+
+		if (!timelineData) {
+			return res.status(404).json({
+				success: false,
+				message: 'Timeline数据不存在'
+			});
+		}
+
+		res.json({
+			success: true,
+			message: 'Timeline数据删除成功'
+		});
+	} catch (error) {
+		console.error('删除timeline数据失败:', error);
+		res.status(500).json({
+			success: false,
+			message: '删除timeline数据失败'
 		});
 	}
 });

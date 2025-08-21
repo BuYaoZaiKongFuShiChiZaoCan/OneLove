@@ -91,20 +91,28 @@
 
 		button {
 			color: #FFFFFF;
-			background: none;
-			border-radius: 10px;
+			background: rgba(52, 73, 94, 0.5);
+			border-radius: 12px;
 			width: 120px;
 			height: 40px;
 			position: relative;
 			z-index: 8;
-			border: 2px solid;
-			border-bottom: 4px solid;
+			border: 2px solid #16A085;
 			cursor: pointer;
 			transition: all 0.3s ease;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+			font-weight: bold;
 		}
 
 		button:hover {
 			transform: translateY(-2px);
+			background: rgba(22, 160, 133, 0.8);
+			box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+		}
+
+		button:active {
+			transform: translateY(0);
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 		}
 
 		article {
@@ -151,11 +159,28 @@
 		/* Changelog编辑按钮悬停样式 */
 		.changelog-item-with-edit {
 			position: relative;
+			transition: background-color 0.3s ease, transform 0.3s ease;
+		}
+
+		.changelog-item-with-edit button {
+
+		}
+
+		/* 悬停时添加背景样式 */
+		.changelog-item-with-edit:hover {
+			background-color: rgba(22, 160, 133, 0.1);
+			transform: translateY(-2px);
 		}
 
 		.changelog-edit-button {
 			opacity: 0;
-			transition: opacity 0.3s ease;
+			transition: opacity 0.3s ease, background-color 0.3s ease, transform 0.3s ease;
+			padding: 4px 8px;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			background-color: rgba(52, 73, 94, 0.7);
+			color: white;
 		}
 
 		/* 悬停时显示编辑/删除按钮 */
@@ -163,16 +188,21 @@
 			opacity: 1;
 		}
 
+		/* 编辑按钮悬停效果 */
+		.changelog-edit-button:hover {
+			background-color: #16A085;
+			transform: scale(1.05);
+		}
+
 		/* 时间显示样式 */
-		.Ttime,
-		.itemTime {
+		.Ttime:not(:empty),
+		.itemTime:not(:empty) {
 			display: inline-block;
 			min-width: 140px;
 			margin-right: 10px;
 			padding: 2px 6px;
 			border-radius: 4px;
 			background: rgba(149,165,166,0.18);
-			color: #ecf0f1;
 			font-size: 0.9em;
 		}
 
@@ -365,7 +395,6 @@
 			width: auto !important;
 			height: auto !important;
 			border: none !important;
-			background: none !important;
 		}
 
 		/* 确保表单元素正确显示 */
