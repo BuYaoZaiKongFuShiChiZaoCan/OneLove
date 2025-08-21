@@ -205,8 +205,6 @@
 		.itemTime:not(:empty) {
 			display: inline-block;
 			min-width: 140px;
-			margin-right: 10px;
-			padding: 2px 6px;
 			border-radius: 4px;
 			font-size: 0.9em;
 		}
@@ -220,6 +218,10 @@
 		.changelog-item-with-edit {
 			position: relative;
 			transition: background-color 0.3s ease, transform 0.3s ease;
+			display: grid;
+			grid-template-columns: 160px 1fr;
+			column-gap: 10px;
+			align-items: start;
 		}
 
 		.changelog-item-with-edit:hover {
@@ -242,6 +244,15 @@
 
 		.changelog-edit-button.delete {
 			right: 80px;
+		}
+
+		/* 让换行文本与首行对齐（时间在第一列，内容在第二列） */
+		.changelog-item-with-edit > .Ttime {
+			grid-column: 1;
+		}
+		.changelog-item-with-edit > span {
+			grid-column: 2;
+			white-space: pre-wrap;
 		}
 
 		.changelog-edit-:hover {

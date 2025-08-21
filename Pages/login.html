@@ -292,15 +292,30 @@
 					console.log('准备跳转到主页...');
 					setTimeout(() => {
 						console.log('执行跳转...');
-						// 先判断能不能返回上一页 ../ 不行 那就直接跳转到主页
-						if (window.history.length > 1) {
-							// 返回上一页，并刷新页面
-							window.history.back();
-							setTimeout(() => {
-								location.reload();
-							}, 3200);
+						
+						// 获取来源页面URL（优先使用保存的来源页面）
+						const savedReferrer = sessionStorage.getItem('loginReferrer');
+						const referrer = savedReferrer || document.referrer;
+						const currentOrigin = window.location.origin;
+						
+						// 检查是否有有效的来源页面（同域名且不是登录页本身）
+						if (referrer && 
+							referrer.startsWith(currentOrigin) && 
+							!referrer.includes('/login.html') && 
+							!referrer.includes('/Pages/login.html')) {
+							
+							// 清除保存的来源页面信息
+							sessionStorage.removeItem('loginReferrer');
+							
+							// 方案1：直接跳转到来源页面并刷新
+							window.location.replace(referrer);
+							
+							// 方案2：如果上面的方案不行，可以尝试这个备选方案
+							// setTimeout(() => {
+							// 	window.location.href = referrer;
+							// }, 100);
 						} else {
-							// 确保跳转到正确的首页路径
+							// 没有有效来源页面，跳转到主页
 							window.location.href = window.location.origin;
 						}
 					}, 1500);
@@ -325,6 +340,17 @@
 			}
 		}
 
+		// 生成带返回URL的登录链接（供其他页面使用）
+		function getLoginUrl(returnUrl = null) {
+			const loginUrl = window.location.href;
+			if (returnUrl) {
+				const url = new URL(loginUrl);
+				url.searchParams.set('returnUrl', returnUrl);
+				return url.toString();
+			}
+			return loginUrl;
+		}
+		
 		// 重置密码
 		async function resetPassword(email) {
 			try {
@@ -349,8 +375,25 @@
 			}
 		}
 
-		// 页面加载时检查是否已登录
+		// 页面加载时记录来源页面（如果不是直接访问登录页）
 		window.addEventListener('load', () => {
+			// 检查URL参数中是否有来源页面信息
+			const urlParams = new URLSearchParams(window.location.search);
+			const returnUrl = urlParams.get('returnUrl');
+			
+			// 记录来源页面信息（优先使用URL参数，其次是referrer）
+			const referrer = returnUrl || document.referrer;
+			const currentOrigin = window.location.origin;
+			
+			// 如果有有效的来源页面且不是登录页本身，保存到 sessionStorage
+			if (referrer && 
+				referrer.startsWith(currentOrigin) && 
+				!referrer.includes('/login.html') && 
+				!referrer.includes('/Pages/login.html')) {
+				sessionStorage.setItem('loginReferrer', referrer);
+			}
+			
+			// 检查是否已登录
 			const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 			if (token) {
 				// 验证令牌有效性

@@ -50,7 +50,13 @@ const requireDeveloperOrAdmin = async (req, res, next) => {
 // 导入数据模型
 const User = require('./models/User');
 const Changelog = require('./models/Changelog');
-const TimelineData = require('./models/TimelineData');
+// 避免重复定义 TimelineData
+let TimelineData;
+if (mongoose.models.TimelineData) {
+    TimelineData = mongoose.models.TimelineData;
+} else {
+    TimelineData = require('./models/TimelineData');
+}
 // Password和Phone模型在下方定义
 
 // 创建Express应用实例
@@ -404,10 +410,10 @@ app.get('/api/auth', (req, res) => {
   });
 });
 
-// 格式化时间为 UTC+8，形如 YYYY-MM-DD HH:mm
+// 格式化时间为 UTC+8，形如 YYYY-MM-DD HH:mm:SS
 function formatUTC8(date = new Date()) {
 	const utc8 = new Date(date.getTime() + (8 * 60 * 60 * 1000));
-	return utc8.toISOString().slice(0, 16).replace('T', ' ');
+	return utc8.toISOString().slice(0, 19).replace('T', ' ');
 }
 
 // 创建changelog
@@ -2471,49 +2477,7 @@ app.delete('/api/changelog/:id/items/:itemIndex', authenticateToken, requireDeve
 // Timeline数据API\n\n// 创建timeline数据\napp.post('/api/timeline-data', authenticateToken, async (req, res) => {\n\ttry {\n\t\tconst { type, title, time, content, images = [], videos = [] } = req.body;\n\t\tconst userId = req.user._id;\n\t\t\n\t\t// 验证必填字段\n\t\tif (!type || !title || !time || !content || !Array.isArray(content)) {\n\t\t\treturn res.status(400).json({\n\t\t\t\tsuccess: false,\n\t\t\t\tmessage: '类型、标题、时间和内容是必填项，且内容必须是数组'\n\t\t\t});\n\t\t}\n\t\t\n\t\t// 验证类型是否有效\n\t\tif (!['myPast', 'health'].includes(type)) {\n\t\t\treturn res.status(400).json({\n\t\t\t\tsuccess: false,\n\t\t\t\tmessage: '无效的数据类型'\n\t\t\t});\n\t\t}\n\t\t\n\t\t// 验证content格式\n\t\tconst isValidContent = content.every(item => item && typeof item === 'object' && 'itemContent' in item);\n\t\tif (!isValidContent) {\n\t\t\treturn res.status(400).json({\n\t\t\t\tsuccess: false,\n\t\t\t\tmessage: '内容格式无效，每个条目必须包含itemContent字段'\n\t\t\t});\n\t\t}\n\t\t\n\t\t// 创建新的timeline数据\n\t\tconst newTimelineData = new TimelineData({\n\t\t\tuserId: userId,\n\t\t\ttype: type,\n\t\t\ttitle: title,\n\t\t\ttime: time,\n\t\t\tcontent: content,\n\t\t\timages: images,\n\t\t\tvideos: videos\n\t\t});\n\t\t\n\t\tawait newTimelineData.save();\n\t\t\n\t\tres.status(201).json({\n\t\t\tsuccess: true,\n\t\t\tmessage: 'Timeline数据创建成功',\n\t\t\tdata: newTimelineData\n\t\t});\n\t} catch (error) {\n\t\tconsole.error('创建timeline数据失败:', error);\n\t\tres.status(500).json({\n\t\t\tsuccess: false,\n\t\t\tmessage: '创建timeline数据失败'\n\t\t});\n\t}\n});
 // ========================================
 
-// Timeline数据模型
-const timelineDataSchema = new mongoose.Schema({
-	type: {
-		type: String,
-		enum: ['myPast', 'health'],
-		required: true
-	},
-	title: {
-		type: String,
-		required: true,
-		trim: true
-	},
-	time: {
-		type: String,
-		required: true
-	},
-	content: [{
-		itemContent: {
-			type: String,
-			required: true
-		}
-	}],
-	images: [{
-		type: String,
-		trim: true
-	}],
-	videos: [{
-		type: String,
-		trim: true
-	}],
-	createdBy: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'User'
-	},
-	updatedBy: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'User'
-	}
-}, {
-	timestamps: true
-});
-
-const TimelineData = mongoose.model('TimelineData', timelineDataSchema, 'timelinedatas');
+// Timeline数据模型（已通过 models/TimelineData.js 定义并在顶部导入）
 
 // 调试API - 获取所有timeline数据
 app.get('/api/timeline-data-debug', async (req, res) => {

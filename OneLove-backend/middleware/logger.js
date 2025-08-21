@@ -1,14 +1,17 @@
 const AccessLog = require('../models/AccessLog');
+const mongoose = require('mongoose');
 
 // 记录访问日志
 const logAccess = async (req, action, resource, details = {}, status = 'SUCCESS', errorMessage = null) => {
     try {
-        if (!req.user) {
-            return; // 未登录用户不记录
+        // 检查数据库连接状态
+        if (mongoose.connection.readyState !== 1) {
+            console.log('数据库未连接，跳过访问日志记录');
+            return;
         }
 
         const logData = {
-            userId: req.user._id,
+            userId: req.user ? req.user._id : null, // 登录时可能没有用户信息
             action: action,
             resource: resource,
             details: details,
@@ -34,12 +37,15 @@ const loggerMiddleware = (action, resource) => {
             const status = res.statusCode >= 400 ? 'FAILED' : 'SUCCESS';
             const errorMessage = res.statusCode >= 400 ? data : null;
             
+            // 异步记录日志，不阻塞响应
             logAccess(req, action, resource, {
                 method: req.method,
                 url: req.originalUrl,
                 statusCode: res.statusCode,
                 responseSize: data ? data.length : 0
-            }, status, errorMessage);
+            }, status, errorMessage).catch(err => {
+                console.error('记录访问日志失败:', err);
+            });
             
             originalSend.call(this, data);
         };
