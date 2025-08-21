@@ -58,10 +58,6 @@
 			text-align: center;
 		}
 
-		header button {
-			background: none;
-		}
-
 		header div:nth-of-type(2) {
 			display: flex;
 			flex-direction: row;
@@ -95,6 +91,7 @@
 
 		button {
 			color: #FFFFFF;
+			background: none;
 			border-radius: 10px;
 			width: 120px;
 			height: 40px;
@@ -162,37 +159,20 @@
 			transition: opacity 0.3s ease;
 		}
 
-		.changelog-item-with-edit button {
-			width: auto;
-			height: auto;
-		}
-
 		/* 悬停时显示编辑/删除按钮 */
 		.changelog-item-with-edit:hover .changelog-edit-button {
-			color: #000;
 			opacity: 1;
-			transition: all cubic-bezier(0.075, 0.82, 0.165, 1) 0.3s;
-			transform: translateY(-50%);
-		}
-
-		.changelog-item-with-edit:hover .changelog-edit-button:hover {
-			transform: translateY(-55%) scale(1.1);
 		}
 
 		/* 时间显示样式 */
-		.Ttime {
-			color: #16A085;
-		}
-
-		/* 当时间元素有内容时应用的样式 */
-		.Ttime:not(:empty),
-		.itemTime:not(:empty) {
+		.Ttime,
+		.itemTime {
 			display: inline-block;
 			min-width: 140px;
 			margin-right: 10px;
 			padding: 2px 6px;
 			border-radius: 4px;
-			color: #16A085;
+			color: #ecf0f1;
 			font-size: 0.9em;
 		}
 
@@ -202,37 +182,42 @@
 		}
 
 		/* 子条目样式 - 悬停效果 */
-		.changelog-item-with-edit {
-			position: relative;
-			transition: background-color 0.3s ease, transform 0.3s ease;
-		}
+.changelog-item-with-edit {
+	position: relative;
+	transition: background-color 0.3s ease, transform 0.3s ease;
+}
 
-		.changelog-item-with-edit:hover {
-			background-color: rgba(22, 160, 133, 0.1);
-		}
+.changelog-item-with-edit:hover {
+	background-color: rgba(22, 160, 133, 0.1);
+	transform: translateX(5px);
+}
 
-		/* 编辑和删除按钮样式 */
-		.changelog-edit-button {
-			opacity: 0;
-			position: absolute;
-			right: 5px;
-			top: 50%;
-			transform: translateY(-50%);
-			transition: opacity 0.3s ease, background-color 0.3s ease;
-			padding: 4px 8px;
-			border: none;
-			border-radius: 4px;
-			cursor: pointer;
-		}
+/* 编辑和删除按钮样式 */
+.changelog-edit-button {
+	opacity: 0;
+	position: absolute;
+	right: 5px;
+	top: 50%;
+	transform: translateY(-50%);
+	transition: opacity 0.3s ease, background-color 0.3s ease;
+	padding: 4px 8px;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+}
 
-		.changelog-edit-button.delete {
-			right: 80px;
-		}
+.changelog-edit-button.delete {
+	right: 60px;
+}
 
-		.changelog-edit-:hover {
-			background-color: #16A085;
-			color: white;
-		}
+.changelog-item-with-edit:hover .changelog-edit-button {
+	opacity: 1;
+}
+
+.changelog-edit-button:hover {
+	background-color: #16A085;
+	color: white;
+}
 
 		/* 时间轴样式 - 恢复到之前的设计 */
 		.timeline {
@@ -354,7 +339,7 @@
 			justify-content: flex-end;
 		}
 
-		.timeline-actions  {
+		.timeline-actions button {
 			background: rgba(52, 152, 219, 0.8);
 			border: none;
 			padding: 5px 10px;
@@ -365,7 +350,7 @@
 			height: auto;
 		}
 
-		.timeline-actions :last-child {
+		.timeline-actions button:last-child {
 			background: rgba(231, 76, 60, 0.8);
 		}
 
@@ -411,6 +396,14 @@
 			}
 		}
 
+		/* 修复按钮样式冲突 */
+		.timeline button:not(.timeline-actions button),
+		.add-timeline-form button,
+		.edit-timeline-form button {
+			width: auto !important;
+			height: auto !important;
+		}
+
 		/* 确保表单元素正确显示 */
 		.add-timeline-form input,
 		.add-timeline-form textarea,
@@ -429,7 +422,7 @@
 		}
 
 		/* 确保操作按钮正确显示 */
-		.timeline-actions  {
+		.timeline-actions button {
 			background: rgba(52, 152, 219, 0.8) !important;
 			border: none !important;
 			padding: 5px 10px !important;
@@ -440,7 +433,7 @@
 			height: auto !important;
 		}
 
-		.timeline-actions :last-child {
+		.timeline-actions button:last-child {
 			background: rgba(231, 76, 60, 0.8) !important;
 		}
 
@@ -570,9 +563,7 @@
 		</div>
 		<script>
 			// 配置API基础URL
-			// 配置API基础URL
-window.OneLoveConfig = { apiBaseUrl: '/api' };
-console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
+			window.OneLoveConfig = { apiBaseUrl: '/api' };
 
 			/**
 			 * 从API获取changelog数据
@@ -633,62 +624,23 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 			async function loadTimelineData(type) {
 				try {
 					const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
-					// 添加时间戳参数避免缓存
-					const timestamp = new Date().getTime();
-					let url = `${apiBaseUrl}/timeline-data/${type}?timestamp=${timestamp}`;
+					console.log(`正在加载${type}数据，API地址: ${apiBaseUrl}/timeline-data/${type}`);
 
-					// 检查用户是否是开发者，如果是则获取所有用户数据
-					const isDev = await isDeveloper();
-					if (isDev) {
-						url += '&allUsers=true';
-						console.log(`[${new Date().toISOString()}] 开发者用户，获取所有用户的${type}数据`);
-					}
-
-					console.log(`[${new Date().toISOString()}] 正在加载${type}数据，API地址: ${url}`);
-
-					// 获取存储的身份验证令牌（使用正确的键名'token'）
-					const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-					console.log(`[${new Date().toISOString()}] 获取到的token:`, token ? `存在 (${token.length}字符)` : '不存在');
-
-					// 尝试解析token获取用户信息，帮助调试
-					try {
-						if (token) {
-							const base64Url = token.split('.')[1];
-							const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-							const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-							const userInfo = JSON.parse(jsonPayload);
-							console.log(`[${new Date().toISOString()}] 解析token获取的用户信息:`, userInfo);
-							console.log(`[${new Date().toISOString()}] 当前用户ID:`, userInfo.userId || userInfo.id);
-						}
-					} catch (e) {
-						console.error(`[${new Date().toISOString()}] 解析token失败:`, e);
-					}
-					
-					// 设置请求头，包含身份验证令牌
-					const headers = {
-						'Authorization': token ? `Bearer ${token}` : ''
-					};
-					
-					const response = await fetch(url, { headers });
-					console.log(`[${new Date().toISOString()}] ${type} API响应状态:`, response.status);
-					console.log(`[${new Date().toISOString()}] ${type} API响应头:`, response.headers);
+					const response = await fetch(`${apiBaseUrl}/timeline-data/${type}`);
+					console.log(`${type} API响应状态:`, response.status);
 
 					const result = await response.json();
-					console.log(`[${new Date().toISOString()}] ${type} API返回数据:`, JSON.stringify(result, null, 2));
+					console.log(`${type} API返回数据:`, result);
 
 					if (result.success && result.data) {
-						console.log(`[${new Date().toISOString()}] ${type} 数据加载成功，数据项数量:`, result.data.length);
-						// 记录前两条数据，帮助调试
-						if (result.data.length > 0) {
-							console.log(`[${new Date().toISOString()}] ${type} 前两条数据示例:`, JSON.stringify(result.data.slice(0, 2), null, 2));
-						}
-						return result.data;
+						console.log(`${type} 数据加载成功，数据项数量:`, result.data.length);
+						return result.data; // 直接返回result.data，不需要.timeline
 					} else {
-						console.error(`[${new Date().toISOString()}] ${type} API返回失败:`, result);
-						throw new Error(`获取${type}数据失败: ${JSON.stringify(result)}`);
+						console.error(`${type} API返回失败:`, result);
+						throw new Error(`获取${type}数据失败`);
 					}
 				} catch (error) {
-					console.error(`[${new Date().toISOString()}] 加载${type}数据失败:`, error);
+					console.error(`加载${type}数据失败:`, error);
 					return [];
 				}
 			}
@@ -747,8 +699,8 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 					const timeSpan = document.createElement('span');
 					timeSpan.className = 'itemTime';
 					const originalTime = item[timeField] || '';
-					// 直接使用后端返回的时间，不在渲染时处理
-					timeSpan.textContent = originalTime;
+					// 确保时间格式包含秒级精度
+					timeSpan.textContent = formatTimeWithSeconds(originalTime);
 					h4.appendChild(timeSpan);
 					rightDiv.appendChild(h4);
 
@@ -767,8 +719,8 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 							const strong = document.createElement('strong');
 							strong.className = 'Ttime';
 							const itemTime = content.itemTime || '';
-							// 直接使用后端返回的时间，不在渲染时处理
-							strong.textContent = itemTime;
+							// 确保时间格式包含秒级精度
+							strong.textContent = formatTimeWithSeconds(itemTime);
 
 							li.appendChild(strong);
 							li.appendChild(document.createTextNode(' '));
@@ -784,27 +736,27 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 								li.className = 'changelog-item-with-edit';
 
 								const editItemButton = document.createElement('button');
-								editItemButton.textContent = '✏️ 编辑';
-								editItemButton.title = '编辑此条目';
-								editItemButton.className = 'changelog-edit-button';
-								editItemButton.onclick = () => showEditChangelogItemForm(item._id, item.version, index, content);
-								li.appendChild(editItemButton);
+editItemButton.textContent = '✏️ 编辑';
+editItemButton.title = '编辑此条目';
+editItemButton.className = 'changelog-edit-button';
+editItemButton.onclick = () => showEditChangelogItemForm(item._id, item.version, index, content);
+li.appendChild(editItemButton);
 
-								const deleteItemButton = document.createElement('button');
-								deleteItemButton.textContent = '🗑️ 删除';
-								deleteItemButton.title = '删除此条目';
-								deleteItemButton.className = 'changelog-edit-button delete';
-								deleteItemButton.onclick = async () => {
-									if (!confirm('确定要删除此条目吗？')) return;
-									try {
-										const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-										const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
-										const resp = await fetch(`${apiBaseUrl}/changelog/${item._id}/items/${index}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-										let resJson; try { resJson = await resp.json(); } catch (_) { resJson = { success: false, message: `HTTP ${resp.status}` }; }
-										if (resJson.success) { await loadAllData(); showSuccessMessage('删除成功'); } else { alert(`删除失败 (${resp.status}): ${resJson.message || ''}`); }
-									} catch (err) { console.error('删除失败:', err); alert('删除失败，请稍后重试'); }
-								};
-								li.appendChild(deleteItemButton);
+const deleteItemButton = document.createElement('button');
+deleteItemButton.textContent = '🗑️ 删除';
+deleteItemButton.title = '删除此条目';
+deleteItemButton.className = 'changelog-edit-button delete';
+deleteItemButton.onclick = async () => {
+	if (!confirm('确定要删除此条目吗？')) return;
+	try {
+		const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+		const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
+		const resp = await fetch(`${apiBaseUrl}/changelog/${item._id}/items/${index}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+		let resJson; try { resJson = await resp.json(); } catch (_) { resJson = { success: false, message: `HTTP ${resp.status}` }; }
+		if (resJson.success) { await loadAllData(); showSuccessMessage('删除成功'); } else { alert(`删除失败 (${resp.status}): ${resJson.message || ''}`); }
+	} catch (err) { console.error('删除失败:', err); alert('删除失败，请稍后重试'); }
+};
+li.appendChild(deleteItemButton);
 							}
 
 							ol.appendChild(li);
@@ -1094,13 +1046,13 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 				// 获取URL中的锚点
 				const hash = window.location.hash;
 				if (hash) {
-					// console.log('检测到锚点:', hash);
+					console.log('检测到锚点:', hash);
 
 					// 延迟执行，确保DOM完全渲染
 					setTimeout(() => {
 						const targetElement = document.querySelector(hash);
 						if (targetElement) {
-							// console.log('找到目标元素，执行跳转:', targetElement);
+							console.log('找到目标元素，执行跳转:', targetElement);
 							targetElement.scrollIntoView({
 								behavior: 'smooth',
 								block: 'start'
@@ -1125,7 +1077,7 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 					// 检查是否已经添加过这个条目（避免重复添加）
 					const existingEntry = localStorage.getItem('changelog_antiduplicate_added');
 					if (existingEntry) {
-						// console.log('更新日志条目已存在，跳过添加');
+						console.log('更新日志条目已存在，跳过添加');
 						return;
 					}
 
@@ -1617,9 +1569,9 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 					const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
 
 					const requestData = {
-						version: version,
-						time: formatTimeWithSeconds(time)
-					};
+							version: version,
+							time: formatTimeWithSeconds(time)
+						};
 
 					const response = await fetch(`${apiBaseUrl}/changelog/${changelogId}`, {
 						method: 'PUT',
@@ -1669,17 +1621,11 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 					const manualTimeInput = document.getElementById('editItemManualTimeInput');
 					const useAutoTime = !timeSetting || timeSetting.value === 'auto';
 					let itemTime = '';
-					
-					if (useAutoTime) {
-						// 自动设置时间（UTC+8）
-						const now = new Date();
-						const utc8Time = new Date(now.getTime() + (8 * 60 * 60 * 1000));
-						itemTime = formatTimeWithSeconds(utc8Time.toISOString().slice(0, 19).replace('T', ' '));
-					} else if (manualTimeInput && manualTimeInput.value) {
-						// 手动设置时间
+					if (!useAutoTime && manualTimeInput && manualTimeInput.value) {
 						const selectedTime = new Date(manualTimeInput.value);
-						const manualUtc8Time = new Date(selectedTime.getTime() + (8 * 60 * 60 * 1000));
-						itemTime = formatTimeWithSeconds(manualUtc8Time.toISOString().slice(0, 19).replace('T', ' '));
+						const utc8Time = new Date(selectedTime.getTime() + (8 * 60 * 60 * 1000));
+						// 确保时间格式包含秒级精度
+							itemTime = formatTimeWithSeconds(utc8Time.toISOString().slice(0, 19).replace('T', ' '));
 					}
 
 					if (!itemContent) {
@@ -2196,27 +2142,27 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 		 * @param {string} timeStr - 输入的时间字符串
 		 * @returns {string} 包含秒级精度的时间字符串
 		 */
-			function formatTimeWithSeconds(timeStr) {
-				if (!timeStr) return '';
-
-				// 检查时间格式是否已包含秒
-				const timeParts = timeStr.split(' ');
-				if (timeParts.length < 2) return timeStr;
-
-				const datePart = timeParts[0];
-				let timePart = timeParts[1];
-
-				// 检查时间部分是否包含秒
-				if (timePart.split(':').length === 2) {
-					// 只有小时和分钟，添加秒
-					timePart += ':00';
-				}
-
-				return `${datePart} ${timePart}`;
+		function formatTimeWithSeconds(timeStr) {
+			if (!timeStr) return '';
+			
+			// 检查时间格式是否已包含秒
+			const timeParts = timeStr.split(' ');
+			if (timeParts.length < 2) return timeStr;
+			
+			const datePart = timeParts[0];
+			let timePart = timeParts[1];
+			
+			// 检查时间部分是否包含秒
+			if (timePart.split(':').length === 2) {
+				// 只有小时和分钟，添加秒
+				timePart += ':00';
 			}
-
-			// 切换时间输入显示
-			function toggleTimeInput() {
+			
+			return `${datePart} ${timePart}`;
+		}
+		
+		// 切换时间输入显示
+		function toggleTimeInput() {
 				const timeSetting = document.getElementById('timeSetting');
 				const manualTimeInput = document.getElementById('manualTimeInput');
 
@@ -2381,11 +2327,6 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 
 					// 检查是否为开发者且选择手动设置时间
 					const isDeveloper = globalUserRole === 'developer';
-					// 获取当前时间（UTC+8）
-					const now = new Date();
-					const utc8Time = new Date(now.getTime() + (8 * 60 * 60 * 1000));
-					const formattedTime = formatTimeWithSeconds(utc8Time.toISOString().slice(0, 19).replace('T', ' '));
-
 					if (isDeveloper) {
 						const versionTimeSetting = document.getElementById('versionTimeSetting');
 						const versionManualTimeInput = document.getElementById('versionManualTimeInput');
@@ -2393,17 +2334,16 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 						if (versionTimeSetting && versionTimeSetting.value === 'manual' && versionManualTimeInput && versionManualTimeInput.value) {
 							// 开发者选择手动设置时间
 							const selectedTime = new Date(versionManualTimeInput.value);
-							const manualUtc8Time = new Date(selectedTime.getTime() + (8 * 60 * 60 * 1000));
-							requestData.time = formatTimeWithSeconds(manualUtc8Time.toISOString().slice(0, 19).replace('T', ' '));
+							const utc8Time = new Date(selectedTime.getTime() + (8 * 60 * 60 * 1000));
+							// 使用formatTimeWithSeconds函数确保时间格式包含秒级精度
+requestData.time = formatTimeWithSeconds(utc8Time.toISOString().slice(0, 19).replace('T', ' '));
 							requestData.useAutoTime = false;
 						} else {
 							// 开发者选择自动设置时间
-							requestData.time = formattedTime;
 							requestData.useAutoTime = true;
 						}
 					} else {
 						// 非开发者只能使用自动时间
-						requestData.time = formattedTime;
 						requestData.useAutoTime = true;
 					}
 
@@ -2495,11 +2435,6 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 						requestData: requestData
 					});
 
-					// 获取当前时间（UTC+8）
-					const now = new Date();
-					const utc8Time = new Date(now.getTime() + (8 * 60 * 60 * 1000));
-					const formattedTime = formatTimeWithSeconds(utc8Time.toISOString().slice(0, 19).replace('T', ' '));
-
 					// 检查是否为开发者且选择手动设置时间
 					const isDeveloper = globalUserRole === 'developer';
 					if (isDeveloper) {
@@ -2509,17 +2444,16 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 						if (timeSetting && timeSetting.value === 'manual' && manualTimeInput && manualTimeInput.value) {
 							// 开发者选择手动设置时间
 							const selectedTime = new Date(manualTimeInput.value);
-							const manualUtc8Time = new Date(selectedTime.getTime() + (8 * 60 * 60 * 1000));
-							requestData.itemTime = formatTimeWithSeconds(manualUtc8Time.toISOString().slice(0, 19).replace('T', ' '));
+							const utc8Time = new Date(selectedTime.getTime() + (8 * 60 * 60 * 1000));
+							// 确保时间格式包含秒级精度
+							requestData.itemTime = formatTimeWithSeconds(utc8Time.toISOString().slice(0, 19).replace('T', ' '));
 							requestData.useAutoTime = false;
 						} else {
 							// 开发者选择自动设置时间
-							requestData.itemTime = formattedTime;
 							requestData.useAutoTime = true;
 						}
 					} else {
 						// 非开发者只能使用自动时间
-						requestData.itemTime = formattedTime;
 						requestData.useAutoTime = true;
 					}
 
