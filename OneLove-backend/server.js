@@ -50,12 +50,8 @@ const requireDeveloperOrAdmin = async (req, res, next) => {
 // 导入数据模型
 const User = require('./models/User');
 const Changelog = require('./models/Changelog');
-<<<<<<< HEAD
-// Password、Phone和TimelineData模型在下方定义
-=======
 const TimelineData = require('./models/TimelineData');
 // Password和Phone模型在下方定义
->>>>>>> fe36e846b1ba9a0ab05017c191b55ec82d016005
 
 // 创建Express应用实例
 const app = express();
@@ -2590,7 +2586,6 @@ app.get('/api/timeline-data-debug', async (req, res) => {
 app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
 	try {
 		const { type } = req.params;
-<<<<<<< HEAD
 		
 		// 验证类型并映射到数据库中的实际值
 		const typeMapping = {
@@ -2748,32 +2743,6 @@ app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
 		if (timelineItems.length > 0) {
 			console.log(`📝 第一条数据样例:`, JSON.stringify(timelineItems[0], null, 2));
 		}
-=======
-		const userId = req.user._id;
-		const { allUsers } = req.query;
-		const userRole = req.user.role;
-
-		// 验证类型是否有效
-		if (!['myPast', 'health'].includes(type)) {
-			return res.status(400).json({
-				success: false,
-				message: '无效的数据类型'
-			});
-		}
-
-		// 构建查询条件
-		let query = { type: type };
-
-		// 如果不是developer或者没有请求所有用户数据，则只查询当前用户的数据
-		if (userRole !== 'developer' || allUsers !== 'true') {
-			query.userId = userId;
-		} else {
-			console.log(`[${new Date().toISOString()}] 开发者用户请求所有用户的${type}数据`);
-		}
-
-		// 从数据库查询数据
-		const data = await TimelineData.find(query).sort({ time: -1 });
->>>>>>> fe36e846b1ba9a0ab05017c191b55ec82d016005
 
 		res.json({
 			success: true,
