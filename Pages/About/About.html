@@ -16,6 +16,11 @@
 	<meta name="og:url" content="http://apicloud.fun">
 	<meta name="og:description" content="">
 	<meta name="apple-mobile-web-app-title" content="祁富强">
+	
+	<!-- Markdown 解析库 -->
+	<script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.1/dist/purify.min.js"></script>
+	
 	<style>
 		:root {
 			--icon-size: 50px;
@@ -253,6 +258,123 @@
 		.changelog-item-with-edit > span {
 			grid-column: 2;
 			white-space: pre-wrap;
+		}
+
+		/* 内容解析样式 */
+		.parsed-content {
+			line-height: 1.6;
+		}
+
+		.parsed-content h1,
+		.parsed-content h2,
+		.parsed-content h3,
+		.parsed-content h4,
+		.parsed-content h5,
+		.parsed-content h6 {
+			margin: 10px 0 5px 0;
+			color: #16A085;
+			font-weight: 600;
+		}
+
+		.parsed-content h1 { font-size: 1.4em; }
+		.parsed-content h2 { font-size: 1.3em; }
+		.parsed-content h3 { font-size: 1.2em; }
+		.parsed-content h4 { font-size: 1.1em; }
+		.parsed-content h5 { font-size: 1.0em; }
+		.parsed-content h6 { font-size: 0.9em; }
+
+		.parsed-content p {
+			margin: 8px 0;
+		}
+
+		.parsed-content ul,
+		.parsed-content ol {
+			margin: 8px 0;
+			padding-left: 20px;
+		}
+
+		.parsed-content li {
+			margin: 4px 0;
+		}
+
+		.parsed-content blockquote {
+			border-left: 4px solid #16A085;
+			margin: 10px 0;
+			padding: 10px 15px;
+			background-color: rgba(22, 160, 133, 0.1);
+			border-radius: 0 4px 4px 0;
+		}
+
+		.parsed-content code {
+			background-color: rgba(255, 255, 255, 0.1);
+			padding: 2px 6px;
+			border-radius: 3px;
+			font-family: 'Courier New', monospace;
+			font-size: 0.9em;
+		}
+
+		.parsed-content pre {
+			background-color: rgba(0, 0, 0, 0.2);
+			padding: 10px;
+			border-radius: 4px;
+			overflow-x: auto;
+			margin: 10px 0;
+		}
+
+		.parsed-content pre code {
+			background: none;
+			padding: 0;
+		}
+
+		.parsed-content a {
+			color: #16A085;
+			text-decoration: underline;
+		}
+
+		.parsed-content a:hover {
+			color: #1abc9c;
+		}
+
+		.parsed-content strong {
+			font-weight: 600;
+			color: #16A085;
+		}
+
+		.parsed-content em {
+			font-style: italic;
+		}
+
+		.parsed-content img {
+			max-width: 100%;
+			height: auto;
+			border-radius: 4px;
+			margin: 10px 0;
+		}
+
+		.parsed-content table {
+			border-collapse: collapse;
+			width: 100%;
+			margin: 10px 0;
+		}
+
+		.parsed-content th,
+		.parsed-content td {
+			border: 1px solid rgba(255, 255, 255, 0.2);
+			padding: 8px;
+			text-align: left;
+		}
+
+		.parsed-content th {
+			background-color: rgba(22, 160, 133, 0.2);
+			font-weight: 600;
+		}
+
+		/* 内容类型指示器 */
+		.content-type-indicator {
+			font-size: 0.7em;
+			color: #95a5a6;
+			margin-left: 5px;
+			font-style: italic;
 		}
 
 		.changelog-edit-:hover {
@@ -730,6 +852,140 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 			}
 
 			/**
+			 * 安全的内容解析函数
+			 * @param {string} content - 原始内容
+			 * @returns {object} 包含解析后内容和类型信息的对象
+			 */
+			function parseContent(content) {
+				if (!content || typeof content !== 'string') {
+					return {
+						parsedContent: content || '',
+						contentType: 'plain',
+						indicator: ''
+					};
+				}
+
+				const trimmedContent = content.trim();
+				
+				// 检测内容类型
+				let contentType = 'plain';
+				let indicator = '';
+				
+				// 检测 Markdown
+				const markdownPatterns = [
+					/^#{1,6}\s/, // 标题
+					/\*\*.*?\*\*/, // 粗体
+					/\*.*?\*/, // 斜体
+					/\[.*?\]\(.*?\)/, // 链接
+					/!\[.*?\]\(.*?\)/, // 图片
+					/^[-*+]\s/, // 无序列表
+					/^\d+\.\s/, // 有序列表
+					/^>\s/, // 引用
+					/`.*?`/, // 行内代码
+					/^```[\s\S]*?```$/m, // 代码块
+					/^\|.*\|$/, // 表格
+					/^---$/, // 分割线
+				];
+				
+				// 检测 HTML
+				const htmlPatterns = [
+					/<[^>]+>/, // HTML 标签
+					/&[a-zA-Z]+;/, // HTML 实体
+					/&#\d+;/, // 数字 HTML 实体
+				];
+				
+				const hasMarkdown = markdownPatterns.some(pattern => pattern.test(trimmedContent));
+				const hasHtml = htmlPatterns.some(pattern => pattern.test(trimmedContent));
+				
+				if (hasMarkdown && hasHtml) {
+					contentType = 'markdown+html';
+					indicator = ' (Markdown+HTML)';
+				} else if (hasMarkdown) {
+					contentType = 'markdown';
+					indicator = ' (Markdown)';
+				} else if (hasHtml) {
+					contentType = 'html';
+					indicator = ' (HTML)';
+				}
+				
+				// 解析内容
+				let parsedContent = trimmedContent;
+				
+				try {
+					if (contentType === 'markdown' || contentType === 'markdown+html') {
+						// 配置 Markdown 解析器
+						marked.setOptions({
+							breaks: true, // 支持换行
+							gfm: true, // GitHub Flavored Markdown
+							sanitize: false, // 不使用内置的 sanitize，我们使用 DOMPurify
+						});
+						
+						// 解析 Markdown
+						const htmlContent = marked.parse(trimmedContent);
+						
+						// 使用 DOMPurify 清理 HTML
+						const cleanHtml = DOMPurify.sanitize(htmlContent, {
+							ALLOWED_TAGS: [
+								'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+								'p', 'br', 'hr',
+								'ul', 'ol', 'li',
+								'strong', 'b', 'em', 'i',
+								'code', 'pre',
+								'a', 'img',
+								'blockquote',
+								'table', 'thead', 'tbody', 'tr', 'th', 'td',
+								'span', 'div'
+							],
+							ALLOWED_ATTR: [
+								'href', 'src', 'alt', 'title', 'class', 'id',
+								'target', 'rel', 'width', 'height'
+							],
+							ALLOW_DATA_ATTR: false,
+							FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed'],
+							FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur']
+						});
+						
+						parsedContent = cleanHtml;
+					} else if (contentType === 'html') {
+						// 直接清理 HTML
+						const cleanHtml = DOMPurify.sanitize(trimmedContent, {
+							ALLOWED_TAGS: [
+								'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+								'p', 'br', 'hr',
+								'ul', 'ol', 'li',
+								'strong', 'b', 'em', 'i',
+								'code', 'pre',
+								'a', 'img',
+								'blockquote',
+								'table', 'thead', 'tbody', 'tr', 'th', 'td',
+								'span', 'div'
+							],
+							ALLOWED_ATTR: [
+								'href', 'src', 'alt', 'title', 'class', 'id',
+								'target', 'rel', 'width', 'height'
+							],
+							ALLOW_DATA_ATTR: false,
+							FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed'],
+							FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur']
+						});
+						
+						parsedContent = cleanHtml;
+					}
+				} catch (error) {
+					console.warn('内容解析失败，使用原始内容:', error);
+					parsedContent = trimmedContent;
+					contentType = 'plain';
+					indicator = ' (解析失败)';
+				}
+				
+				return {
+					parsedContent,
+					contentType,
+					indicator
+				};
+			}
+
+			/**
 			 * 通用的时间轴渲染函数
 			 */
 			function renderTimeline(containerId, data, options = {}) {
@@ -809,10 +1065,30 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 							li.appendChild(strong);
 							li.appendChild(document.createTextNode(' '));
 
+							// 解析内容
+							const parsedResult = parseContent(content.itemContent || '');
+							
 							const contentSpan = document.createElement('span');
-							contentSpan.textContent = content.itemContent || '';
-							contentSpan.style.whiteSpace = 'pre-wrap';
+							
+							if (parsedResult.contentType === 'plain') {
+								// 纯文本内容
+								contentSpan.textContent = parsedResult.parsedContent;
+								contentSpan.style.whiteSpace = 'pre-wrap';
+							} else {
+								// HTML 内容
+								contentSpan.innerHTML = parsedResult.parsedContent;
+								contentSpan.className = 'parsed-content';
+							}
+							
 							li.appendChild(contentSpan);
+							
+							// 添加内容类型指示器
+							if (parsedResult.indicator) {
+								const indicatorSpan = document.createElement('span');
+								indicatorSpan.className = 'content-type-indicator';
+								indicatorSpan.textContent = parsedResult.indicator;
+								li.appendChild(indicatorSpan);
+							}
 
 							// 为每个子条目添加编辑按钮（鼠标悬停显示）
 							if (isUserLoggedIn() && (globalHasEditPermission || globalUserRole === 'developer' || globalUserRole === 'admin')) {
@@ -851,7 +1127,6 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 						// 其他内容直接显示
 						if (Array.isArray(item[contentField])) {
 							item[contentField].forEach(content => {
-								const p = document.createElement('p');
 								let contentText = '';
 								if (typeof content === 'string') {
 									contentText = content;
@@ -862,18 +1137,59 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 								}
 
 								if (contentText.trim() !== '') {
-									p.textContent = contentText;
-									p.style.whiteSpace = 'pre-wrap';
+									// 解析内容
+									const parsedResult = parseContent(contentText);
+									
+									const p = document.createElement('p');
+									
+									if (parsedResult.contentType === 'plain') {
+										// 纯文本内容
+										p.textContent = parsedResult.parsedContent;
+										p.style.whiteSpace = 'pre-wrap';
+									} else {
+										// HTML 内容
+										p.innerHTML = parsedResult.parsedContent;
+										p.className = 'parsed-content';
+									}
+									
 									contentDiv.appendChild(p);
+									
+									// 添加内容类型指示器
+									if (parsedResult.indicator) {
+										const indicatorSpan = document.createElement('span');
+										indicatorSpan.className = 'content-type-indicator';
+										indicatorSpan.textContent = parsedResult.indicator;
+										contentDiv.appendChild(indicatorSpan);
+									}
 								}
 							});
 						} else {
 							const contentText = String(item[contentField] || '');
 							if (contentText.trim() !== '') {
+								// 解析内容
+								const parsedResult = parseContent(contentText);
+								
 								const p2 = document.createElement('p');
-								p2.textContent = contentText;
-								p2.style.whiteSpace = 'pre-wrap';
+								
+								if (parsedResult.contentType === 'plain') {
+									// 纯文本内容
+									p2.textContent = parsedResult.parsedContent;
+									p2.style.whiteSpace = 'pre-wrap';
+								} else {
+									// HTML 内容
+									p2.innerHTML = parsedResult.parsedContent;
+									p2.className = 'parsed-content';
+								}
+								
 								contentDiv.appendChild(p2);
+								
+								// 添加内容类型指示器
+								if (parsedResult.indicator) {
+									const indicatorSpan = document.createElement('span');
+									indicatorSpan.className = 'content-type-indicator';
+									indicatorSpan.textContent = parsedResult.indicator;
+									contentDiv.appendChild(indicatorSpan);
+								}
 							}
 						}
 					}

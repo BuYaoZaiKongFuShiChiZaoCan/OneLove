@@ -1918,10 +1918,9 @@
 
 						if (isMobile) {
 							// 手机端：检查登录状态
-							const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-							if (!token) {
-								// 未登录，跳转到登录页面
-								window.location.href = 'Pages/login.html';
+							if (!window.auth || !window.auth.isLoggedIn()) {
+								// 未登录，跳转到登录页面，并传递当前页面URL作为返回地址
+								window.auth.redirectToLogin();
 								return;
 							}
 							// 已登录，显示侧边菜单
@@ -1942,12 +1941,9 @@
 
 						if (isMobile) {
 							// 手机端：检查登录状态
-							const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-							if (!token) {
+							if (!window.auth || !window.auth.isLoggedIn()) {
 								// 未登录，跳转到登录页面，并传递当前页面URL作为返回地址
-								const currentUrl = window.location.href;
-								const loginUrl = `Pages/login.html?returnUrl=${encodeURIComponent(currentUrl)}`;
-								window.location.href = loginUrl;
+								window.auth.redirectToLogin();
 								return;
 							}
 							// 已登录，跳转到个人信息页面
@@ -2090,6 +2086,9 @@
 		})();
 	</script>
 
+	<!-- 认证工具 -->
+	<script src="./js/auth.js"></script>
+	
 	<!-- 彩蛋 最后加载 -->
 	<script async src="./scripts/caiDan.js"></script>
 </body>
