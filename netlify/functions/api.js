@@ -55,38 +55,102 @@ app.post('/api/auth/login', (req, res) => {
   
   console.log('解析的用户名:', username);
   console.log('解析的密码:', password);
-  console.log('期望的用户名: admin');
-  console.log('期望的密码: admin123');
   
-  if (username === 'admin' && password === 'admin123') {
+  // 测试账户列表
+  const testAccounts = {
+    'admin': { password: 'admin123', email: 'admin@example.com', role: 'admin' },
+    'user': { password: 'user123', email: 'user@example.com', role: 'user' },
+    'developer': { password: 'dev123', email: 'dev@example.com', role: 'developer' },
+    'test': { password: 'test123', email: 'test@example.com', role: 'user' },
+    'guest': { password: 'guest123', email: 'guest@example.com', role: 'guest' }
+  };
+  
+  console.log('期望的用户名列表:', Object.keys(testAccounts));
+  
+  if (testAccounts[username] && testAccounts[username].password === password) {
     console.log('登录验证成功');
     res.json({
       success: true,
       message: '登录成功',
       data: {
         user: {
-          username: 'admin',
-          email: 'admin@example.com',
-          role: 'admin'
+          username: username,
+          email: testAccounts[username].email,
+          role: testAccounts[username].role
         },
-        token: 'temp_token_' + Date.now()
+        token: 'temp_token_' + Date.now() + '_' + username
       }
     });
   } else {
     console.log('登录验证失败');
-    console.log('用户名匹配:', username === 'admin');
-    console.log('密码匹配:', password === 'admin123');
+    console.log('用户名存在:', !!testAccounts[username]);
+    if (testAccounts[username]) {
+      console.log('密码匹配:', testAccounts[username].password === password);
+    }
     res.status(401).json({
       success: false,
       message: '用户名或密码错误',
       debug: {
         receivedUsername: username,
         receivedPassword: password ? '***' : 'undefined',
-        expectedUsername: 'admin',
-        expectedPassword: 'admin123'
+        availableAccounts: Object.keys(testAccounts),
+        hint: '可用的测试账户: admin/admin123, user/user123, developer/dev123, test/test123, guest/guest123'
       }
     });
   }
+});
+
+// 用户注册端点
+app.post('/api/auth/register', (req, res) => {
+  console.log('=== 注册请求开始 ===');
+  console.log('请求体:', req.body);
+  
+  const { username, email, password, confirmPassword } = req.body;
+  
+  // 基本验证
+  if (!username || !email || !password || !confirmPassword) {
+    return res.status(400).json({
+      success: false,
+      message: '请填写所有必填字段'
+    });
+  }
+  
+  if (password !== confirmPassword) {
+    return res.status(400).json({
+      success: false,
+      message: '两次输入的密码不一致'
+    });
+  }
+  
+  if (password.length < 6) {
+    return res.status(400).json({
+      success: false,
+      message: '密码长度至少6位'
+    });
+  }
+  
+  // 检查用户名是否已存在（模拟）
+  const existingUsers = ['admin', 'user', 'developer', 'test', 'guest'];
+  if (existingUsers.includes(username)) {
+    return res.status(400).json({
+      success: false,
+      message: '用户名已存在'
+    });
+  }
+  
+  // 模拟注册成功
+  console.log('注册成功:', { username, email });
+  res.json({
+    success: true,
+    message: '注册成功！请使用新账户登录',
+    data: {
+      user: {
+        username: username,
+        email: email,
+        role: 'user'
+      }
+    }
+  });
 });
 
 // 时间线数据端点
@@ -138,16 +202,36 @@ app.get('/api/auth/me', (req, res) => {
   const token = req.headers.authorization?.replace('Bearer ', '');
   
   if (token && token.startsWith('temp_token_')) {
-    res.json({
-      success: true,
-      data: {
-        user: {
-          username: 'admin',
-          email: 'admin@example.com',
-          role: 'admin'
+    // 从token中提取用户名
+    const tokenParts = token.split('_');
+    const username = tokenParts[tokenParts.length - 1];
+    
+    // 测试账户列表
+    const testAccounts = {
+      'admin': { email: 'admin@example.com', role: 'admin' },
+      'user': { email: 'user@example.com', role: 'user' },
+      'developer': { email: 'dev@example.com', role: 'developer' },
+      'test': { email: 'test@example.com', role: 'user' },
+      'guest': { email: 'guest@example.com', role: 'guest' }
+    };
+    
+    if (testAccounts[username]) {
+      res.json({
+        success: true,
+        data: {
+          user: {
+            username: username,
+            email: testAccounts[username].email,
+            role: testAccounts[username].role
+          }
         }
-      }
-    });
+      });
+    } else {
+      res.status(401).json({
+        success: false,
+        message: '无效的token'
+      });
+    }
   } else {
     res.status(401).json({
       success: false,
