@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "OneLove Frontend with Netlify Functions",
   "scripts": {
-    "build": "echo 'Static site build completed'",
+    "build": "node build-functions.js && echo 'Static site build completed'",
+    "install-functions": "cd netlify/functions && npm install",
     "dev": "netlify dev"
   },
   "devDependencies": {
