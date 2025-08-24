@@ -81,8 +81,6 @@ const connectDB = async () => {
 		console.log('🔗 正在连接数据库...');
 
 		const conn = await mongoose.connect(mongoURI, {
-			useNewUrlParser: true,
-			useUnifiedTopology: true,
 			serverSelectionTimeoutMS: 5000,
 			socketTimeoutMS: 45000,
 		});

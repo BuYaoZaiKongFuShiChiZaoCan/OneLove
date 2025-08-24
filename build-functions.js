@@ -34,7 +34,7 @@ const packageJson = {
         "multer": "^1.4.5-lts.1"
     },
     "engines": {
-        "node": "18.x"
+        "node": ">=18.x"
     }
 };
 

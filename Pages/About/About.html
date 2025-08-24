@@ -16,11 +16,11 @@
 	<meta name="og:url" content="http://apicloud.fun">
 	<meta name="og:description" content="">
 	<meta name="apple-mobile-web-app-title" content="祁富强">
-	
+
 	<!-- Markdown 解析库 -->
 	<script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.1/dist/purify.min.js"></script>
-	
+
 	<style>
 		:root {
 			--icon-size: 50px;
@@ -252,10 +252,11 @@
 		}
 
 		/* 让换行文本与首行对齐（时间在第一列，内容在第二列） */
-		.changelog-item-with-edit > .Ttime {
+		.changelog-item-with-edit>.Ttime {
 			grid-column: 1;
 		}
-		.changelog-item-with-edit > span {
+
+		.changelog-item-with-edit>span {
 			grid-column: 2;
 			white-space: pre-wrap;
 		}
@@ -276,12 +277,29 @@
 			font-weight: 600;
 		}
 
-		.parsed-content h1 { font-size: 1.4em; }
-		.parsed-content h2 { font-size: 1.3em; }
-		.parsed-content h3 { font-size: 1.2em; }
-		.parsed-content h4 { font-size: 1.1em; }
-		.parsed-content h5 { font-size: 1.0em; }
-		.parsed-content h6 { font-size: 0.9em; }
+		.parsed-content h1 {
+			font-size: 1.4em;
+		}
+
+		.parsed-content h2 {
+			font-size: 1.3em;
+		}
+
+		.parsed-content h3 {
+			font-size: 1.2em;
+		}
+
+		.parsed-content h4 {
+			font-size: 1.1em;
+		}
+
+		.parsed-content h5 {
+			font-size: 1.0em;
+		}
+
+		.parsed-content h6 {
+			font-size: 0.9em;
+		}
 
 		.parsed-content p {
 			margin: 8px 0;
@@ -384,13 +402,9 @@
 
 		/* 时间轴样式 - 恢复到之前的设计 */
 		.timeline {
-			position: relative;
 			max-width: 1200px;
 			margin: 0 auto;
 			padding: 20px;
-			/* 添加滚动容器样式 */
-			max-height: 600px;
-			overflow-y: auto;
 			scroll-behavior: smooth;
 			/* 自定义滚动条 */
 			scrollbar-width: thin;
@@ -465,6 +479,9 @@
 		.timeline .item .left .icon {
 			font-size: var(--icon-size);
 			color: #16A085;
+			position: sticky;
+			top: 0;
+			background: #34495E;
 		}
 
 		/* 连接线 - 从图标中心到下一个图标中心 */
@@ -492,8 +509,12 @@
 			align-items: center;
 			justify-content: space-between;
 			padding: 10px;
-			border-radius: 10px;
+			border-bottom-left-radius: 10px;
+			border-bottom-right-radius: 10px;
 			background: rebeccapurple;
+			position: sticky;
+			top: 0;
+			z-index: 10;
 		}
 
 		.timeline .item .right h4 span {
@@ -559,7 +580,7 @@
 			justify-content: flex-end;
 		}
 
-		.timeline-actions  {
+		.timeline-actions {
 			background: rgba(52, 152, 219, 0.8);
 			border: none;
 			padding: 5px 10px;
@@ -646,7 +667,7 @@
 		}
 
 		/* 确保操作按钮正确显示 */
-		.timeline-actions  {
+		.timeline-actions {
 			background: rgba(52, 152, 219, 0.8) !important;
 			border: none !important;
 			padding: 5px 10px !important;
@@ -786,8 +807,8 @@
 		<script>
 			// 配置API基础URL
 			// 配置API基础URL
-window.OneLoveConfig = { apiBaseUrl: '/api' };
-console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
+			window.OneLoveConfig = { apiBaseUrl: '/api' };
+			console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 
 			/**
 			 * 从API获取changelog数据
@@ -878,12 +899,12 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 					} catch (e) {
 						console.error(`[${new Date().toISOString()}] 解析token失败:`, e);
 					}
-					
+
 					// 设置请求头，包含身份验证令牌
 					const headers = {
 						'Authorization': token ? `Bearer ${token}` : ''
 					};
-					
+
 					const response = await fetch(url, { headers });
 
 					const result = await response.json();
@@ -915,11 +936,11 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 				}
 
 				const trimmedContent = content.trim();
-				
+
 				// 检测内容类型
 				let contentType = 'plain';
 				let indicator = '';
-				
+
 				// 检测 Markdown
 				const markdownPatterns = [
 					/^#{1,6}\s/, // 标题
@@ -935,17 +956,17 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 					/^\|.*\|$/, // 表格
 					/^---$/, // 分割线
 				];
-				
+
 				// 检测 HTML
 				const htmlPatterns = [
 					/<[^>]+>/, // HTML 标签
 					/&[a-zA-Z]+;/, // HTML 实体
 					/&#\d+;/, // 数字 HTML 实体
 				];
-				
+
 				const hasMarkdown = markdownPatterns.some(pattern => pattern.test(trimmedContent));
 				const hasHtml = htmlPatterns.some(pattern => pattern.test(trimmedContent));
-				
+
 				if (hasMarkdown && hasHtml) {
 					contentType = 'markdown+html';
 					indicator = ' (Markdown+HTML)';
@@ -956,10 +977,10 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 					contentType = 'html';
 					indicator = ' (HTML)';
 				}
-				
+
 				// 解析内容
 				let parsedContent = trimmedContent;
-				
+
 				try {
 					if (contentType === 'markdown' || contentType === 'markdown+html') {
 						// 配置 Markdown 解析器
@@ -968,10 +989,10 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 							gfm: true, // GitHub Flavored Markdown
 							sanitize: false, // 不使用内置的 sanitize，我们使用 DOMPurify
 						});
-						
+
 						// 解析 Markdown
 						const htmlContent = marked.parse(trimmedContent);
-						
+
 						// 使用 DOMPurify 清理 HTML
 						const cleanHtml = DOMPurify.sanitize(htmlContent, {
 							ALLOWED_TAGS: [
@@ -993,7 +1014,7 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 							FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed'],
 							FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur']
 						});
-						
+
 						parsedContent = cleanHtml;
 					} else if (contentType === 'html') {
 						// 直接清理 HTML
@@ -1017,7 +1038,7 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 							FORBID_TAGS: ['script', 'style', 'iframe', 'object', 'embed'],
 							FORBID_ATTR: ['onerror', 'onload', 'onclick', 'onmouseover', 'onfocus', 'onblur']
 						});
-						
+
 						parsedContent = cleanHtml;
 					}
 				} catch (error) {
@@ -1026,7 +1047,7 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 					contentType = 'plain';
 					indicator = ' (解析失败)';
 				}
-				
+
 				return {
 					parsedContent,
 					contentType,
@@ -1118,19 +1139,19 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 							const parsedResult = parseContent(content.itemContent || '');
 
 							const contentSpan = document.createElement('span');
-							
+
 							if (parsedResult.contentType === 'plain') {
 								// 纯文本内容
 								contentSpan.textContent = parsedResult.parsedContent;
-							contentSpan.style.whiteSpace = 'pre-wrap';
+								contentSpan.style.whiteSpace = 'pre-wrap';
 							} else {
 								// HTML 内容
 								contentSpan.innerHTML = parsedResult.parsedContent;
 								contentSpan.className = 'parsed-content';
 							}
-							
+
 							li.appendChild(contentSpan);
-							
+
 							// 添加内容类型指示器
 							if (parsedResult.indicator) {
 								const indicatorSpan = document.createElement('span');
@@ -1188,21 +1209,21 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 								if (contentText.trim() !== '') {
 									// 解析内容
 									const parsedResult = parseContent(contentText);
-									
+
 									const p = document.createElement('p');
-									
+
 									if (parsedResult.contentType === 'plain') {
 										// 纯文本内容
 										p.textContent = parsedResult.parsedContent;
-									p.style.whiteSpace = 'pre-wrap';
+										p.style.whiteSpace = 'pre-wrap';
 									} else {
 										// HTML 内容
 										p.innerHTML = parsedResult.parsedContent;
 										p.className = 'parsed-content';
 									}
-									
+
 									contentDiv.appendChild(p);
-									
+
 									// 添加内容类型指示器
 									if (parsedResult.indicator) {
 										const indicatorSpan = document.createElement('span');
@@ -1217,21 +1238,21 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 							if (contentText.trim() !== '') {
 								// 解析内容
 								const parsedResult = parseContent(contentText);
-								
+
 								const p2 = document.createElement('p');
-								
+
 								if (parsedResult.contentType === 'plain') {
 									// 纯文本内容
 									p2.textContent = parsedResult.parsedContent;
-								p2.style.whiteSpace = 'pre-wrap';
+									p2.style.whiteSpace = 'pre-wrap';
 								} else {
 									// HTML 内容
 									p2.innerHTML = parsedResult.parsedContent;
 									p2.className = 'parsed-content';
 								}
-								
+
 								contentDiv.appendChild(p2);
-								
+
 								// 添加内容类型指示器
 								if (parsedResult.indicator) {
 									const indicatorSpan = document.createElement('span');
@@ -2086,7 +2107,7 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 					const manualTimeInput = document.getElementById('editItemManualTimeInput');
 					const useAutoTime = !timeSetting || timeSetting.value === 'auto';
 					let itemTime = '';
-					
+
 					if (useAutoTime) {
 						// 自动设置时间（UTC+8）
 						const now = new Date();
@@ -3088,9 +3109,9 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 		const scrollIndicator = document.getElementById('scrollIndicator');
 
 		// 监听滚动事件
-		window.addEventListener('scroll', function() {
+		window.addEventListener('scroll', function () {
 			const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-			
+
 			// 当滚动超过300px时显示指示器
 			if (scrollTop > 300) {
 				scrollIndicator.classList.add('visible');
@@ -3110,10 +3131,10 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 
 
 		// 添加键盘快捷键支持
-		document.addEventListener('keydown', function(e) {
+		document.addEventListener('keydown', function (e) {
 			// Ctrl/Cmd + 方向键滚动
 			if (e.ctrlKey || e.metaKey) {
-				switch(e.key) {
+				switch (e.key) {
 					case 'ArrowUp':
 						e.preventDefault();
 						scrollToTop();
@@ -3133,11 +3154,11 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 		let touchStartY = 0;
 		let touchEndY = 0;
 
-		document.addEventListener('touchstart', function(e) {
+		document.addEventListener('touchstart', function (e) {
 			touchStartY = e.touches[0].clientY;
 		});
 
-		document.addEventListener('touchend', function(e) {
+		document.addEventListener('touchend', function (e) {
 			touchEndY = e.changedTouches[0].clientY;
 			const diff = touchStartY - touchEndY;
 
@@ -3148,14 +3169,14 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 		});
 
 		// 初始化滚动效果
-		document.addEventListener('DOMContentLoaded', function() {
+		document.addEventListener('DOMContentLoaded', function () {
 			// 为所有timeline添加淡入效果
 			const timelineItems = document.querySelectorAll('.timeline .item');
 			timelineItems.forEach((item, index) => {
 				item.style.opacity = '0';
 				item.style.transform = 'translateY(20px)';
 				item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-				
+
 				setTimeout(() => {
 					item.style.opacity = '1';
 					item.style.transform = 'translateY(0)';
