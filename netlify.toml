@@ -16,6 +16,7 @@
 [context.production.environment]
   NODE_ENV = "production"
   JWT_SECRET = "OneLove_JWT_Secret_2024_Production_Key_For_Security"
+  MONGODB_URI = "mongodb+srv://OneLoveAdminQi:LG.2457_AtlasQiAdminOneLove@onelove.bepz2u0.mongodb.net/onelove?retryWrites=true&w=majority&appName=OneLove"
   CORS_ORIGIN = "https://yibiling.netlify.app"
 
 [[redirects]]

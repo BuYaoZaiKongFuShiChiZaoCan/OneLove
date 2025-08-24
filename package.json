@@ -3,9 +3,12 @@
   "version": "1.0.0",
   "description": "OneLove Frontend with Netlify Functions",
   "scripts": {
-    "build": "node build-functions.js && echo 'Static site build completed'",
-    "install-functions": "cd netlify/functions && npm install",
-    "dev": "netlify dev"
+    "build": "echo 'Static site build completed'",
+    "install-functions": "cd backend/netlify-functions && npm install",
+    "dev": "netlify dev",
+    "start-backend": "cd backend && node server.js",
+    "start-local": "cd backend && node server.js",
+    "deploy": "cd backend && node deploy-netlify.js"
   },
   "devDependencies": {
     "netlify-cli": "^17.0.0"

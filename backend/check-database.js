@@ -3,7 +3,7 @@
 const mongoose = require('mongoose');
 
 // 数据库连接字符串
-const MONGODB_URI = 'mongodb+srv://OneLoveAdminQi:LG.2457_AtlasQiAdminOneLove@onelove.bepz2u0.mongodb.net/?retryWrites=true&w=majority&appName=OneLove';
+const MONGODB_URI = 'mongodb+srv://OneLoveAdminQi:LG.2457_AtlasQiAdminOneLove@onelove.bepz2u0.mongodb.net/onelove?retryWrites=true&w=majority&appName=OneLove';
 
 async function checkDatabase() {
   console.log('🔍 检查数据库连接和集合信息...\n');
