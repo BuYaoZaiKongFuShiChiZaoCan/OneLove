@@ -157,9 +157,25 @@ app.get('/api/changelog', async (req, res) => {
       .sort({ timestamp: -1 })
       .limit(limit);
 
+    // 转换数据格式以匹配前端期望
+    const formattedChangelogs = changelogs.map(changelog => ({
+      id: changelog._id,
+      title: changelog.title,
+      content: changelog.content,
+      author: changelog.author,
+      timestamp: changelog.timestamp,
+      version: changelog.version,
+      category: changelog.category,
+      order: changelog.order || 0,
+      time: changelog.time || '',
+      createdAt: changelog.createdAt,
+      updatedAt: changelog.updatedAt
+    }));
+
     res.json({
       success: true,
-      data: changelogs
+      data: formattedChangelogs,
+      message: '获取Changelog成功'
     });
   } catch (error) {
     console.error('❌ 获取Changelog错误:', error);
@@ -187,8 +203,9 @@ app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
     if (!timelineData) {
       return res.json({
         success: true,
-        data: null,
-        message: `未找到${type}类型的数据`
+        data: [],
+        message: `未找到${type}类型的数据`,
+        isEmpty: true
       });
     }
 
