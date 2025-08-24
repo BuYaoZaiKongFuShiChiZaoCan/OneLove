@@ -14,33 +14,8 @@
 # 环境变量配置
 [context.production.environment]
   NODE_ENV = "production"
-  MONGODB_URI = "mongodb+srv://OneLoveAdminQi:LG.2457_AtlasQiAdminOneLove@onelove.bepz2u0.mongodb.net/onelove?retryWrites=true&w=majority&appName=OneLove"
   JWT_SECRET = "OneLove_JWT_Secret_2024_Production_Key_For_Security"
-  JWT_EXPIRES_IN = "7d"
-  ENCRYPTION_KEY = "OneLove_Encryption_Key_256_Bit_Production_2024"
-  ENCRYPTION_IV = "OneLove_IV_16_Bit"
   CORS_ORIGIN = "https://yibiling.netlify.app"
-  BCRYPT_ROUNDS = "12"
-  SESSION_SECRET = "OneLove_Session_Secret_Production_2024"
-  LOG_LEVEL = "info"
-  MAX_REQUEST_SIZE = "10mb"
-  RATE_LIMIT_WINDOW_MS = "900000"
-  RATE_LIMIT_MAX_REQUESTS = "100"
-
-[context.deploy-preview.environment]
-  NODE_ENV = "development"
-  MONGODB_URI = "mongodb+srv://OneLoveAdminQi:LG.2457_AtlasQiAdminOneLove@onelove.bepz2u0.mongodb.net/onelove?retryWrites=true&w=majority&appName=OneLove"
-  JWT_SECRET = "OneLove_JWT_Secret_2024_Development_Key"
-  JWT_EXPIRES_IN = "7d"
-  ENCRYPTION_KEY = "OneLove_Encryption_Key_256_Bit_Dev_2024"
-  ENCRYPTION_IV = "OneLove_IV_16_Bit"
-  CORS_ORIGIN = "https://yibiling.netlify.app"
-  BCRYPT_ROUNDS = "10"
-  SESSION_SECRET = "OneLove_Session_Secret_Development_2024"
-  LOG_LEVEL = "debug"
-  MAX_REQUEST_SIZE = "10mb"
-  RATE_LIMIT_WINDOW_MS = "900000"
-  RATE_LIMIT_MAX_REQUESTS = "1000"
 
 [[redirects]]
   from = "/api/*"
