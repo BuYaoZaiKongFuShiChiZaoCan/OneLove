@@ -10,7 +10,7 @@
 [functions]
   directory = "backend/netlify-functions"
   node_bundler = "esbuild"
-  external_node_modules = ["express", "cors", "bcryptjs", "jsonwebtoken", "mongoose", "dotenv", "morgan", "helmet", "express-validator", "multer"]
+  external_node_modules = ["express", "cors", "bcryptjs", "jsonwebtoken", "mongoose", "dotenv", "morgan", "helmet", "express-validator", "multer", "serverless-http"]
 
 # 环境变量配置
 [context.production.environment]
@@ -34,4 +34,7 @@
   command = "npm run dev"
   port = 3000
   publish = "."
-  framework = "#static" 
+  framework = "#static"
+
+[[plugins]]
+  package = "@netlify/plugin-functions-install-core" 
