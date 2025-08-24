@@ -38,6 +38,50 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 
+// Changelog模型
+const changelogSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+  author: { type: String, required: true },
+  timestamp: { type: Date, default: Date.now },
+  version: { type: String },
+  category: { type: String, default: 'general' }
+});
+
+const Changelog = mongoose.models.Changelog || mongoose.model('Changelog', changelogSchema);
+
+// Timeline数据模型
+const timelineDataSchema = new mongoose.Schema({
+  userId: { type: String, required: true },
+  type: { type: String, required: true, enum: ['myPast', 'health', 'work', 'study'] },
+  data: { type: mongoose.Schema.Types.Mixed },
+  timestamp: { type: Date, default: Date.now }
+});
+
+const TimelineData = mongoose.models.TimelineData || mongoose.model('TimelineData', timelineDataSchema);
+
+// Changelog模型
+const changelogSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  content: { type: String, required: true },
+  author: { type: String, required: true },
+  timestamp: { type: Date, default: Date.now },
+  version: { type: String },
+  category: { type: String, default: 'general' }
+});
+
+const Changelog = mongoose.models.Changelog || mongoose.model('Changelog', changelogSchema);
+
+// Timeline数据模型
+const timelineDataSchema = new mongoose.Schema({
+  userId: { type: String, required: true },
+  type: { type: String, required: true, enum: ['myPast', 'health', 'work', 'study'] },
+  data: { type: mongoose.Schema.Types.Mixed },
+  timestamp: { type: Date, default: Date.now }
+});
+
+const TimelineData = mongoose.models.TimelineData || mongoose.model('TimelineData', timelineDataSchema);
+
 // 连接数据库
 const connectDB = async () => {
   try {
@@ -63,6 +107,24 @@ const connectDB = async () => {
   }
 };
 
+// JWT验证中间件
+const authenticateToken = async (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ success: false, message: '访问令牌缺失' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(403).json({ success: false, message: '无效的访问令牌' });
+  }
+};
+
 // 健康检查
 app.get('/api/health', async (req, res) => {
   console.log('🏥 健康检查请求');
@@ -79,6 +141,98 @@ app.get('/api/health', async (req, res) => {
       has_mongodb_uri: !!process.env.MONGODB_URI
     }
   });
+});
+
+// 用户角色检查
+app.get('/api/test/user', authenticateToken, async (req, res) => {
+  console.log('👤 用户角色检查请求');
+  try {
+    const dbConnected = await connectDB();
+    if (!dbConnected) {
+      return res.status(500).json({ success: false, message: '数据库连接失败' });
+    }
+
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: '用户不存在' });
+    }
+
+    res.json({
+      success: true,
+      data: {
+        userId: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        isActive: user.isActive
+      }
+    });
+  } catch (error) {
+    console.error('❌ 用户角色检查错误:', error);
+    res.status(500).json({ success: false, message: '服务器错误' });
+  }
+});
+
+// 获取Changelog
+app.get('/api/changelog', async (req, res) => {
+  console.log('📝 获取Changelog请求');
+  try {
+    const dbConnected = await connectDB();
+    if (!dbConnected) {
+      return res.status(500).json({ success: false, message: '数据库连接失败' });
+    }
+
+    const limit = parseInt(req.query.limit) || 100;
+    const changelogs = await Changelog.find()
+      .sort({ timestamp: -1 })
+      .limit(limit);
+
+    res.json({
+      success: true,
+      data: changelogs
+    });
+  } catch (error) {
+    console.error('❌ 获取Changelog错误:', error);
+    res.status(500).json({ success: false, message: '获取Changelog失败' });
+  }
+});
+
+// 获取Timeline数据
+app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
+  const { type } = req.params;
+  const { timestamp } = req.query;
+  
+  console.log(`📊 获取Timeline数据请求 - 类型: ${type}, 时间戳: ${timestamp}`);
+  
+  try {
+    const dbConnected = await connectDB();
+    if (!dbConnected) {
+      return res.status(500).json({ success: false, message: '数据库连接失败' });
+    }
+
+    // 查找用户的数据
+    const timelineData = await TimelineData.findOne({
+      userId: req.user.userId,
+      type: type
+    }).sort({ timestamp: -1 });
+
+    if (!timelineData) {
+      return res.json({
+        success: true,
+        data: null,
+        message: `未找到${type}类型的数据`
+      });
+    }
+
+    res.json({
+      success: true,
+      data: timelineData.data,
+      timestamp: timelineData.timestamp
+    });
+  } catch (error) {
+    console.error(`❌ 获取${type}数据错误:`, error);
+    res.status(500).json({ success: false, message: `获取${type}数据失败` });
+  }
 });
 
 // 用户登录
