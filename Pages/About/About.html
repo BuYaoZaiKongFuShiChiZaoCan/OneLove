@@ -209,7 +209,7 @@
 		.Ttime:not(:empty),
 		.itemTime:not(:empty) {
 			display: inline-block;
-			min-width: 140px;
+			min-width: 171px;
 			border-radius: 4px;
 			font-size: 0.9em;
 		}
@@ -224,7 +224,7 @@
 			position: relative;
 			transition: background-color 0.3s ease, transform 0.3s ease;
 			display: grid;
-			grid-template-columns: 160px 1fr;
+			grid-template-columns: 171px 1fr;
 			column-gap: 10px;
 			align-items: start;
 		}
@@ -254,6 +254,8 @@
 		/* 让换行文本与首行对齐（时间在第一列，内容在第二列） */
 		.changelog-item-with-edit>.Ttime {
 			grid-column: 1;
+			position: sticky;
+			top: 3rem;
 		}
 
 		.changelog-item-with-edit>span {
