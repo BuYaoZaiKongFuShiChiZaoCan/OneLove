@@ -14,7 +14,7 @@ app.use(express.json());
 
 // 环境变量
 const JWT_SECRET = process.env.JWT_SECRET || 'OneLove_JWT_Secret_2024_Production_Key_For_Security';
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://OneLoveAdminQi:LG.2457_AtlasQiAdminOneLove@onelove.bepz2u0.mongodb.net/?retryWrites=true&w=majority&appName=OneLove';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://OneLoveAdminQi:LG.2457_AtlasQiAdminOneLove@onelove.bepz2u0.mongodb.net/onelove?retryWrites=true&w=majority&appName=OneLove';
 
 console.log('🔧 API初始化 - 环境变量检查:');
 console.log('JWT_SECRET:', JWT_SECRET ? '已设置' : '使用默认值');
@@ -55,6 +55,7 @@ const connectDB = async () => {
     });
     
     console.log('✅ MongoDB 连接成功');
+    console.log('数据库名称:', mongoose.connection.db.databaseName);
     return true;
   } catch (error) {
     console.error('❌ 数据库连接失败:', error.message);
@@ -72,6 +73,7 @@ app.get('/api/health', async (req, res) => {
     timestamp: new Date().toISOString(),
     environment: 'netlify-functions',
     database: dbConnected ? 'connected' : 'disconnected',
+    database_name: mongoose.connection.db?.databaseName || 'unknown',
     env_vars: {
       has_jwt_secret: !!process.env.JWT_SECRET,
       has_mongodb_uri: !!process.env.MONGODB_URI
