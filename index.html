@@ -515,12 +515,6 @@
 							</a>
 						</div>
 						<div class="dropdown-divider"></div>
-						<div id="testButtonContainer" style="display: none;">
-							<div class="dropdown-item test-button-container">
-								<i class="fas fa-clock"></i>
-								<span id="testButtonText">测试休息提醒</span>
-							</div>
-						</div>
 					</div>
 				</div>
 			</div>
@@ -1084,27 +1078,7 @@
 					margin-top: 10px;
 				`;
 
-				// 减少时间按钮（仅在测试环境显示）
-				const reduceTimeBtn = document.createElement('button');
-				reduceTimeBtn.innerHTML = '⏰ 减少20%时间';
-				reduceTimeBtn.style.cssText = `
-					background: linear-gradient(135deg, #ff4757, #ff6b35);
-					color: white;
-					border: none;
-					border-radius: 8px;
-					padding: 10px 20px;
-					font-size: 16px;
-					font-weight: 600;
-					margin-top: 15px;
-					cursor: pointer;
-					transition: all 0.3s ease;
-				`;
-				reduceTimeBtn.onclick = reduceRestTime;
-				
-				// 只在测试环境显示减少时间按钮
-				if (!isLocalDevelopment()) {
-					reduceTimeBtn.style.display = 'none';
-				}
+
 
 				// 音效提示
 				const soundHint = document.createElement('div');
@@ -1126,7 +1100,6 @@
 				overlay.appendChild(distanceAdvice);
 				overlay.appendChild(brightnessAdvice);
 				overlay.appendChild(countdown);
-				overlay.appendChild(reduceTimeBtn);
 				overlay.appendChild(soundHint);
 
 				return overlay;
@@ -1161,144 +1134,71 @@
 			// 播放老式时钟八点报时音效
 			function playOldClockSound() {
 				try {
-					if (isLocalDevelopment()) {
-						console.log('🎵 尝试播放老式时钟八点报时音效');
-					}
-
 					const audio = new Audio('./time/老式时钟八点报时音效.mp3');
 					audio.volume = 0.6; // 设置音量为60%
 					audio.preload = 'auto';
 
 					// 添加错误处理
 					audio.addEventListener('error', function (e) {
-						if (isLocalDevelopment()) {
-							console.warn('❌ 老式时钟音效加载失败:', e);
-						}
+						console.warn('❌ 老式时钟音效加载失败:', e);
 					});
 
 					audio.addEventListener('canplaythrough', function () {
 						audio.play().then(() => {
-							if (isLocalDevelopment()) {
-								console.log('✅ 老式时钟音效播放成功');
-							}
+							console.log('✅ 老式时钟音效播放成功');
 						}).catch(error => {
-							if (isLocalDevelopment()) {
-								console.warn('❌ 播放老式时钟音效失败:', error);
-							}
+							console.warn('❌ 播放老式时钟音效失败:', error);
 						});
 					});
 
 					if (audio.readyState >= 2) {
 						audio.play().then(() => {
-							if (isLocalDevelopment()) {
-								console.log('✅ 老式时钟音效播放成功');
-							}
+							console.log('✅ 老式时钟音效播放成功');
 						}).catch(error => {
-							if (isLocalDevelopment()) {
-								console.warn('❌ 播放老式时钟音效失败:', error);
-							}
+							console.warn('❌ 播放老式时钟音效失败:', error);
 						});
 					}
 
 				} catch (error) {
-					if (isLocalDevelopment()) {
-						console.warn('❌ 创建老式时钟音频对象失败:', error);
-					}
+					console.warn('❌ 创建老式时钟音频对象失败:', error);
 				}
 			}
 
 			// 播放父页面音乐
 			function playParentMusic() {
 				try {
-					// 只在本地开发环境输出日志
-					if (isLocalDevelopment()) {
-						console.log('=== 开始尝试播放父页面音乐 ===');
-					}
-
 					// 直接使用 playSong() 函数播放音乐
 					if (typeof playSong === 'function') {
-						if (isLocalDevelopment()) {
-							console.log('✅ 使用 playSong() 函数播放音乐');
-						}
 						playSong();
-						if (isLocalDevelopment()) {
-							console.log('✅ playSong() 函数调用成功');
-						}
 					} else {
 						// 备用方案：直接使用页面中的音频元素
 						const audioElement = document.getElementById('audio');
 						if (audioElement && audioElement.src) {
-							if (isLocalDevelopment()) {
-								console.log('✅ 使用页面audio元素播放音乐（备用方案）');
-							}
-							audioElement.play().then(() => {
-								if (isLocalDevelopment()) {
-									console.log('✅ 页面audio元素播放成功');
-								}
-							}).catch(error => {
-								if (isLocalDevelopment()) {
-									console.warn('❌ 页面audio元素播放失败:', error);
-								}
+							audioElement.play().catch(error => {
+								console.warn('❌ 页面audio元素播放失败:', error);
 							});
-						} else {
-							if (isLocalDevelopment()) {
-								console.warn('❌ 未找到可用的播放方法');
-							}
 						}
 					}
-
-					if (isLocalDevelopment()) {
-						console.log('=== 音乐播放尝试完成 ===');
-					}
 				} catch (error) {
-					if (isLocalDevelopment()) {
-						console.warn('❌ 播放父页面音乐失败:', error);
-					}
+					console.warn('❌ 播放父页面音乐失败:', error);
 				}
 			}
 
-			// 暂停父页面音乐
+			// 暂停页面音乐
 			function pauseParentMusic() {
 				try {
-					// 只在本地开发环境输出日志
-					if (isLocalDevelopment()) {
-						console.log('=== 开始尝试暂停父页面音乐 ===');
-					}
-
 					// 直接使用 pauseSong() 函数暂停音乐
 					if (typeof pauseSong === 'function') {
-						if (isLocalDevelopment()) {
-							console.log('✅ 使用 pauseSong() 函数暂停音乐');
-						}
 						pauseSong();
-						if (isLocalDevelopment()) {
-							console.log('✅ pauseSong() 函数调用成功');
-						}
 					} else {
 						// 备用方案：直接使用页面中的音频元素
 						const audioElement = document.getElementById('audio');
 						if (audioElement && audioElement.src) {
-							if (isLocalDevelopment()) {
-								console.log('✅ 使用页面audio元素暂停音乐（备用方案）');
-							}
 							audioElement.pause();
-							if (isLocalDevelopment()) {
-								console.log('✅ 页面audio元素暂停成功');
-							}
-						} else {
-							if (isLocalDevelopment()) {
-								console.warn('❌ 未找到可用的暂停方法');
-							}
 						}
 					}
-
-					if (isLocalDevelopment()) {
-						console.log('=== 音乐暂停尝试完成 ===');
-					}
 				} catch (error) {
-					if (isLocalDevelopment()) {
-						console.warn('❌ 暂停父页面音乐失败:', error);
-					}
+					console.warn('❌ 暂停父页面音乐失败:', error);
 				}
 			}
 
@@ -1428,12 +1328,7 @@
 				}, timerDuration);
 			}
 
-			// 检查是否为本地开发环境
-			function isLocalDevelopment() {
-				return window.location.hostname === '127.0.0.1' ||
-					window.location.hostname === 'localhost' ||
-					window.location.hostname === '0.0.0.0';
-			}
+
 
 			// 保存累计时长到localStorage
 			function saveAccumulatedTime() {
@@ -1492,61 +1387,6 @@
 					return true;
 				}
 				return false;
-			}
-
-
-
-			// 减少休息时间（按百分比）
-			function reduceRestTime() {
-				if (!isInBreak) {
-					console.log('⏰ 当前不在休息状态，无法减少时间');
-					return;
-				}
-
-				// 获取当前剩余时间
-				const countdownElement = document.getElementById('restCountdown');
-				if (!countdownElement) {
-					console.log('⏰ 找不到倒计时元素，可能休息提醒未显示');
-					return;
-				}
-
-				// 解析当前剩余时间
-				const timeText = countdownElement.textContent;
-				const timeMatch = timeText.match(/剩余时间: (\d+):(\d+)/);
-
-				if (timeMatch) {
-					const currentMinutes = parseInt(timeMatch[1]);
-					const currentSeconds = parseInt(timeMatch[2]);
-					const currentTotalSeconds = currentMinutes * 60 + currentSeconds;
-
-					// 减少20%的时间
-					const reductionPercent = 0.2; // 20%
-					const reducedSeconds = Math.floor(currentTotalSeconds * reductionPercent);
-					const newTotalSeconds = currentTotalSeconds - reducedSeconds;
-
-					if (newTotalSeconds > 0) {
-						// 更新全局变量
-						window.currentRestTimeLeft = newTotalSeconds;
-
-						// 更新显示
-						const newMinutes = Math.floor(newTotalSeconds / 60);
-						const newSeconds = newTotalSeconds % 60;
-						countdownElement.textContent = `剩余时间: ${newMinutes}:${newSeconds.toString().padStart(2, '0')}`;
-
-						console.log(`⏰ 减少时间: ${currentMinutes}:${currentSeconds.toString().padStart(2, '0')} → ${newMinutes}:${newSeconds.toString().padStart(2, '0')} (减少${reducedSeconds}秒)`);
-
-						// 显示成功提示
-						showToast('时间已减少20%', 'success');
-					} else {
-						// 时间不足，直接结束
-						hideRestReminder();
-						console.log('⏰ 时间不足，直接结束休息');
-						showToast('休息结束', 'info');
-					}
-				} else {
-					console.log('⏰ 无法解析当前剩余时间格式');
-					showToast('无法解析时间格式', 'error');
-				}
 			}
 
 			// 显示Toast提示
@@ -1624,7 +1464,6 @@
 				const authDropdownButtons = document.getElementById('authDropdownButtons');
 				const dropdownUsername = document.getElementById('dropdownUsername');
 				const dropdownAvatar = document.getElementById('dropdownAvatar');
-				const testButtonContainer = document.getElementById('testButtonContainer');
 
 				// SideMenu 元素
 				const sideMenuUserInfo = document.getElementById('sideMenuUserInfo');
@@ -1718,8 +1557,7 @@
 									sideMenuDashboard.style.display = 'block';
 								}
 
-								// 显示测试按钮（始终显示）
-								testButtonContainer.style.display = 'flex';
+
 
 								// 加载用户数据统计
 								loadUserStats();
@@ -1753,7 +1591,7 @@
 									sideMenuStats.style.display = 'none';
 									sideMenuActions.style.display = 'none';
 								}
-								testButtonContainer.style.display = 'flex'; // 始终显示休息时间按钮
+
 							}
 						})
 						.catch(error => {
@@ -1782,7 +1620,7 @@
 								sideMenuStats.style.display = 'none';
 								sideMenuActions.style.display = 'none';
 							}
-							testButtonContainer.style.display = 'flex'; // 始终显示休息时间按钮
+
 						});
 				} else {
 					// 未登录，显示登录按钮
@@ -1813,7 +1651,7 @@
 						sideMenuStats.style.display = 'none';
 						sideMenuActions.style.display = 'none';
 					}
-					testButtonContainer.style.display = 'flex'; // 始终显示休息时间按钮
+
 				}
 			}
 
@@ -1965,29 +1803,7 @@
 					tipClose.addEventListener('click', tipBox);
 				}
 
-				// 下拉菜单测试按钮
-				const testButtonContainer = document.getElementById('testButtonContainer');
-				if (testButtonContainer) {
-					testButtonContainer.addEventListener('click', function () {
-						// 测试按钮只用于开始休息
-						showRestReminder();
-					});
 
-					// 右键菜单测试老式时钟音效
-					testButtonContainer.addEventListener('contextmenu', function (e) {
-						e.preventDefault();
-						console.log('🎵 右键测试：强制播放老式时钟音效');
-						playOldClockSound();
-					});
-
-					// 中键重置累计时长
-					testButtonContainer.addEventListener('auxclick', function (e) {
-						e.preventDefault();
-						console.log('🔄 中键测试：重置累计工作时长');
-						resetAccumulatedTime();
-						alert('累计工作时长已重置');
-					});
-				}
 			}
 
 			// 页面加载完成后启动计时
@@ -2035,13 +1851,7 @@
 				// 添加其他事件监听器
 				addEventListeners();
 
-				// 定期更新测试按钮文本
-				setInterval(() => {
-					const testButtonText = document.getElementById('testButtonText');
-					if (testButtonText) {
-						testButtonText.textContent = '测试休息提醒';
-					}
-				}, 1000);
+
 
 				// 加载累计时长
 				loadAccumulatedTime();
@@ -2088,7 +1898,7 @@
 
 	<!-- 认证工具 -->
 	<script src="./js/auth.js"></script>
-	
+
 	<!-- 彩蛋 最后加载 -->
 	<script async src="./scripts/caiDan.js"></script>
 </body>
