@@ -11,21 +11,55 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// 请求日志中间件
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  console.log('Request Headers:', req.headers);
+  console.log('Request Body:', req.body);
+  next();
+});
+
 // 健康检查端点
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     message: 'OneLove API is running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development'
+  });
+});
+
+// 测试端点
+app.post('/api/test', (req, res) => {
+  console.log('=== 测试端点 ===');
+  console.log('请求体:', req.body);
+  console.log('请求头:', req.headers);
+  
+  res.json({
+    success: true,
+    message: '测试端点正常工作',
+    receivedData: req.body,
+    headers: req.headers,
     timestamp: new Date().toISOString()
   });
 });
 
 // 认证相关端点
 app.post('/api/auth/login', (req, res) => {
+  console.log('=== 登录请求开始 ===');
+  console.log('请求体:', req.body);
+  console.log('Content-Type:', req.headers['content-type']);
+  
   // 临时登录逻辑
   const { username, password } = req.body;
   
+  console.log('解析的用户名:', username);
+  console.log('解析的密码:', password);
+  console.log('期望的用户名: admin');
+  console.log('期望的密码: admin123');
+  
   if (username === 'admin' && password === 'admin123') {
+    console.log('登录验证成功');
     res.json({
       success: true,
       message: '登录成功',
@@ -39,9 +73,18 @@ app.post('/api/auth/login', (req, res) => {
       }
     });
   } else {
+    console.log('登录验证失败');
+    console.log('用户名匹配:', username === 'admin');
+    console.log('密码匹配:', password === 'admin123');
     res.status(401).json({
       success: false,
-      message: '用户名或密码错误'
+      message: '用户名或密码错误',
+      debug: {
+        receivedUsername: username,
+        receivedPassword: password ? '***' : 'undefined',
+        expectedUsername: 'admin',
+        expectedPassword: 'admin123'
+      }
     });
   }
 });
@@ -126,7 +169,8 @@ app.use((err, req, res, next) => {
   console.error('API Error:', err);
   res.status(500).json({
     success: false,
-    message: '服务器内部错误'
+    message: '服务器内部错误',
+    error: err.message
   });
 });
 

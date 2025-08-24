@@ -197,6 +197,9 @@
 
 
 	<script>
+		// 配置API基础URL
+		window.OneLoveConfig = { apiBaseUrl: '/api' };
+		
 		// 使用配置文件中的API基础URL
 		const API_BASE = window.OneLoveConfig?.apiBaseUrl || window.location.origin;
 		// 确保API_BASE不以/api结尾，避免重复
