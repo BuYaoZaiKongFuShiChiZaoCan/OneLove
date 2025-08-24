@@ -388,6 +388,63 @@
 			max-width: 1200px;
 			margin: 0 auto;
 			padding: 20px;
+			/* 添加滚动容器样式 */
+			max-height: 600px;
+			overflow-y: auto;
+			scroll-behavior: smooth;
+			/* 自定义滚动条 */
+			scrollbar-width: thin;
+			scrollbar-color: #16A085 #34495E;
+		}
+
+		/* Webkit浏览器的滚动条样式 */
+		.timeline::-webkit-scrollbar {
+			width: 8px;
+		}
+
+		.timeline::-webkit-scrollbar-track {
+			background: #34495E;
+			border-radius: 4px;
+		}
+
+		.timeline::-webkit-scrollbar-thumb {
+			background: #16A085;
+			border-radius: 4px;
+		}
+
+		.timeline::-webkit-scrollbar-thumb:hover {
+			background: #138D75;
+		}
+
+
+
+		/* 滚动指示器 */
+		.scroll-indicator {
+			position: fixed;
+			right: 20px;
+			bottom: 20px;
+			background: #16A085;
+			color: white;
+			width: 50px;
+			height: 50px;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			opacity: 0;
+			transition: opacity 0.3s ease;
+			z-index: 1000;
+			box-shadow: 0 4px 15px rgba(22, 160, 133, 0.3);
+		}
+
+		.scroll-indicator.visible {
+			opacity: 1;
+		}
+
+		.scroll-indicator:hover {
+			background: #138D75;
+			transform: scale(1.1);
 		}
 
 		.timeline .item {
@@ -558,6 +615,8 @@
 				grid-template-columns: 1fr;
 			}
 		}
+
+
 		/* 修复按钮样式冲突 */
 		.timeline button:not(.timeline-actions button),
 		.add-timeline-form button,
@@ -705,7 +764,7 @@
 		<!-- 汉子调经 - E6KB -->
 		<h3 id="汉子调经">. 调经 .</h3>
 		<div style="text-align: right; margin-bottom: 10px;">
-			<button id="addHealthBtn" style="display: none; background: #16A085; color: white; box-sizing: content-box; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
+			<button id="addHealthBtn" style="display: none; background: #16A085; color: white; border: none; box-sizing: content-box; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
 				➕ 添加新项目
 			</button>
 		</div>
@@ -719,11 +778,9 @@
 				➕ 添加新版本
 			</button>
 		</div>
-		<div class="timeline">
-			<div id="versionLogContainer">
-				<div style="text-align: center; padding: 20px;">
-					<i class="fas fa-spinner fa-spin"></i> 正在加载版本信息...
-				</div>
+		<div class="timeline" id="versionLogContainer">
+			<div style="text-align: center; padding: 20px;">
+				<i class="fas fa-spinner fa-spin"></i> 正在加载版本信息...
 			</div>
 		</div>
 		<script>
@@ -1317,6 +1374,8 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 					}
 				}
 			}
+
+
 
 			// 全局用户权限状态
 			let globalUserRole = 'guest';
@@ -1998,7 +2057,7 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 						showLoadingMessage('编辑成功，正在刷新数据...');
 
 						// 重新加载数据
-						await loadChangelogFromAPI();
+						await loadAllData();
 
 						// 重新处理锚点跳转
 						handleAnchorNavigation();
@@ -2114,20 +2173,7 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 								showLoadingMessage('删除成功，正在刷新数据...');
 
 								// 重新加载数据
-								if (containerId === 'versionLogContainer') {
-									await loadChangelogFromAPI();
-								} else {
-									const type = containerId === 'myPastContainer' ? 'myPast' : 'health';
-									const data = await loadTimelineData(type);
-									renderTimeline(containerId, data, {
-										iconText: containerId === 'myPastContainer' ? '📅' : '🏥',
-										titleField: 'title',
-										timeField: 'time',
-										contentField: 'content',
-										imagesField: 'images',
-										videosField: 'videos'
-									});
-								}
+								await loadAllData();
 
 								// 重新处理锚点跳转
 								handleAnchorNavigation();
@@ -2554,10 +2600,10 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 			}
 
 			/**
-		 * 格式化时间字符串，确保包含秒级精度
-		 * @param {string} timeStr - 输入的时间字符串
-		 * @returns {string} 包含秒级精度的时间字符串
-		 */
+			* 格式化时间字符串，确保包含秒级精度
+			* @param {string} timeStr - 输入的时间字符串
+			* @returns {string} 包含秒级精度的时间字符串
+			*/
 			function formatTimeWithSeconds(timeStr) {
 				if (!timeStr) return '';
 
@@ -2657,7 +2703,7 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 					const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
 
 					const requestData = {
-						type: type,
+						type: type === 'myPastData' ? 'myPast' : 'health',
 						title: title,
 						content: [{
 							itemContent: content
@@ -2787,8 +2833,8 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 						// 显示加载状态
 						showLoadingMessage('版本添加成功，正在刷新数据...');
 
-						// 重新加载数据
-						await loadChangelogFromAPI();
+						// 重新加载并渲染所有数据
+						await loadAllData();
 
 						// 重新处理锚点跳转
 						handleAnchorNavigation();
@@ -3000,6 +3046,20 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 			}
 
 			/**
+			 * 显示图片模态框
+			 */
+			function showImageModal(imageUrl) {
+				const modal = document.createElement('div');
+				modal.className = 'modal-overlay';
+				const modalImg = document.createElement('img');
+				modalImg.src = imageUrl;
+				modalImg.className = 'modal-image';
+				modal.appendChild(modalImg);
+				modal.onclick = () => modal.remove();
+				document.body.appendChild(modal);
+			}
+
+			/**
 			 * 关闭预览模态框
 			 */
 			function closePreviewModal() {
@@ -3011,11 +3071,98 @@ console.log('API基础URL:', window.OneLoveConfig.apiBaseUrl);
 		</script>
 		</div>
 	</article>
+
+	<!-- 滚动指示器 -->
+	<div class="scroll-indicator" id="scrollIndicator" onclick="scrollToTop()">
+		↑
+	</div>
+
 	<footer>
 		Copyright © qAiJi
 		<br />
 		备案是不阔能备案滴
 	</footer>
+
+	<script>
+		// 滚动指示器功能
+		const scrollIndicator = document.getElementById('scrollIndicator');
+
+		// 监听滚动事件
+		window.addEventListener('scroll', function() {
+			const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+			
+			// 当滚动超过300px时显示指示器
+			if (scrollTop > 300) {
+				scrollIndicator.classList.add('visible');
+			} else {
+				scrollIndicator.classList.remove('visible');
+			}
+		});
+
+		// 滚动到顶部功能
+		function scrollToTop() {
+			window.scrollTo({
+				top: 0,
+				behavior: 'smooth'
+			});
+		}
+
+
+
+		// 添加键盘快捷键支持
+		document.addEventListener('keydown', function(e) {
+			// Ctrl/Cmd + 方向键滚动
+			if (e.ctrlKey || e.metaKey) {
+				switch(e.key) {
+					case 'ArrowUp':
+						e.preventDefault();
+						scrollToTop();
+						break;
+					case 'ArrowDown':
+						e.preventDefault();
+						window.scrollTo({
+							top: document.body.scrollHeight,
+							behavior: 'smooth'
+						});
+						break;
+				}
+			}
+		});
+
+		// 添加触摸滑动支持（移动端）
+		let touchStartY = 0;
+		let touchEndY = 0;
+
+		document.addEventListener('touchstart', function(e) {
+			touchStartY = e.touches[0].clientY;
+		});
+
+		document.addEventListener('touchend', function(e) {
+			touchEndY = e.changedTouches[0].clientY;
+			const diff = touchStartY - touchEndY;
+
+			// 向上滑动超过50px时显示滚动指示器
+			if (diff > 50 && window.pageYOffset > 300) {
+				scrollIndicator.classList.add('visible');
+			}
+		});
+
+		// 初始化滚动效果
+		document.addEventListener('DOMContentLoaded', function() {
+			// 为所有timeline添加淡入效果
+			const timelineItems = document.querySelectorAll('.timeline .item');
+			timelineItems.forEach((item, index) => {
+				item.style.opacity = '0';
+				item.style.transform = 'translateY(20px)';
+				item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+				
+				setTimeout(() => {
+					item.style.opacity = '1';
+					item.style.transform = 'translateY(0)';
+				}, index * 100);
+			});
+		});
+	</script>
 </body>
 
 </html>
