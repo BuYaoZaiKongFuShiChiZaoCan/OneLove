@@ -929,6 +929,11 @@
 							return { items: merged, statusText: text };
 						}
 
+						// 开发者但返回空数组（无任何用户数据）
+						if (isDev && Array.isArray(payload) && payload.length === 0) {
+							return { items: [], statusText: '暂无数据（未找到任何用户数据）' };
+						}
+
 						const list = Array.isArray(payload) ? payload : [];
 						const text = list.length ? '' : '暂无数据（您还没有创建记录）';
 						return { items: list, statusText: text };
