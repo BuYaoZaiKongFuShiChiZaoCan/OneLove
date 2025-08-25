@@ -148,6 +148,39 @@ app.get('/api/test/user', authenticateToken, async (req, res) => {
   }
 });
 
+// 获取当前登录用户信息
+app.get('/api/auth/me', authenticateToken, async (req, res) => {
+  console.log('🔎 获取当前用户信息 /api/auth/me');
+  try {
+    const dbConnected = await connectDB();
+    if (!dbConnected) {
+      return res.status(500).json({ success: false, message: '数据库连接失败' });
+    }
+
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: '用户不存在' });
+    }
+
+    return res.json({
+      success: true,
+      data: {
+        user: {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          isActive: user.isActive,
+          lastLogin: user.lastLogin
+        }
+      }
+    });
+  } catch (error) {
+    console.error('❌ /api/auth/me 错误:', error);
+    return res.status(500).json({ success: false, message: '服务器错误' });
+  }
+});
+
 // 获取Changelog
 app.get('/api/changelog', async (req, res) => {
   console.log('📝 获取Changelog请求');
