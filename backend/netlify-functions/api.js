@@ -241,8 +241,9 @@ app.get('/api/changelog', async (req, res) => {
 // 获取Timeline数据
 app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
   const { type } = req.params;
+  const { allUsers } = req.query;
   
-  console.log(`📊 获取Timeline数据请求 - 类型: ${type}`);
+  console.log(`📊 获取Timeline数据请求 - 类型: ${type} allUsers=${allUsers}`);
   
   try {
     const dbConnected = await connectDB();
@@ -250,6 +251,18 @@ app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
       return res.status(500).json({ success: false, message: '数据库连接失败' });
     }
 
+    // 开发者可查看所有用户该类型数据
+    if (allUsers === 'true' && (req.user?.role === 'developer' || req.user?.role === 'admin')) {
+      const docs = await TimelineData.find({ type }).sort({ timestamp: -1 }).limit(200);
+      const payload = docs.map(doc => ({
+        userId: doc.userId,
+        data: Array.isArray(doc.data) ? doc.data : (doc.data || []),
+        timestamp: doc.timestamp
+      }));
+      return res.json({ success: true, data: payload, count: payload.length });
+    }
+
+    // 普通用户：仅返回当前用户的最新一条
     const timelineData = await TimelineData.findOne({
       userId: req.user.userId,
       type: type
@@ -264,14 +277,14 @@ app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
       });
     }
 
-    res.json({
+    return res.json({
       success: true,
-      data: Array.isArray(timelineData.data) ? timelineData.data : [],
+      data: Array.isArray(timelineData.data) ? timelineData.data : (timelineData.data || []),
       timestamp: timelineData.timestamp
     });
   } catch (error) {
     console.error(`❌ 获取${type}数据错误:`, error);
-    res.status(500).json({ success: false, message: `获取${type}数据失败` });
+    return res.status(500).json({ success: false, message: `获取${type}数据失败` });
   }
 });
 
