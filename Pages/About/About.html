@@ -921,16 +921,6 @@
 								const list = Array.isArray(block.data) ? block.data : [];
 								list.forEach(item => {
 									const cloned = { ...item };
-									if (cloned && typeof cloned === 'object') {
-										// 优化用户ID显示
-										let userIdDisplay = block.userId;
-										if (userIdDisplay === 'system') {
-											userIdDisplay = '系统';
-										} else if (userIdDisplay === 'unknown') {
-											userIdDisplay = '系统';
-										}
-										cloned.title = (cloned.title ? `[${userIdDisplay}] ` + cloned.title : `[${userIdDisplay}]`);
-									}
 									merged.push(cloned);
 								});
 							});
