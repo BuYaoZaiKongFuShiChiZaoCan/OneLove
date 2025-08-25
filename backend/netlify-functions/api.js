@@ -38,14 +38,19 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 
-// Changelog模型
+// Changelog模型（与本地后端一致）
+const changelogItemSchema = new mongoose.Schema({
+  itemTime: { type: String, default: '' },
+  itemContent: { type: String, required: true }
+});
+
 const changelogSchema = new mongoose.Schema({
-  title: { type: String, required: true },
-  content: { type: String, required: true },
-  author: { type: String, required: true },
-  timestamp: { type: Date, default: Date.now },
-  version: { type: String },
-  category: { type: String, default: 'general' }
+  version: { type: String, required: true, unique: true },
+  order: { type: Number, default: 0 },
+  time: { type: String, default: '' },
+  content: { type: [changelogItemSchema], default: [] },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now }
 });
 
 const Changelog = mongoose.models.Changelog || mongoose.model('Changelog', changelogSchema);
@@ -154,22 +159,17 @@ app.get('/api/changelog', async (req, res) => {
 
     const limit = parseInt(req.query.limit) || 100;
     const changelogs = await Changelog.find()
-      .sort({ timestamp: -1 })
+      .sort({ order: -1, updatedAt: -1 })
       .limit(limit);
 
-    // 转换数据格式以匹配前端期望
-    const formattedChangelogs = changelogs.map(changelog => ({
-      id: changelog._id,
-      title: changelog.title,
-      content: changelog.content,
-      author: changelog.author,
-      timestamp: changelog.timestamp,
-      version: changelog.version,
-      category: changelog.category,
-      order: changelog.order || 0,
-      time: changelog.time || '',
-      createdAt: changelog.createdAt,
-      updatedAt: changelog.updatedAt
+    const formattedChangelogs = changelogs.map(cl => ({
+      _id: cl._id,
+      version: cl.version,
+      order: typeof cl.order === 'number' ? cl.order : 0,
+      time: cl.time || '',
+      content: Array.isArray(cl.content) ? cl.content : [],
+      createdAt: cl.createdAt,
+      updatedAt: cl.updatedAt
     }));
 
     res.json({
@@ -211,7 +211,7 @@ app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
 
     res.json({
       success: true,
-      data: timelineData.data,
+      data: Array.isArray(timelineData.data) ? timelineData.data : [],
       timestamp: timelineData.timestamp
     });
   } catch (error) {
