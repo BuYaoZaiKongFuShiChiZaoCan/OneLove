@@ -717,6 +717,10 @@
 			font-size: 12px;
 			z-index: 10;
 		}
+
+		/* 防止长文本溢出 */
+		.changelog-item-with-edit > span{display:block;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;max-width:100%}
+		.right,.right .content{min-width:0}
 	</style>
 </head>
 
@@ -1075,10 +1079,19 @@
 					versionLogs = null
 				} = options;
 
+				// 安全兜底
+				const items = Array.isArray(data) ? data : [];
+
 				// 清空容器
 				container.innerHTML = '';
 
-				data.forEach((item, index) => {
+				// 空态
+				if (items.length === 0) {
+					container.innerHTML = '<div style="opacity:.7;padding:8px 0">暂无数据</div>';
+					return;
+				}
+
+				items.forEach((item, index) => {
 					const timelineItem = document.createElement('div');
 					timelineItem.className = 'item';
 					item.id && (timelineItem.id = item.id);
@@ -1092,7 +1105,7 @@
 
 					// 根据不同类型设置图标
 					if (isVersionLog) {
-						const isLastAndExpectNext = index === data.length - 1 && item.version === 'ExpectTheNextVersion';
+						const isLastAndExpectNext = index === items.length - 1 && item.version === 'ExpectTheNextVersion';
 						icon.textContent = isLastAndExpectNext ? '𝕹' : '𝕶';
 					} else {
 						icon.textContent = iconText;
@@ -1124,7 +1137,8 @@
 						// 版本日志使用有序列表
 						const ol = document.createElement('ol');
 
-						item[contentField].forEach((content, index) => {
+						const contents = Array.isArray(item[contentField]) ? item[contentField] : [];
+						contents.forEach((content, index) => {
 							const li = document.createElement('li');
 							li.style.position = 'relative'; // 为编辑按钮定位
 
