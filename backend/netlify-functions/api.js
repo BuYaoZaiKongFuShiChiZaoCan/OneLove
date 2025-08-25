@@ -148,11 +148,20 @@ app.get('/api/test/user', authenticateToken, async (req, res) => {
     res.json({
       success: true,
       data: {
+        // 兼容旧字段
         userId: user._id,
         username: user.username,
         email: user.email,
         role: user.role,
-        isActive: user.isActive
+        isActive: user.isActive,
+        // 前端期望的新结构
+        user: {
+          id: user._id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          isActive: user.isActive
+        }
       }
     });
   } catch (error) {
