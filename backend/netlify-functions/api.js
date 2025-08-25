@@ -253,20 +253,56 @@ app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
 
 		// 开发者可查看所有用户该类型数据
 		if (allUsers === 'true' && (req.user?.role === 'developer' || req.user?.role === 'admin')) {
-			const docs = await TimelineData.find({ type }).sort({ timestamp: -1 }).limit(200);
+			// 兼容旧数据结构：直接查询type字段
+			let docs = await TimelineData.find({ type }).sort({ timestamp: -1 }).limit(200);
+			
+			// 如果没有找到数据，尝试查询兼容的字段名
+			if (docs.length === 0) {
+				const compatibleTypes = {
+					'myPast': 'myPastData',
+					'health': 'healthData',
+					'work': 'workData', 
+					'study': 'studyData'
+				};
+				
+				const compatibleType = compatibleTypes[type];
+				if (compatibleType) {
+					docs = await TimelineData.find({ type: compatibleType }).sort({ timestamp: -1 }).limit(200);
+				}
+			}
+
 			const payload = docs.map(doc => ({
-				userId: doc.userId,
-				data: Array.isArray(doc.data) ? doc.data : (doc.data || []),
-				timestamp: doc.timestamp
+				userId: doc.userId || 'unknown',
+				data: Array.isArray(doc.data) ? doc.data : [doc], // 如果没有data字段，将整个文档作为数据
+				timestamp: doc.timestamp || doc.updatedAt || doc.createdAt
 			}));
+			
 			return res.json({ success: true, data: payload, count: payload.length });
 		}
 
 		// 普通用户：仅返回当前用户的最新一条
-		const timelineData = await TimelineData.findOne({
+		let timelineData = await TimelineData.findOne({
 			userId: req.user.userId,
 			type: type
 		}).sort({ timestamp: -1 });
+
+		// 如果没有找到数据，尝试查询兼容的字段名
+		if (!timelineData) {
+			const compatibleTypes = {
+				'myPast': 'myPastData',
+				'health': 'healthData',
+				'work': 'workData',
+				'study': 'studyData'
+			};
+			
+			const compatibleType = compatibleTypes[type];
+			if (compatibleType) {
+				timelineData = await TimelineData.findOne({
+					userId: req.user.userId,
+					type: compatibleType
+				}).sort({ timestamp: -1 });
+			}
+		}
 
 		if (!timelineData) {
 			return res.json({
@@ -277,10 +313,12 @@ app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
 			});
 		}
 
+		// 返回数据，兼容旧结构
+		const data = Array.isArray(timelineData.data) ? timelineData.data : [timelineData];
 		return res.json({
 			success: true,
-			data: Array.isArray(timelineData.data) ? timelineData.data : (timelineData.data || []),
-			timestamp: timelineData.timestamp
+			data: data,
+			timestamp: timelineData.timestamp || timelineData.updatedAt || timelineData.createdAt
 		});
 	} catch (error) {
 		console.error(`❌ 获取${type}数据错误:`, error);

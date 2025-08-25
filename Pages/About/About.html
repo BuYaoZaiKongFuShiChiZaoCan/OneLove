@@ -909,6 +909,8 @@
 
 					if (result.success) {
 						const payload = result.data;
+						
+						// 处理开发者获取所有用户数据的情况
 						if (isDev && Array.isArray(payload) && payload.length && typeof payload[0] === 'object' && 'userId' in payload[0] && 'data' in payload[0]) {
 							const mine = currentUserId ? payload.find(x => x.userId === currentUserId) : null;
 							if (mine && Array.isArray(mine.data) && mine.data.length) {
@@ -929,12 +931,17 @@
 							return { items: merged, statusText: text };
 						}
 
-						// 开发者但返回空数组（无任何用户数据）
-						if (isDev && Array.isArray(payload) && payload.length === 0) {
-							return { items: [], statusText: '暂无数据（未找到任何用户数据）' };
+						// 处理直接返回数组的情况（新结构）
+						if (Array.isArray(payload)) {
+							if (payload.length === 0) {
+								const text = isDev ? '暂无数据（未找到任何用户数据）' : '暂无数据（您还没有创建记录）';
+								return { items: [], statusText: text };
+							}
+							return { items: payload, statusText: '' };
 						}
 
-						const list = Array.isArray(payload) ? payload : [];
+						// 兼容旧结构：如果payload不是数组，尝试包装成数组
+						const list = Array.isArray(payload) ? payload : [payload];
 						const text = list.length ? '' : '暂无数据（您还没有创建记录）';
 						return { items: list, statusText: text };
 					} else {
