@@ -2376,6 +2376,24 @@
 
 			// 显示添加表单
 			function showAddForm(type) {
+				const isDeveloper = globalUserRole === 'developer' || globalUserRole === 'admin';
+				
+				const timeSection = isDeveloper ? `
+					<div style="margin-bottom: 15px;">
+						<label>时间设置:</label><br>
+						<select id="addTimeSetting" onchange="toggleAddTimeInput()" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 10px;">
+							<option value="auto">自动使用创建时间（UTC+8）</option>
+							<option value="manual">手动设置时间</option>
+						</select>
+						<input type="datetime-local" id="addManualTimeInput" step="1" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; display: none;" placeholder="选择时间">
+					</div>
+				` : `
+					<div style="margin-bottom: 15px;">
+						<label>时间:</label><br>
+						<input type="text" value="自动使用创建时间" disabled style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background-color: #f5f5f5; color: #666;">
+					</div>
+				`;
+
 				const formHtml = `
 					<div id="addFormOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; justify-content: center; align-items: center;">
 						<div style="background: white; padding: 20px; border-radius: 10px; width: 80%; max-width: 500px; max-height: 80vh; overflow-y: auto;">
@@ -2385,10 +2403,7 @@
 									<label>标题:</label><br>
 									<input type="text" id="addTitle" required style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
 								</div>
-								<div style="margin-bottom: 15px;">
-									<label>时间:</label><br>
-									<input type="text" value="自动使用创建时间" disabled style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background-color: #f5f5f5; color: #666;">
-								</div>
+								${timeSection}
 								<div style="margin-bottom: 15px;">
 									<label>内容:</label><br>
 									<textarea id="addContent" required style="width: 100%; height: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" placeholder="请输入内容..."></textarea>
@@ -2425,6 +2440,22 @@
 					e.preventDefault();
 					submitNewItem(type);
 				};
+			}
+
+			// 切换添加表单的时间输入
+			function toggleAddTimeInput() {
+				const timeSetting = document.getElementById('addTimeSetting');
+				const manualTimeInput = document.getElementById('addManualTimeInput');
+				
+				if (timeSetting.value === 'manual') {
+					manualTimeInput.style.display = 'block';
+					// 设置默认值为当前时间
+					const now = new Date();
+					const localTime = new Date(now.getTime() - (now.getTimezoneOffset() * 60000));
+					manualTimeInput.value = localTime.toISOString().slice(0, 19);
+				} else {
+					manualTimeInput.style.display = 'none';
+				}
 			}
 
 			// 显示添加更新日志表单
@@ -2689,17 +2720,36 @@
 						return;
 					}
 
+					// 获取时间设置
+					let customTime = null;
+					const isDeveloper = globalUserRole === 'developer' || globalUserRole === 'admin';
+					if (isDeveloper) {
+						const timeSetting = document.getElementById('addTimeSetting');
+						if (timeSetting && timeSetting.value === 'manual') {
+							const manualTimeInput = document.getElementById('addManualTimeInput');
+							if (manualTimeInput && manualTimeInput.value) {
+								customTime = manualTimeInput.value;
+							}
+						}
+					}
+
 					const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 					const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
 
-					const requestData = {
-						type: type === 'myPastData' ? 'myPast' : 'health',
+					// 构建数据结构，确保与后端期望一致
+					const timelineItem = {
 						title: title,
+						time: customTime || new Date().toISOString(),
 						content: [{
 							itemContent: content
 						}],
 						images: images ? images.split(',').map(url => url.trim()) : [],
 						videos: videos ? videos.split(',').map(url => url.trim()) : []
+					};
+
+					const requestData = {
+						type: type === 'myPastData' ? 'myPast' : 'health',
+						data: [timelineItem] // 确保data是数组
 					};
 
 					const response = await fetch(`${apiBaseUrl}/timeline-data`, {
