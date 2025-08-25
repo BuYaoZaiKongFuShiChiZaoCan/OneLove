@@ -892,15 +892,16 @@
 					const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 					console.log(`[${new Date().toISOString()}] 获取到的token:`, token ? `存在 (${token.length}字符)` : '不存在');
 
-					// 尝试解析token获取用户信息，帮助调试
+					// 解析token获取当前用户ID
+					let currentUserId = null;
 					try {
 						if (token) {
 							const base64Url = token.split('.')[1];
 							const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
 							const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
 							const userInfo = JSON.parse(jsonPayload);
-							console.log(`[${new Date().toISOString()}] 解析token获取的用户信息:`, userInfo);
-							console.log(`[${new Date().toISOString()}] 当前用户ID:`, userInfo.userId || userInfo.id);
+							currentUserId = userInfo.userId || userInfo.id || null;
+							console.log(`[${new Date().toISOString()}] 当前用户ID:`, currentUserId);
 						}
 					} catch (e) {
 						console.error(`[${new Date().toISOString()}] 解析token失败:`, e);
@@ -912,11 +913,34 @@
 					};
 
 					const response = await fetch(url, { headers });
-
 					const result = await response.json();
 
-					if (result.success && result.data) {
-						return result.data;
+					if (result.success) {
+						const payload = result.data;
+						// 开发者 allUsers=true：后端返回 [{userId, data:[...]}, ...]
+						if (isDev && Array.isArray(payload) && payload.length && typeof payload[0] === 'object' && 'userId' in payload[0] && 'data' in payload[0]) {
+							// 优先返回当前用户的数据
+							const mine = currentUserId ? payload.find(x => x.userId === currentUserId) : null;
+							if (mine && Array.isArray(mine.data)) {
+								return mine.data;
+							}
+							// 若当前用户没有数据，则合并所有数据并在标题上标注来源用户
+							const merged = [];
+							payload.forEach(block => {
+								const list = Array.isArray(block.data) ? block.data : [];
+								list.forEach(item => {
+									const cloned = { ...item };
+									if (cloned && typeof cloned === 'object') {
+										cloned.title = (cloned.title ? `[${block.userId}] ` + cloned.title : `[${block.userId}]`);
+									}
+									merged.push(cloned);
+								});
+							});
+							return merged;
+						}
+
+						// 普通用户：后端返回数组或空数组
+						return Array.isArray(payload) ? payload : [];
 					} else {
 						console.error(`[${new Date().toISOString()}] ${type} API返回失败:`, result);
 						throw new Error(`获取${type}数据失败: ${JSON.stringify(result)}`);
