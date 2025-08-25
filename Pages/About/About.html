@@ -1448,7 +1448,7 @@
 				console.log('最终使用token:', token ? `存在 (${token.length}字符)` : '不存在');
 
 				// 清除缓存，确保获取最新的登录状态
-				clearAllCache();
+				// clearAllCache(); // 已删除此函数
 
 				// 第二步：检查用户权限
 				globalUserRole = await getUserRole();
