@@ -174,7 +174,7 @@ app.get('/api/changelog', async (req, res) => {
 
     res.json({
       success: true,
-      data: formattedChangelogs,
+      data: { changelogs: formattedChangelogs },
       message: '获取Changelog成功'
     });
   } catch (error) {
