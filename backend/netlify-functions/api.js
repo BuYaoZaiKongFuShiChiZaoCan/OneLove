@@ -105,6 +105,19 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
+// 角色校验中间件
+function requireDeveloperOrAdmin(req, res, next) {
+  const role = req.user?.role;
+  if (role === 'developer' || role === 'admin') return next();
+  return res.status(403).json({ success: false, message: '需要开发者或管理员权限' });
+}
+
+function requireAdmin(req, res, next) {
+  const role = req.user?.role;
+  if (role === 'admin') return next();
+  return res.status(403).json({ success: false, message: '需要管理员权限' });
+}
+
 // 健康检查
 app.get('/api/health', async (req, res) => {
   console.log('🏥 健康检查请求');
@@ -319,6 +332,190 @@ app.post('/api/auth/login', async (req, res) => {
   } catch (error) {
     console.error('❌ 登录错误:', error);
     res.status(500).json({ success: false, message: '登录失败' });
+  }
+});
+
+// ========== Changelog 写接口 ==========
+// 创建changelog
+app.post('/api/changelog', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
+  try {
+    const dbConnected = await connectDB();
+    if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+    const { version, order = 0, time = '', content = [] } = req.body || {};
+    if (!version) return res.status(400).json({ success: false, message: 'version 必填' });
+
+    const created = await Changelog.create({ version, order, time, content: Array.isArray(content) ? content : [] });
+    return res.json({ success: true, data: created });
+  } catch (error) {
+    console.error('❌ 创建changelog失败:', error);
+    return res.status(500).json({ success: false, message: '创建失败' });
+  }
+});
+
+// 添加子项
+app.post('/api/changelog/:id/items', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
+  try {
+    const dbConnected = await connectDB();
+    if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+    const { id } = req.params;
+    const { itemTime = '', itemContent = '' } = req.body || {};
+    if (!itemContent) return res.status(400).json({ success: false, message: 'itemContent 必填' });
+
+    const doc = await Changelog.findById(id);
+    if (!doc) return res.status(404).json({ success: false, message: '版本不存在' });
+
+    doc.content = Array.isArray(doc.content) ? doc.content : [];
+    doc.content.push({ itemTime, itemContent });
+    doc.updatedAt = new Date();
+    await doc.save();
+
+    return res.json({ success: true, data: doc });
+  } catch (error) {
+    console.error('❌ 添加changelog子项失败:', error);
+    return res.status(500).json({ success: false, message: '添加失败' });
+  }
+});
+
+// 删除子项
+app.delete('/api/changelog/:id/items/:index', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
+  try {
+    const dbConnected = await connectDB();
+    if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+    const { id, index } = req.params;
+    const idx = Number(index);
+
+    const doc = await Changelog.findById(id);
+    if (!doc) return res.status(404).json({ success: false, message: '版本不存在' });
+
+    doc.content = Array.isArray(doc.content) ? doc.content : [];
+    if (idx < 0 || idx >= doc.content.length) {
+      return res.status(400).json({ success: false, message: '索引无效' });
+    }
+    doc.content.splice(idx, 1);
+    doc.updatedAt = new Date();
+    await doc.save();
+
+    return res.json({ success: true, data: doc });
+  } catch (error) {
+    console.error('❌ 删除changelog子项失败:', error);
+    return res.status(500).json({ success: false, message: '删除失败' });
+  }
+});
+
+// ========== Auth 扩展 ==========
+const SALT_ROUNDS = 10;
+
+// 注册
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const dbConnected = await connectDB();
+    if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+    const { username, email, password, role = 'user' } = req.body || {};
+    if (!username || !email || !password) return res.status(400).json({ success: false, message: '必填项缺失' });
+
+    const exists = await User.findOne({ $or: [{ username }, { email }] });
+    if (exists) return res.status(409).json({ success: false, message: '用户名或邮箱已存在' });
+
+    const hashed = await bcrypt.hash(password, SALT_ROUNDS);
+    const created = await User.create({ username, email, password: hashed, role });
+
+    return res.json({ success: true, data: { id: created._id, username, email, role: created.role } });
+  } catch (error) {
+    console.error('❌ 注册失败:', error);
+    return res.status(500).json({ success: false, message: '注册失败' });
+  }
+});
+
+// 登出（前端删除token即可，这里返回成功）
+app.post('/api/auth/logout', authenticateToken, async (req, res) => {
+  return res.json({ success: true, message: '已登出' });
+});
+
+// 更新个人资料
+app.put('/api/auth/profile', authenticateToken, async (req, res) => {
+  try {
+    const dbConnected = await connectDB();
+    if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+    const { username, email } = req.body || {};
+    const updates = {};
+    if (username) updates.username = username;
+    if (email) updates.email = email;
+
+    const updated = await User.findByIdAndUpdate(req.user.userId, updates, { new: true });
+    return res.json({ success: true, data: { id: updated._id, username: updated.username, email: updated.email, role: updated.role } });
+  } catch (error) {
+    console.error('❌ 更新资料失败:', error);
+    return res.status(500).json({ success: false, message: '更新失败' });
+  }
+});
+
+// 修改密码
+app.put('/api/auth/password', authenticateToken, async (req, res) => {
+  try {
+    const dbConnected = await connectDB();
+    if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+    const { oldPassword, newPassword } = req.body || {};
+    if (!oldPassword || !newPassword) return res.status(400).json({ success: false, message: '缺少旧/新密码' });
+
+    const user = await User.findById(req.user.userId);
+    if (!user) return res.status(404).json({ success: false, message: '用户不存在' });
+
+    const ok = await user.comparePassword(oldPassword);
+    if (!ok) return res.status(401).json({ success: false, message: '旧密码不正确' });
+
+    user.password = await bcrypt.hash(newPassword, SALT_ROUNDS);
+    await user.save();
+
+    return res.json({ success: true, message: '密码已更新' });
+  } catch (error) {
+    console.error('❌ 修改密码失败:', error);
+    return res.status(500).json({ success: false, message: '修改失败' });
+  }
+});
+
+// 忘记密码（占位实现）
+app.post('/api/auth/forgot-password', async (req, res) => {
+  return res.json({ success: true, message: '如果邮箱存在，将发送重置说明（占位）' });
+});
+
+// 重置密码（占位实现）
+app.post('/api/auth/reset-password', async (req, res) => {
+  return res.json({ success: true, message: '密码已重置（占位）' });
+});
+
+// ========== Users 基本接口 ==========
+// 列表
+app.get('/api/users', async (req, res) => {
+  try {
+    const dbConnected = await connectDB();
+    if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+    const users = await User.find({}, { username: 1, email: 1, role: 1, isActive: 1, createdAt: 1 });
+    return res.json({ success: true, data: users });
+  } catch (error) {
+    console.error('❌ 获取用户列表失败:', error);
+    return res.status(500).json({ success: false, message: '获取失败' });
+  }
+});
+
+// 详情
+app.get('/api/users/:id', async (req, res) => {
+  try {
+    const dbConnected = await connectDB();
+    if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+    const user = await User.findById(req.params.id, { username: 1, email: 1, role: 1, isActive: 1, createdAt: 1 });
+    if (!user) return res.status(404).json({ success: false, message: '用户不存在' });
+    return res.json({ success: true, data: user });
+  } catch (error) {
+    console.error('❌ 获取用户详情失败:', error);
+    return res.status(500).json({ success: false, message: '获取失败' });
   }
 });
 
