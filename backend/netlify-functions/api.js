@@ -267,12 +267,28 @@ app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
 				
 				const compatibleType = compatibleTypes[type];
 				if (compatibleType) {
-					docs = await TimelineData.find({ type: compatibleType }).sort({ timestamp: -1 }).limit(200);
+					docs = await TimelineData.find({ type: compatibleType }).limit(200);
 				}
 			}
 
+			// 按time字段排序（如果有的话），否则按时间戳排序
+			docs.sort((a, b) => {
+				// 优先按time字段排序（字符串格式的日期）
+				if (a.time && b.time) {
+					const timeA = new Date(a.time);
+					const timeB = new Date(b.time);
+					if (!isNaN(timeA.getTime()) && !isNaN(timeB.getTime())) {
+						return timeB - timeA; // 降序，最新的在前面
+					}
+				}
+				// 备用排序：按时间戳
+				const timestampA = a.timestamp || a.updatedAt || a.createdAt;
+				const timestampB = b.timestamp || b.updatedAt || b.createdAt;
+				return new Date(timestampB) - new Date(timestampA);
+			});
+
 			const payload = docs.map(doc => ({
-				userId: doc.userId || 'unknown',
+				userId: doc.userId || 'system', // 使用'system'而不是'unknown'
 				data: Array.isArray(doc.data) ? doc.data : [doc], // 如果没有data字段，将整个文档作为数据
 				timestamp: doc.timestamp || doc.updatedAt || doc.createdAt
 			}));
@@ -301,6 +317,29 @@ app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
 					userId: req.user.userId,
 					type: compatibleType
 				}).sort({ timestamp: -1 });
+			}
+		}
+
+		// 如果还是没找到，尝试查找没有userId的系统数据
+		if (!timelineData) {
+			const compatibleTypes = {
+				'myPast': 'myPastData',
+				'health': 'healthData',
+				'work': 'workData',
+				'study': 'studyData'
+			};
+			
+			const compatibleType = compatibleTypes[type];
+			if (compatibleType) {
+				// 查找没有userId的系统数据，按time字段排序
+				const systemData = await TimelineData.find({ 
+					type: compatibleType,
+					userId: { $exists: false }
+				}).sort({ time: -1 }).limit(1);
+				
+				if (systemData.length > 0) {
+					timelineData = systemData[0];
+				}
 			}
 		}
 
