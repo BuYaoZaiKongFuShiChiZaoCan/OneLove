@@ -400,6 +400,47 @@ app.post('/api/timeline-data', authenticateToken, async (req, res) => {
 	}
 });
 
+// 删除 Timeline 数据
+app.delete('/api/timeline-data/:id', authenticateToken, async (req, res) => {
+	try {
+		const dbConnected = await connectDB();
+		if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+		const { id } = req.params;
+		if (!id) {
+			return res.status(400).json({ success: false, message: '缺少项目ID' });
+		}
+
+		// 权限：普通用户只能删除自己的数据；开发者/管理员可删除任意数据
+		const isPrivileged = req.user?.role === 'developer' || req.user?.role === 'admin';
+		
+		if (isPrivileged) {
+			// 开发者/管理员可以删除任意数据
+			const deletedDoc = await TimelineData.findByIdAndDelete(id);
+			if (!deletedDoc) {
+				return res.status(404).json({ success: false, message: '项目不存在' });
+			}
+			return res.json({ success: true, message: '删除成功' });
+		} else {
+			// 普通用户只能删除自己的数据
+			const doc = await TimelineData.findById(id);
+			if (!doc) {
+				return res.status(404).json({ success: false, message: '项目不存在' });
+			}
+			
+			if (doc.userId !== req.user.userId) {
+				return res.status(403).json({ success: false, message: '权限不足，只能删除自己的数据' });
+			}
+			
+			await TimelineData.findByIdAndDelete(id);
+			return res.json({ success: true, message: '删除成功' });
+		}
+	} catch (error) {
+		console.error('❌ 删除Timeline数据失败:', error);
+		return res.status(500).json({ success: false, message: '删除失败' });
+	}
+});
+
 // 用户登录
 app.post('/api/auth/login', async (req, res) => {
 	console.log('🔐 登录请求开始');

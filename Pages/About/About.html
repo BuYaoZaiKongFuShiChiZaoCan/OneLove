@@ -906,19 +906,19 @@
 						
 						// 处理开发者获取所有用户数据的情况
 						if (isDev && Array.isArray(payload) && payload.length && typeof payload[0] === 'object' && 'userId' in payload[0] && 'data' in payload[0]) {
-							const mine = currentUserId ? payload.find(x => x.userId === currentUserId) : null;
-							if (mine && Array.isArray(mine.data) && mine.data.length) {
-								return { items: mine.data, statusText: '' };
-							}
 							const merged = [];
 							payload.forEach(block => {
 								const list = Array.isArray(block.data) ? block.data : [];
 								list.forEach(item => {
 									const cloned = { ...item };
+									// 为开发者添加用户标识信息
+									cloned._userIdentifier = block.userId || 'unknown';
 									merged.push(cloned);
 								});
 							});
-							const text = merged.length ? '显示汇总数据（未找到本人数据）' : '暂无数据（未找到任何用户数据）';
+							
+							// 开发者总是返回所有数据，不管自己有没有数据
+							const text = merged.length ? `显示所有用户数据 (共${merged.length}条)` : '暂无数据（未找到任何用户数据）';
 							return { items: merged, statusText: text };
 						}
 
@@ -1134,7 +1134,16 @@
 
 					// 创建标题
 					const h4 = document.createElement('h4');
-					h4.textContent = item[titleField];
+					
+					// 为开发者显示用户标识
+					let titleText = item[titleField];
+					if (globalUserRole === 'developer' || globalUserRole === 'admin') {
+						if (item._userIdentifier && item._userIdentifier !== 'unknown') {
+							titleText = `[${item._userIdentifier}] ${titleText}`;
+						}
+					}
+					
+					h4.textContent = titleText;
 
 					const timeSpan = document.createElement('span');
 					timeSpan.className = 'itemTime';
@@ -2198,6 +2207,13 @@
 							const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 							const apiBaseUrl = window.OneLoveConfig?.apiBaseUrl || '/api';
 
+							// 确保有有效的item ID
+							if (!item || !item._id) {
+								console.error('删除失败: 无效的item ID', item);
+								alert('删除失败: 无效的项目ID');
+								return;
+							}
+
 							// 根据容器类型确定删除的API端点
 							let deleteUrl;
 							if (containerId === 'versionLogContainer') {
@@ -2205,6 +2221,8 @@
 							} else {
 								deleteUrl = `${apiBaseUrl}/timeline-data/${item._id}`;
 							}
+
+							console.log('删除URL:', deleteUrl);
 
 							const response = await fetch(deleteUrl, {
 								method: 'DELETE',
