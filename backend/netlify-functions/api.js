@@ -553,4 +553,123 @@ app.get('/api/userdata/stats', authenticateToken, async (req, res) => {
   }
 });
 
+// ========== UserData 密码/手机 CRUD 与查询（占位实现） ==========
+// 密码列表
+app.get('/api/userdata/passwords', authenticateToken, async (req, res) => {
+  return res.json({ success: true, data: [] });
+});
+// 密码查询
+app.get('/api/userdata/passwords/query', authenticateToken, async (req, res) => {
+  return res.json({ success: true, data: [] });
+});
+// 新增密码
+app.post('/api/userdata/passwords', authenticateToken, async (req, res) => {
+  return res.json({ success: true, data: { id: 'placeholder', ...req.body } });
+});
+// 更新密码
+app.put('/api/userdata/passwords/:id', authenticateToken, async (req, res) => {
+  return res.json({ success: true, data: { id: req.params.id, ...req.body } });
+});
+// 删除密码
+app.delete('/api/userdata/passwords/:id', authenticateToken, async (req, res) => {
+  return res.json({ success: true, message: 'deleted' });
+});
+// 通过分类名删除密码
+app.delete('/api/userdata/passwords/category/:category', authenticateToken, async (req, res) => {
+  return res.json({ success: true, message: 'deleted by category', category: req.params.category });
+});
+
+// 手机列表
+app.get('/api/userdata/phones', authenticateToken, async (req, res) => {
+  return res.json({ success: true, data: [] });
+});
+// 新增手机
+app.post('/api/userdata/phones', authenticateToken, async (req, res) => {
+  return res.json({ success: true, data: { id: 'placeholder', ...req.body } });
+});
+// 更新手机
+app.put('/api/userdata/phones/:id', authenticateToken, async (req, res) => {
+  return res.json({ success: true, data: { id: req.params.id, ...req.body } });
+});
+// 删除手机
+app.delete('/api/userdata/phones/:id', authenticateToken, async (req, res) => {
+  return res.json({ success: true, message: 'deleted' });
+});
+
+// ========== Admin 管理端（占位实现，需更细权限时可切换为 requireAdmin） ==========
+// 管理用户列表
+app.get('/api/admin/users', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
+  return res.json({ success: true, data: [] });
+});
+// 管理查看全部密码
+app.get('/api/admin/passwords', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
+  return res.json({ success: true, data: [] });
+});
+// 管理查看全部手机
+app.get('/api/admin/phones', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
+  return res.json({ success: true, data: [] });
+});
+// 管理删除任意密码
+app.delete('/api/admin/passwords/:id', authenticateToken, requireAdmin, async (req, res) => {
+  return res.json({ success: true, message: 'admin deleted password', id: req.params.id });
+});
+// 管理删除任意手机
+app.delete('/api/admin/phones/:id', authenticateToken, requireAdmin, async (req, res) => {
+  return res.json({ success: true, message: 'admin deleted phone', id: req.params.id });
+});
+// 管理更新用户角色
+app.put('/api/admin/users/:id/role', authenticateToken, requireAdmin, async (req, res) => {
+  return res.json({ success: true, message: 'role updated (placeholder)', id: req.params.id, role: req.body?.role || 'user' });
+});
+// 管理禁用/启用用户
+app.put('/api/admin/users/:id/status', authenticateToken, requireAdmin, async (req, res) => {
+  return res.json({ success: true, message: 'status updated (placeholder)', id: req.params.id, isActive: !!req.body?.isActive });
+});
+
+// ========== 数据迁移/导出导入/备份恢复/访问日志（占位实现） ==========
+// 迁移密码
+app.post('/api/migrate/passwords', authenticateToken, async (req, res) => {
+  return res.json({ success: true, message: 'passwords migrated (placeholder)' });
+});
+// 迁移手机
+app.post('/api/migrate/phones', authenticateToken, async (req, res) => {
+  return res.json({ success: true, message: 'phones migrated (placeholder)' });
+});
+// 导出用户数据
+app.get('/api/userdata/export', authenticateToken, async (req, res) => {
+  return res.json({ success: true, data: { passwords: [], phones: [] } });
+});
+// 导入用户数据
+app.post('/api/userdata/import', authenticateToken, async (req, res) => {
+  return res.json({ success: true, message: 'imported (placeholder)' });
+});
+// 备份历史
+app.get('/api/userdata/backups', authenticateToken, async (req, res) => {
+  return res.json({ success: true, data: [] });
+});
+// 创建备份
+app.post('/api/userdata/backup', authenticateToken, async (req, res) => {
+  return res.json({ success: true, message: 'backup created (placeholder)', id: 'backup-id' });
+});
+// 备份详情
+app.get('/api/userdata/backup/:backupId', authenticateToken, async (req, res) => {
+  return res.json({ success: true, data: { id: req.params.backupId, items: [] } });
+});
+// 恢复备份
+app.post('/api/userdata/restore/:backupId', authenticateToken, async (req, res) => {
+  return res.json({ success: true, message: 'restored (placeholder)', id: req.params.backupId });
+});
+// 删除备份
+app.delete('/api/userdata/backup/:backupId', authenticateToken, async (req, res) => {
+  return res.json({ success: true, message: 'backup deleted (placeholder)', id: req.params.backupId });
+});
+// 访问日志
+app.get('/api/userdata/access-logs', authenticateToken, async (req, res) => {
+  return res.json({ success: true, data: [] });
+});
+// 访问统计
+app.get('/api/userdata/access-stats', authenticateToken, async (req, res) => {
+  return res.json({ success: true, data: { total: 0 } });
+});
+
 module.exports.handler = serverless(app);
