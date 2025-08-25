@@ -519,4 +519,29 @@ app.get('/api/users/:id', async (req, res) => {
   }
 });
 
+// ========== UserData 统计（占位实现，避免404） ==========
+app.get('/api/userdata/stats', authenticateToken, async (req, res) => {
+  try {
+    const dbConnected = await connectDB();
+    if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+    const user = await User.findById(req.user.userId);
+    if (!user) return res.status(404).json({ success: false, message: '用户不存在' });
+
+    // 占位统计，后续可接入真实 passwords/phones/backups 集合
+    const stats = {
+      passwords: 0,
+      phones: 0,
+      backups: 0,
+      accessLogs: 0,
+      lastLogin: user.lastLogin || null
+    };
+
+    return res.json({ success: true, data: stats });
+  } catch (error) {
+    console.error('❌ 获取用户数据统计失败:', error);
+    return res.status(500).json({ success: false, message: '统计失败' });
+  }
+});
+
 module.exports.handler = serverless(app);
