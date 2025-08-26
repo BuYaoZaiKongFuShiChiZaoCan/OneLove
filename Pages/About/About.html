@@ -498,6 +498,7 @@
 		}
 
 		.timeline .item .right {
+			display: inline-table;
 			width: 100%;
 			text-align: justify;
 			background: white;
@@ -506,7 +507,8 @@
 
 		.timeline .item .right h4 {
 			display: flex;
-			flex-wrap: nowrap;
+			flex-wrap: wrap;
+			/* 允许标题换行，避免溢出 */
 			flex-direction: row;
 			align-items: center;
 			justify-content: space-between;
@@ -521,6 +523,17 @@
 
 		.timeline .item .right h4 span {
 			margin-left: 2em;
+		}
+
+		/* 处理标题过长导致溢出的问题 */
+		.timeline .item .right h4 {
+			word-break: break-word;
+			overflow-wrap: anywhere;
+		}
+
+		.timeline .item .right h4 .itemTime {
+			flex-shrink: 0;
+			margin-left: auto;
 		}
 
 		.timeline .item .right .content {
@@ -599,35 +612,55 @@
 
 		/* 响应式设计 */
 		@media (max-width: 768px) {
+			/* 顶部头像、跑马灯在移动端自适应 */
+			header a img {
+				width: min(40vw, 260px) !important;
+				height: auto !important;
+			}
+			
+			body {
+				font-size: 16px;
+			}
+			
 			article {
 				margin: 20px;
+				min-width: 400px;
+				padding: 0 40px;
 			}
 
 			.timeline {
-				padding: 10px;
+				padding: 10px 0;
 			}
 
-			.timeline::before {
-				left: 30px;
+			.timeline .item .left .icon {
+				font-size: 32px;
+				line-height: 1;
+				position: sticky;
+				top: 0;
+				z-index: 10;
 			}
 
-			.timeline .item {
-				flex-direction: column;
-				align-items: center;
-				text-align: center;
+			.timeline .item .right {
+				display: block;
+				grid-column: 2;
+				border-radius: 12px;
+				overflow: hidden;
 			}
 
-			.timeline .left {
-				margin-right: 0;
-				margin-bottom: 15px;
-				width: 60px;
-				height: 60px;
+			.timeline .item .right h4 {
+				position: sticky;
+				top: 0;
+				z-index: 10;
+			}
+
+			article>h3 {
+				width: 100%;
 				font-size: 20px;
+				padding: 0 8px;
 			}
 
-			.timeline .right h4 {
-				flex-direction: column;
-				gap: 10px;
+			article .content {
+				padding: 0 8px;
 			}
 
 			.timeline .images {
@@ -636,6 +669,147 @@
 
 			.timeline .videos {
 				grid-template-columns: 1fr;
+			}
+
+			/* 媒体显示在移动端占满宽度 */
+			.timeline .item .right .content video {
+				width: 100% !important;
+				height: auto !important;
+			}
+
+			.timeline .item .right .images img {
+				max-width: 100% !important;
+				max-height: 60vh !important;
+			}
+
+			.scroll-indicator {
+				width: 44px;
+				height: 44px;
+				right: 12px;
+				bottom: 12px;
+			}
+
+			/* 所有文本均可换行，避免溢出 */
+			.timeline .item .right .content p,
+			.timeline .item .right .content li,
+			.timeline .item .right .content span,
+			.parsed-content {
+				word-break: break-word;
+				overflow-wrap: anywhere;
+				line-height: 1.7;
+			}
+		}
+
+		/* 更小屏幕进一步优化 */
+		@media (max-width: 480px) {
+			header {
+				padding: 20px 0;
+			}
+
+			article {
+				margin: 16px;
+			}
+
+			.timeline .item {
+				margin-top: 22px;
+			}
+
+			.timeline .item .right {
+				padding: 0;
+			}
+
+			.timeline .item .right h4 {
+				padding: 8px;
+				font-size: 16px;
+			}
+
+			.timeline .item .right .content {
+				margin: 8px;
+			}
+
+			.Ttime,
+			.itemTime {
+				min-width: auto;
+				font-size: 0.9em;
+			}
+
+			button {
+				width: auto;
+				height: auto;
+				padding: 6px 10px;
+			}
+		}
+
+		/* 平板等常见分辨率（如 iPad、Surface） */
+		@media (max-width: 1024px) {
+			body {
+				font-size: 17px;
+			}
+
+			.timeline {
+				padding: 12px;
+			}
+
+			.timeline .item .left .icon {
+				font-size: 44px;
+				position: sticky;
+				top: 0;
+				z-index: 10;
+			}
+
+			.timeline .item .right .images img {
+				max-height: 70vh;
+			}
+		}
+
+		/* 小屏常见宽度（iPhone 12/13/14/15、部分安卓 390~430） */
+		@media (max-width: 430px) {
+			body {
+				font-size: 15px;
+			}
+
+			article {
+				margin: 14px;
+			}
+
+			header a img {
+				width: 70vw !important;
+			}
+
+			.timeline .item .right h4 {
+				font-size: 15px;
+			}
+
+			.timeline .item .right .content {
+				margin: 6px;
+			}
+
+			button {
+				padding: 6px 10px;
+			}
+		}
+
+		/* 超小屏（老机型 320~360） */
+		@media (max-width: 360px) {
+			body {
+				font-size: 14px;
+			}
+
+			article {
+				margin: 12px;
+			}
+
+			.timeline .item {
+				margin-top: 18px;
+			}
+
+			.timeline .item .right h4 {
+				font-size: 14px;
+				padding: 6px;
+			}
+
+			button {
+				padding: 5px 8px;
 			}
 		}
 
@@ -719,16 +893,36 @@
 		}
 
 		/* 防止长文本溢出 */
-		.changelog-item-with-edit > span{display:block;white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;max-width:100%}
-		.right,.right .content{min-width:0}
-		.timeline-empty{opacity:.75;padding:8px 0;color:#9aa3ab}
+		.changelog-item-with-edit>span {
+			display: block;
+			white-space: pre-wrap;
+			overflow-wrap: anywhere;
+			word-break: break-word;
+			max-width: 100%
+		}
+
+		.right,
+		.right .content {
+			min-width: 0
+		}
+
+		.timeline-empty {
+			opacity: .75;
+			padding: 8px 0;
+			color: #9aa3ab;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			flex-wrap: wrap
+		}
 	</style>
 </head>
 
 <body>
 	<header>
 		<a href="../../index.html">
-			<img src="../../images/logo.png" alt="" style="border-radius: 50%; width: 360px; height: 360px; object-fit: cover;">
+			<img src="../../images/logo.png" alt=""
+				style="border-radius: 50%; width: 360px; height: 360px; object-fit: cover;">
 		</a>
 		<div>
 			<h3>关于</h3>
@@ -762,7 +956,8 @@
 						我个人认为这个意大利面就应该拌42号混凝土，因为这个螺丝钉的长度，它很容易会直接影响到挖掘机的扭矩，你知道吧?你往里砸的时候，一瞬间它就会产生大量的高能蛋白，俗称UFO，
 						会严重影响经济的发展，甚至对这个太平洋以及充电器都会造成一定的核污染
 					</div>
-					<video src="./mp4/卧龙凤雏.mp4" height="600vh" controls preload="metadata"></video><!-- metadata仅加载元数据 -->
+					<video src="./mp4/卧龙凤雏.mp4" height="600vh" controls
+						preload="metadata"></video><!-- metadata仅加载元数据 -->
 					<div>看完视频，大家应该懂什么叫爱情了吧(*^▽^*)</div>
 				</details>
 			</div>
@@ -776,7 +971,8 @@
 		<!-- 时间轴 -->
 		<h3 id="MyPast">. My past .</h3>
 		<div style="text-align: right; margin-bottom: 10px;">
-			<button id="addMyPastBtn" style="display: none; background: #16A085; color: white; border: none; box-sizing: content-box; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
+			<button id="addMyPastBtn"
+				style="display: none; background: #16A085; color: white; border: none; box-sizing: content-box; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
 				➕ 添加新项目
 			</button>
 		</div>
@@ -786,7 +982,8 @@
 		<!-- 汉子调经 - E6KB -->
 		<h3 id="汉子调经">. 调经 .</h3>
 		<div style="text-align: right; margin-bottom: 10px;">
-			<button id="addHealthBtn" style="display: none; background: #16A085; color: white; border: none; box-sizing: content-box; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
+			<button id="addHealthBtn"
+				style="display: none; background: #16A085; color: white; border: none; box-sizing: content-box; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
 				➕ 添加新项目
 			</button>
 		</div>
@@ -796,7 +993,8 @@
 		<!-- 历史更新 -->
 		<h3 id="更新日志">. 更新日志 .</h3>
 		<div style="text-align: right; margin-bottom: 10px;">
-			<button id="addChangelogBtn" style="display: none; background: #16A085; color: white; border: none; box-sizing: content-box; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
+			<button id="addChangelogBtn"
+				style="display: none; background: #16A085; color: white; border: none; box-sizing: content-box; padding: 8px 16px; border-radius: 5px; cursor: pointer;">
 				➕ 添加新版本
 			</button>
 		</div>
@@ -883,6 +1081,11 @@
 					const token = localStorage.getItem('token') || sessionStorage.getItem('token');
 					console.log(`[${new Date().toISOString()}] 获取到的token:`, token ? `存在 (${token.length}字符)` : '不存在');
 
+					// 未登录时，跳过需要鉴权的数据请求，避免401报错
+					if (!token && (type === 'myPast' || type === 'health')) {
+						return { items: [], statusText: '请登录后查看' };
+					}
+
 					let currentUserId = null;
 					try {
 						if (token) {
@@ -903,7 +1106,7 @@
 
 					if (result.success) {
 						const payload = result.data;
-						
+
 						// 处理开发者获取所有用户数据的情况
 						if (isDev && Array.isArray(payload) && payload.length && typeof payload[0] === 'object' && 'userId' in payload[0] && 'data' in payload[0]) {
 							const merged = [];
@@ -916,7 +1119,7 @@
 									merged.push(cloned);
 								});
 							});
-							
+
 							// 开发者总是返回所有数据，不管自己有没有数据
 							const text = merged.length ? `显示所有用户数据 (共${merged.length}条)` : '暂无数据（未找到任何用户数据）';
 							return { items: merged, statusText: text };
@@ -1102,7 +1305,16 @@
 				container.innerHTML = '';
 				if (items.length === 0) {
 					const text = statusText || '暂无数据';
-					container.innerHTML = `<div class="timeline-empty">${text}</div>`;
+					if (text.includes('请登录')) {
+						container.innerHTML = `
+							<div class="timeline-empty">${text}
+								<button id="goLoginBtn" style="margin-left:12px;background:#16A085;color:#fff;border:none;padding:4px 10px;border-radius:4px;cursor:pointer">去登录</button>
+							</div>`;
+						const btn = container.querySelector('#goLoginBtn');
+						if (btn) btn.onclick = () => { window.location.href = '/Pages/login.html'; };
+					} else {
+						container.innerHTML = `<div class="timeline-empty">${text}</div>`;
+					}
 					return;
 				}
 
@@ -1134,7 +1346,7 @@
 
 					// 创建标题
 					const h4 = document.createElement('h4');
-					
+
 					// 为开发者显示用户标识
 					let titleText = item[titleField];
 					if (globalUserRole === 'developer' || globalUserRole === 'admin') {
@@ -1142,7 +1354,7 @@
 							titleText = `[${item._userIdentifier}] ${titleText}`;
 						}
 					}
-					
+
 					h4.textContent = titleText;
 
 					const timeSpan = document.createElement('span');
@@ -2395,7 +2607,7 @@
 			// 显示添加表单
 			function showAddForm(type) {
 				const isDeveloper = globalUserRole === 'developer' || globalUserRole === 'admin';
-				
+
 				const timeSection = isDeveloper ? `
 					<div style="margin-bottom: 15px;">
 						<label>时间设置:</label><br>
@@ -2464,7 +2676,7 @@
 			function toggleAddTimeInput() {
 				const timeSetting = document.getElementById('addTimeSetting');
 				const manualTimeInput = document.getElementById('addManualTimeInput');
-				
+
 				if (timeSetting.value === 'manual') {
 					manualTimeInput.style.display = 'block';
 					// 设置默认值为当前时间
