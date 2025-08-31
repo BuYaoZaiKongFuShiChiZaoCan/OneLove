@@ -814,7 +814,7 @@ main#main-body #Center #audioMvPanel video {
 }
 
 main#main-body #Center #audioMvPanel .audioMvTitle {
-    opacity: 0.05;
+    opacity: 0;
     padding: 10px;
     color: wheat;
     transition: opacity 0.315s;
@@ -1048,7 +1048,7 @@ main#main-body #sidePanel #cbThree .setTime {
     text-align: center;
     width: 180px;
     position: absolute;
-    top: 50px;
+    top: 52px;
     left: 100px;
     background: aliceblue;
     transform: scale(0);
