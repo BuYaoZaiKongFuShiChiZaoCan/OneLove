@@ -595,17 +595,6 @@
 			justify-content: flex-end;
 		}
 
-		.timeline-actions {
-			background: rgba(52, 152, 219, 0.8);
-			border: none;
-			padding: 5px 10px;
-			border-radius: 5px;
-			cursor: pointer;
-			font-size: 12px;
-			width: auto;
-			height: auto;
-		}
-
 		.timeline-actions :last-child {
 			background: rgba(231, 76, 60, 0.8);
 		}
@@ -655,7 +644,7 @@
 			}
 
 			article>h3 {
-				width: 100%;
+				min-width: 40%;
 				font-size: 20px;
 				padding: 0 8px;
 			}
@@ -690,6 +679,10 @@
 				bottom: 12px;
 			}
 
+			.changelog-item-with-edit {
+				display:list-item;
+			}
+
 			/* 所有文本均可换行，避免溢出 */
 			.timeline .item .right .content p,
 			.timeline .item .right .content li,
@@ -698,6 +691,10 @@
 				word-break: break-word;
 				overflow-wrap: anywhere;
 				line-height: 1.7;
+			}
+
+			.timeline .item .left {
+				margin-right: 1rem;
 			}
 		}
 

@@ -17,7 +17,7 @@
 	<div id="userInfoSettingPage">
 		<!-- 未来此处数据从服务器获取，所有所属本公司用户注册均需从本站专属页面注册，中国公民以身份证号码进行注册，为每个注册用户唯一ID，注册后自动生成用户唯一标识符，以标识符用于后续数据关联，身份证号码以国家使用为准，标识符为用户注册账号，账号 -->
 		<!-- 有些因素比如是后天改变的，或者家族遗传的，先天性的等等 -->
-		<div>姓名：Qi.</div>
+		<div>姓名：J</div>
 		<div id="year">年龄：...</div>
 		<script>
 			// const birthDate = new Date('2004-04-22'); // 假设出生日期为2002年1月1日
@@ -32,7 +32,8 @@
 
 
 			// 计算年龄精确到秒显示出来是也是精确到秒
-			const birthDate = new Date('2004-04-22 18:05:20');
+			const birthDate = new Date('2004-10-18 13:14:52');
+			// const birthDate = new Date('2004-04-22 18:05:20');
 			setAge();
 			function setAge() {
 				const today = new Date();
@@ -44,31 +45,34 @@
 				// ageInSeconds转换格式
 				const ageInSecondsFormat = new Date(ageInSeconds * 1000).toISOString().substr(11, 8);
 
-				document.getElementById('year').textContent = `年龄：${age}岁 第${days}天(${ageInSecondsFormat})`;
+				document.getElementById('year').textContent = `年龄：${age}岁的 第${days}天(${ageInSecondsFormat})`;
 				// document.getElementById('birthday').textContent = `生日：${birthDate.toLocaleDateString()}`;
 			}
 			setInterval(() => {
 				setAge();
 			}, 6000); // 每秒更新一次
 		</script>
-		<div>性别：男</div>
+		<div>性别：女</div>
 		<div>身高：日均168CM</div>
 		<div>体重：日均48kg</div>
-		<div>BMI：</div><!-- B.J. Devine理想体重公式：
+		<div>BMI：</div>
+		<!-- B.J. Devine理想体重公式：
 		BMI = 体重（公斤）÷ 身高（米）²
 		
-女生理想体重（公斤） ： = 45.5 + 2.3 * (身高[cm] - 60)
-男生理想体重（公斤） ： = 50 + 2.3 * (身高[cm] - 60)
-
-正常/健康的BMI体重指数范围通常在18.5至24.9之间.
- -->
+		女生理想体重（公斤） ： = 45.5 + 2.3 * (身高[cm] - 60)
+		男生理想体重（公斤） ： = 50 + 2.3 * (身高[cm] - 60)
+		
+		正常/健康的BMI体重指数范围通常在18.5至24.9之间.
+		-->
+		<div>体脂率</div>
+		<div>三围：</div>
 		<div>穿搭：休闲装、正装、日常装、约会装、聚会装...</div><!-- 2025/7/6 昨晚跟尚宏伟出去玩，他给我他的一套穿搭感觉确实有时候也应该注意一下吧 -->
 		<div>骨骼</div>
 		<div>红细胞</div>
 		<div>白细胞</div>
 		<div>血小板</div>
 		<!-- 下面版块为不同性别展示不同性别人群的一些个性状态 -->
-		<div id="genderSpecificInfo">
+		<!-- <div id="genderSpecificInfo">
 			<div>男：
 				前列腺
 				睾丸：左、右
@@ -83,10 +87,10 @@
 			<div>双性偏男：</div>
 			<div>双性偏女：</div>
 			<div>双性不明显（无性别）：</div>
-		</div>
+		</div> -->
 		<!-- 身体状态信息 -->
 		<!-- 上面是不会频繁变更的信息，下面是一些频繁变更，实时的一些信息，后续为使用全家桶的成员带来量身打造的完美体验 -->
-		<div>头：五官。因为化妆啊、流汗什么的影响面部，所以这些信息也是经常可能会改变的</div>
+		<!-- <div>头：五官。因为化妆啊、流汗什么的影响面部，所以这些信息也是经常可能会改变的</div>
 		<div>腰：酸、疼</div>
 		<div>腹</div>
 		<div>小腹</div>
@@ -110,7 +114,7 @@
 		<div>维生素C</div>
 		<div>维生素D</div>
 		<div>维生素E</div>
-		<div>维生素F</div>
+		<div>维生素F</div> -->
 
 		<!-- 当然除了身体、器官的变化，运动状态、心理变化等一些社会性因素和一些文化等无实物的东西也会影响 -->
 		<h2>我的状态</h2>

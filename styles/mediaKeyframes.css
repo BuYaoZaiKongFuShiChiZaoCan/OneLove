@@ -121,17 +121,30 @@ main#main-body #sidePanel #cbThree #tipBox {
     }
 
     #header nav ul li div.list {
-        left: 76px;
+        left: 60px;
     }
 }
 
 @media screen and (max-width: 500px) {
-
-    /* 小于500px */
-    #header nav {
-        min-width: 60px;
+    #header nav ul li div.list dl dt .title {
+        min-width: 70px;
     }
 
+    #header nav ul li div.list dl dt .content {
+        display: block;
+        overflow: auto;
+        height: 75vh;
+    }
+
+    #header nav ul li div.list dl dt .content {
+        display: none;
+    } 
+
+    #header nav ul li div.list dl dt:hover div.title:hover+.content {
+        display: block;
+    }
+
+    /* 小于500px */
     #main nav {
         justify-content: center;
     }

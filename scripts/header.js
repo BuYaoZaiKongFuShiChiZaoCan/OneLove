@@ -50,11 +50,7 @@ function headers() {
         if (zbbq) {
             zbbq.transform = "translateX(520px) matrix3d(1, 20, 0, -1, -1, 2, 5, 0, 0, 0, 1, 0, 0, 0, 0, 2)";
             setTimeout(() => {
-                // 只在手机端恢复菜单按钮
-                const isMobile = window.innerWidth <= 600;
-                if (isMobile) {
-                    Hbutton.innerHTML = '<span></span><span></span><span></span>';
-                }
+                Hbutton.innerHTML = '<span></span><span></span><span></span>';
                 if (zbbq) {
                     zbbq.display = "none";
                     zbbq.transform = "translateX(-1000px)";

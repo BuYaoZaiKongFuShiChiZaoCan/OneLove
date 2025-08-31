@@ -11,7 +11,7 @@ const musicCover = document.getElementById("music-cover");
 const musicList = document.getElementById('musicList');
 
 // 默认从第一首开始
-let songIndex = +window.localStorage.getItem('songIndex');
+let songIndex = +window.localStorage.getItem('songIndex') || 0;
 
 // 向页面输出音乐数量
 document.getElementById('playlistLength').textContent = songs.length;

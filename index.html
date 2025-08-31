@@ -12,14 +12,14 @@
 	<title>一比零</title>
 
 	<!-- 添加canonical标签 -->
-	<link rel="canonical" href="https://qaiji.netlify.app/" />
+	<link rel="canonical" href="https://yibiling.netlify.app/" />
 
 	<!-- 添加sitemap引用 -->
 	<link rel="sitemap" type="application/xml" title="Sitemap" href="./sitemap.xml" />
 
 	<!-- 添加DNS预解析 -->
 	<link rel="dns-prefetch" href="//unpkg.com" />
-	<link rel="dns-prefetch" href="//qaiji.netlify.app" />
+	<link rel="dns-prefetch" href="//yibiling.netlify.app" />
 
 	<!-- loading加载 -->
 	<link rel='stylesheet' href='https://unpkg.com/nprogress@0.2.0/nprogress.css' />
@@ -46,19 +46,19 @@
 
 	<!-- Open Graph / Facebook -->
 	<meta property="og:type" content="website" />
-	<meta property="og:url" content="https://qaiji.netlify.app/" />
+	<meta property="og:url" content="https://yibiling.netlify.app/" />
 	<meta property="og:title" content="一比零官网 - 专注分享的平台 | 祁富强" />
 	<meta property="og:description" content="一比零官网 - 专注资源分享、笔记整理、音乐播放、工具集合的综合性平台。提供优质内容分享，连接每一个求知者。" />
-	<meta property="og:image" content="https://qaiji.netlify.app/images/logo.png" />
+	<meta property="og:image" content="https://yibiling.netlify.app/images/logo.png" />
 	<meta property="og:site_name" content="一比零" />
 	<meta property="og:locale" content="zh_CN" />
 
 	<!-- Twitter -->
 	<meta property="twitter:card" content="summary_large_image" />
-	<meta property="twitter:url" content="https://qaiji.netlify.app/" />
+	<meta property="twitter:url" content="https://yibiling.netlify.app/" />
 	<meta property="twitter:title" content="一比零官网 - 专注分享的平台 | 祁富强" />
 	<meta property="twitter:description" content="一比零官网 - 专注资源分享、笔记整理、音乐播放、工具集合的综合性平台。" />
-	<meta property="twitter:image" content="https://qaiji.netlify.app/images/logo.png" />
+	<meta property="twitter:image" content="https://yibiling.netlify.app/images/logo.png" />
 
 	<!-- 其他重要meta标签 -->
 	<meta name="format-detection" content="telephone=no" />
@@ -79,9 +79,12 @@
 			"1:0",
 			"OneLove",
 			"一比零官网",
-			"壹比零官网"
+			"壹比零官网",
+			"祁富强",
+			"慕枭渊",
+			"暨芊芊"
 		], // 网站别名
-		"url": "https://qaiji.netlify.app/", // 网站URL
+		"url": "https://yibiling.netlify.app/", // 网站URL
 		"description": "专注资源分享、笔记整理、音乐播放、工具集合的综合性平台", // 网站描述
 		"author": {
 			"@type": "Person", // 声明这是一个个人
@@ -100,7 +103,7 @@
 		},
 		"potentialAction": {
 			"@type": "SearchAction",
-			"target": "https://qaiji.netlify.app/?q={search_term_string}", // 搜索目标URL
+			"target": "https://yibiling.netlify.app/?q={search_term_string}", // 搜索目标URL
 			"query-input": "required name=search_term_string" // 搜索查询输入
 		}
 	}
@@ -125,7 +128,7 @@
 		}
 		// DOM开始解析
 		if (typeof NProgress !== 'undefined' && document.body && document.body.style) {
-			NProgress.set(0.1);
+			NProgress.set(0.01);
 		}
 	</script>
 	<!-- 头部 -->
@@ -133,7 +136,7 @@
 		<div id="menuButton">
 			<span></span><span></span><span></span>
 		</div>
-		<div id="logoButton" role="link" data-href="https://qaiji.netlify.app">
+		<div id="logoButton" role="link" data-href="https://yibiling.netlify.app">
 			<img src="./images/logo.png" alt="一比零官网Logo" />
 			<span>一比零</span>
 		</div>
@@ -988,7 +991,7 @@
 					left: 0;
 					width: 100%;
 					height: 100%;
-					background-color: rgba(50, 200, 50, 0.8);
+					background-color: rgba(80, 220, 80, 0.9);
 					z-index: 9999;
 					display: flex;
 					flex-direction: column;
@@ -996,10 +999,10 @@
 					align-items: center;
 					color: white;
 					font-family: Arial, sans-serif;
-					font-size: 20px;
+					font-size: 18px;
 					font-weight: bold;
-					padding: 20px;
 					text-align: center;
+					backdrop-filter: blur(1px);
 				`;
 
 				// 禁止图标
@@ -1897,7 +1900,7 @@
 	</script>
 
 	<!-- 认证工具 -->
-	<script src="./js/auth.js"></script>
+	<script src="./scripts/auth.js"></script>
 
 	<!-- 彩蛋 最后加载 -->
 	<script async src="./scripts/caiDan.js"></script>
