@@ -2472,10 +2472,333 @@ app.delete('/api/changelog/:id/items/:itemIndex', authenticateToken, requireDeve
 });
 
 // ========================================
-// Timeline数据API\n\n// 创建timeline数据\napp.post('/api/timeline-data', authenticateToken, async (req, res) => {\n\ttry {\n\t\tconst { type, title, time, content, images = [], videos = [] } = req.body;\n\t\tconst userId = req.user._id;\n\t\t\n\t\t// 验证必填字段\n\t\tif (!type || !title || !time || !content || !Array.isArray(content)) {\n\t\t\treturn res.status(400).json({\n\t\t\t\tsuccess: false,\n\t\t\t\tmessage: '类型、标题、时间和内容是必填项，且内容必须是数组'\n\t\t\t});\n\t\t}\n\t\t\n\t\t// 验证类型是否有效\n\t\tif (!['myPast', 'health'].includes(type)) {\n\t\t\treturn res.status(400).json({\n\t\t\t\tsuccess: false,\n\t\t\t\tmessage: '无效的数据类型'\n\t\t\t});\n\t\t}\n\t\t\n\t\t// 验证content格式\n\t\tconst isValidContent = content.every(item => item && typeof item === 'object' && 'itemContent' in item);\n\t\tif (!isValidContent) {\n\t\t\treturn res.status(400).json({\n\t\t\t\tsuccess: false,\n\t\t\t\tmessage: '内容格式无效，每个条目必须包含itemContent字段'\n\t\t\t});\n\t\t}\n\t\t\n\t\t// 创建新的timeline数据\n\t\tconst newTimelineData = new TimelineData({\n\t\t\tuserId: userId,\n\t\t\ttype: type,\n\t\t\ttitle: title,\n\t\t\ttime: time,\n\t\t\tcontent: content,\n\t\t\timages: images,\n\t\t\tvideos: videos\n\t\t});\n\t\t\n\t\tawait newTimelineData.save();\n\t\t\n\t\tres.status(201).json({\n\t\t\tsuccess: true,\n\t\t\tmessage: 'Timeline数据创建成功',\n\t\t\tdata: newTimelineData\n\t\t});\n\t} catch (error) {\n\t\tconsole.error('创建timeline数据失败:', error);\n\t\tres.status(500).json({\n\t\t\tsuccess: false,\n\t\t\tmessage: '创建timeline数据失败'\n\t\t});\n\t}\n});
+// Timeline数据API
 // ========================================
 
-// Timeline数据模型（已通过 models/TimelineData.js 定义并在顶部导入）
+// 删除timeline数据
+app.delete('/api/timeline-data/:id', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
+	try {
+		const timelineData = await TimelineData.findByIdAndDelete(req.params.id);
+
+		if (!timelineData) {
+			return res.status(404).json({
+				success: false,
+				message: 'Timeline数据不存在'
+			});
+		}
+
+		res.json({
+			success: true,
+			message: 'Timeline数据删除成功'
+		});
+	} catch (error) {
+		console.error('删除timeline数据失败:', error);
+		res.status(500).json({
+			success: false,
+			message: '删除timeline数据失败'
+		});
+	}
+});
+
+// 新增单个 Timeline 子项（仅针对数组型data）
+app.post('/api/timeline-data/:type/items', authenticateToken, async (req, res) => {
+	try {
+		const { type } = req.params;
+		const role = req.user?.role;
+		const isPrivileged = role === 'developer' || role === 'admin';
+		if (!isPrivileged && type !== 'myPast') {
+			return res.status(403).json({ success: false, message: '普通用户仅能新增自己的 myPast 数据' });
+		}
+
+		const targetUserId = req.user._id;
+		const item = req.body && typeof req.body === 'object' ? req.body : null;
+		
+		// 验证必要字段
+		if (!item || !item.title || !item.time) {
+			return res.status(400).json({ success: false, message: '缺少必要字段：title、time' });
+		}
+
+		// 确保content是数组格式
+		if (!Array.isArray(item.content)) {
+			return res.status(400).json({ success: false, message: 'content字段必须是数组格式' });
+		}
+
+		// 映射类型到数据库字段
+		const typeMapping = {
+			'myPast': 'myPastData',
+			'health': 'healthData'
+		};
+		const dbType = typeMapping[type];
+		if (!dbType) {
+			return res.status(400).json({ success: false, message: '无效的数据类型' });
+		}
+
+		// 添加发布者信息到新条目
+		const newItem = { 
+			...item, 
+			_id: item._id || new mongoose.Types.ObjectId().toString(),
+			createdBy: targetUserId,
+			createdAt: new Date(),
+			updatedBy: targetUserId,
+			updatedAt: new Date()
+		};
+
+		console.log('准备保存的新条目:', newItem);
+
+		// 查找或创建文档
+		let doc = await TimelineData.findOne({ userId: targetUserId, type: dbType });
+		if (!doc) {
+			// 创建新文档
+			doc = new TimelineData({ 
+				userId: targetUserId, 
+				type: dbType, 
+				data: [newItem], 
+				timestamp: new Date(),
+				createdBy: targetUserId,
+				updatedBy: targetUserId
+			});
+			console.log('创建新文档:', doc);
+		} else {
+			// 更新现有文档
+			doc.data = Array.isArray(doc.data) ? [...doc.data, newItem] : [newItem];
+			doc.timestamp = new Date();
+			doc.updatedBy = targetUserId;
+			console.log('更新现有文档，data长度:', doc.data.length);
+		}
+
+		await doc.save();
+		console.log('文档保存成功，ID:', doc._id);
+
+		return res.json({ success: true, message: '添加成功', data: { id: newItem._id } });
+	} catch (error) {
+		console.error('添加Timeline子项失败:', error);
+		return res.status(500).json({ success: false, message: '保存失败: ' + error.message });
+	}
+});
+
+// 更新单个 Timeline 子项
+app.put('/api/timeline-data/:type/items/:itemId', authenticateToken, async (req, res) => {
+	try {
+		const { type, itemId } = req.params;
+		const role = req.user?.role;
+		const isPrivileged = role === 'developer' || role === 'admin';
+		if (!isPrivileged && type !== 'myPast') {
+			return res.status(403).json({ success: false, message: '普通用户仅能编辑自己的 myPast 数据' });
+		}
+
+		const targetUserId = req.user._id;
+		const updates = req.body && typeof req.body === 'object' ? req.body : {};
+
+		// 映射类型到数据库字段
+		const typeMapping = {
+			'myPast': 'myPastData',
+			'health': 'healthData'
+		};
+		const dbType = typeMapping[type];
+		if (!dbType) {
+			return res.status(400).json({ success: false, message: '无效的数据类型' });
+		}
+
+		const doc = await TimelineData.findOne({ userId: targetUserId, type: dbType });
+		if (!doc || !Array.isArray(doc.data)) {
+			return res.status(404).json({ success: false, message: '未找到数据' });
+		}
+
+		let found = false;
+		doc.data = doc.data.map(it => {
+			if (it && it._id === itemId) {
+				found = true;
+				return { ...it, ...updates, _id: itemId };
+			}
+			return it;
+		});
+
+		if (!found) return res.status(404).json({ success: false, message: '未找到该条目' });
+		doc.timestamp = new Date();
+		doc.updatedBy = req.user._id;
+		await doc.save();
+		return res.json({ success: true, message: '更新成功' });
+	} catch (error) {
+		console.error('更新Timeline子项失败:', error);
+		return res.status(500).json({ success: false, message: '更新失败' });
+	}
+});
+
+// 删除单个 Timeline 子项
+app.delete('/api/timeline-data/:type/items/:itemId', authenticateToken, async (req, res) => {
+	try {
+		const { type, itemId } = req.params;
+		const role = req.user?.role;
+		const isPrivileged = role === 'developer' || role === 'admin';
+		if (!isPrivileged && type !== 'myPast') {
+			return res.status(403).json({ success: false, message: '普通用户仅能删除自己的 myPast 数据' });
+		}
+
+		const targetUserId = req.user._id;
+
+		// 映射类型到数据库字段
+		const typeMapping = {
+			'myPast': 'myPastData',
+			'health': 'healthData'
+		};
+		const dbType = typeMapping[type];
+		if (!dbType) {
+			return res.status(400).json({ success: false, message: '无效的数据类型' });
+		}
+
+		const doc = await TimelineData.findOne({ userId: targetUserId, type: dbType });
+		if (!doc || !Array.isArray(doc.data)) {
+			return res.status(404).json({ success: false, message: '未找到数据' });
+		}
+
+		const originalLen = doc.data.length;
+		doc.data = doc.data.filter(it => it && it._id !== itemId);
+		if (doc.data.length === originalLen) {
+			return res.status(404).json({ success: false, message: '未找到该条目' });
+		}
+		doc.timestamp = new Date();
+		doc.updatedBy = req.user._id;
+		await doc.save();
+		return res.json({ success: true, message: '删除成功' });
+	} catch (error) {
+		console.error('删除Timeline子项失败:', error);
+		return res.status(500).json({ success: false, message: '删除失败' });
+	}
+});
+
+// 新增单个 Timeline 子项（仅针对数组型data）
+app.post('/api/timeline-data/:type/items', authenticateToken, async (req, res) => {
+	try {
+		const { type } = req.params;
+		const role = req.user?.role;
+		const isPrivileged = role === 'developer' || role === 'admin';
+		if (!isPrivileged && type !== 'myPast') {
+			return res.status(403).json({ success: false, message: '普通用户仅能新增自己的 myPast 数据' });
+		}
+
+		const targetUserId = req.user._id;
+		const item = req.body && typeof req.body === 'object' ? req.body : null;
+		if (!item || !item.title || !item.time || !Array.isArray(item.content)) {
+			return res.status(400).json({ success: false, message: '缺少必要字段：title、time、content[]' });
+		}
+
+		// 映射类型到数据库字段
+		const typeMapping = {
+			'myPast': 'myPastData',
+			'health': 'healthData'
+		};
+		const dbType = typeMapping[type];
+		if (!dbType) {
+			return res.status(400).json({ success: false, message: '无效的数据类型' });
+		}
+
+		const newItem = { ...item, _id: item._id || new mongoose.Types.ObjectId().toString() };
+		let doc = await TimelineData.findOne({ userId: targetUserId, type: dbType });
+		if (!doc) {
+			doc = new TimelineData({ userId: targetUserId, type: dbType, data: [newItem], timestamp: new Date() });
+			await doc.save();
+		} else {
+			doc.data = Array.isArray(doc.data) ? [...doc.data, newItem] : [newItem];
+			doc.timestamp = new Date();
+			await doc.save();
+		}
+
+		return res.json({ success: true, message: '添加成功', data: { id: newItem._id } });
+	} catch (error) {
+		console.error('添加Timeline子项失败:', error);
+		return res.status(500).json({ success: false, message: '保存失败' });
+	}
+});
+
+// 更新单个 Timeline 子项
+app.put('/api/timeline-data/:type/items/:itemId', authenticateToken, async (req, res) => {
+	try {
+		const { type, itemId } = req.params;
+		const role = req.user?.role;
+		const isPrivileged = role === 'developer' || role === 'admin';
+		if (!isPrivileged && type !== 'myPast') {
+			return res.status(403).json({ success: false, message: '普通用户仅能编辑自己的 myPast 数据' });
+		}
+
+		const targetUserId = req.user._id;
+		const updates = req.body && typeof req.body === 'object' ? req.body : {};
+
+		// 映射类型到数据库字段
+		const typeMapping = {
+			'myPast': 'myPastData',
+			'health': 'healthData'
+		};
+		const dbType = typeMapping[type];
+		if (!dbType) {
+			return res.status(400).json({ success: false, message: '无效的数据类型' });
+		}
+
+		const doc = await TimelineData.findOne({ userId: targetUserId, type: dbType });
+		if (!doc || !Array.isArray(doc.data)) {
+			return res.status(404).json({ success: false, message: '未找到数据' });
+		}
+
+		let found = false;
+		doc.data = doc.data.map(it => {
+			if (it && it._id === itemId) {
+				found = true;
+				return { ...it, ...updates, _id: itemId };
+			}
+			return it;
+		});
+
+		if (!found) return res.status(404).json({ success: false, message: '未找到该条目' });
+		doc.timestamp = new Date();
+		await doc.save();
+		return res.json({ success: true, message: '更新成功' });
+	} catch (error) {
+		console.error('更新Timeline子项失败:', error);
+		return res.status(500).json({ success: false, message: '更新失败' });
+	}
+});
+
+// 删除单个 Timeline 子项
+app.delete('/api/timeline-data/:type/items/:itemId', authenticateToken, async (req, res) => {
+	try {
+		const { type, itemId } = req.params;
+		const role = req.user?.role;
+		const isPrivileged = role === 'developer' || role === 'admin';
+		if (!isPrivileged && type !== 'myPast') {
+			return res.status(403).json({ success: false, message: '普通用户仅能删除自己的 myPast 数据' });
+		}
+
+		const targetUserId = req.user._id;
+
+		// 映射类型到数据库字段
+		const typeMapping = {
+			'myPast': 'myPastData',
+			'health': 'healthData'
+		};
+		const dbType = typeMapping[type];
+		if (!dbType) {
+			return res.status(400).json({ success: false, message: '无效的数据类型' });
+		}
+
+		const doc = await TimelineData.findOne({ userId: targetUserId, type: dbType });
+		if (!doc || !Array.isArray(doc.data)) {
+			return res.status(404).json({ success: false, message: '未找到数据' });
+		}
+
+		const originalLen = doc.data.length;
+		doc.data = doc.data.filter(it => it && it._id !== itemId);
+		if (doc.data.length === originalLen) {
+			return res.status(404).json({ success: false, message: '未找到该条目' });
+		}
+		doc.timestamp = new Date();
+		await doc.save();
+		return res.json({ success: true, message: '删除成功' });
+	} catch (error) {
+		console.error('删除Timeline子项失败:', error);
+		return res.status(500).json({ success: false, message: '删除失败' });
+	}
+});
+
+// ========================================
 
 // 调试API - 获取所有timeline数据
 app.get('/api/timeline-data-debug', async (req, res) => {
@@ -2548,6 +2871,14 @@ app.get('/api/timeline-data-debug', async (req, res) => {
 app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
 	try {
 		const { type } = req.params;
+
+		// 与 Functions 版本对齐：普通用户仅可访问自己的 myPast
+		const role = req.user?.role;
+		const isPrivileged = role === 'developer' || role === 'admin';
+		// 普通用户只能访问自己的 myPast 数据，但可以访问所有人的 health 数据
+		if (!isPrivileged && type !== 'myPast' && type !== 'health') {
+			return res.status(403).json({ success: false, message: '普通用户仅能访问自己的 myPast 数据和所有人的 health 数据' });
+		}
 		
 		// 验证类型并映射到数据库中的实际值
 		const typeMapping = {
@@ -2565,7 +2896,7 @@ app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
 		const dbType = typeMapping[type];
 
 		// 检查数据库连接状态
-		if (mongoose.connection.readyState !== 1) {
+		if (!mongoose.connection || mongoose.connection.readyState !== 1) {
 			// 数据库未连接，返回模拟数据
 			const mockData = {
 				myPast: [
@@ -2617,104 +2948,120 @@ app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
 		// 从数据库获取数据
 		console.log(`🔍 正在查询数据库中的${type}数据...`);
 		
-		// 首先尝试标准查询
+		if (isPrivileged) {
+			// 开发者/管理员：可以查看所有用户的数据
 		let timelineItems = await TimelineData.find({ type: dbType })
 			.sort({ time: -1, createdAt: -1 })
 			.lean();
 		
-		console.log(`📊 标准查询结果: 找到${timelineItems.length}条${type}数据`);
+			console.log(`📊 开发者查询结果: 找到${timelineItems.length}条${type}数据`);
 		
-		// 如果标准查询没有结果，尝试模糊匹配
+			// 如果没有找到数据，尝试兼容查询
 		if (timelineItems.length === 0) {
-			console.log(`⚠️ 标准查询无结果，尝试模糊匹配...`);
-			
-			// 获取所有数据来分析字段结构
-			const allData = await TimelineData.find({}).lean();
-			console.log(`📊 数据库中总共有${allData.length}条数据`);
-			
-			if (allData.length > 0) {
-				// 分析第一条数据的结构
-				const sampleData = allData[0];
-				console.log(`📝 数据结构分析:`, Object.keys(sampleData));
-				console.log(`📝 第一条数据样例:`, JSON.stringify(sampleData, null, 2));
-				
-				// 尝试不同的字段名和值
-				const possibleFields = ['type', 'category', 'dataType', 'kind', 'dataType', 'section'];
-				const possibleValues = [
-					type, 
-					type.toLowerCase(), 
-					type.charAt(0).toUpperCase() + type.slice(1),
-					'mypast',
-					'MyPast',
-					'MYPAST',
-					'health',
-					'Health',
-					'HEALTH'
-				];
-				
-				for (const field of possibleFields) {
-					if (sampleData.hasOwnProperty(field)) {
-						console.log(`🔍 发现字段: ${field}, 值: ${sampleData[field]}`);
-						
-						for (const value of possibleValues) {
-							const fuzzyQuery = { [field]: value };
-							console.log(`🔍 尝试查询:`, fuzzyQuery);
-							
-							const fuzzyResult = await TimelineData.find(fuzzyQuery).lean();
-							if (fuzzyResult.length > 0) {
-								console.log(`✅ 模糊查询成功! 字段: ${field}, 值: ${value}, 结果: ${fuzzyResult.length}条`);
-								timelineItems = fuzzyResult;
-								break;
-							}
-						}
+				const compatibleTypes = ['myPast', 'health', 'work', 'study'];
+				for (const compatibleType of compatibleTypes) {
+					timelineItems = await TimelineData.find({ type: compatibleType })
+						.sort({ time: -1, createdAt: -1 })
+						.lean();
 						if (timelineItems.length > 0) break;
 					}
 				}
 				
-				// 如果还是没找到，尝试原生查询
-				if (timelineItems.length === 0) {
-					console.log(`🔍 尝试原生数据库查询...`);
-					try {
-						const rawData = await mongoose.connection.db.collection('timelinedatas').find({}).toArray();
-						console.log(`📊 原生查询结果: ${rawData.length}条数据`);
-						
-						if (rawData.length > 0) {
-							console.log(`📝 原生数据第一条样例:`, JSON.stringify(rawData[0], null, 2));
-							
-							// 分析原生数据的结构
-							const rawSample = rawData[0];
-							console.log(`📝 原生数据结构分析:`, Object.keys(rawSample));
-							
-							// 尝试在原生数据中查找匹配的类型
-							for (const item of rawData) {
-								for (const field of possibleFields) {
-									if (item[field]) {
-										console.log(`🔍 原生数据字段 ${field}: ${item[field]}`);
-									}
-								}
-							}
-						}
-					} catch (rawError) {
-						console.log(`❌ 原生查询失败:`, rawError.message);
+			// 处理数据格式
+			const processedData = timelineItems.map(doc => {
+				if (Array.isArray(doc.data)) {
+					return doc.data.map(item => ({
+						...item,
+						_userIdentifier: doc.userId || 'unknown'
+					}));
+				} else {
+					return [{
+						...doc,
+						_userIdentifier: doc.userId || 'unknown'
+					}];
+				}
+			}).flat();
+
+			return res.json({
+				success: true,
+				data: processedData,
+				count: processedData.length,
+				message: `找到${processedData.length}条数据`
+			});
+		} else {
+			// 普通用户：只能查看自己的数据
+			if (type === 'myPast') {
+				// 查找当前用户的 myPast 数据
+				let userData = await TimelineData.findOne({ 
+					userId: req.user._id, 
+					type: dbType 
+				}).sort({ timestamp: -1 });
+
+				// 如果没有找到，尝试兼容查询
+				if (!userData) {
+					const compatibleTypes = ['myPast', 'myPastData'];
+					for (const compatibleType of compatibleTypes) {
+						userData = await TimelineData.findOne({ 
+							userId: req.user._id, 
+							type: compatibleType 
+						}).sort({ timestamp: -1 });
+						if (userData) break;
 					}
 				}
+
+				if (!userData || !Array.isArray(userData.data) || userData.data.length === 0) {
+					return res.json({
+						success: true,
+						data: [],
+						message: '您还没有创建任何记录',
+						isEmpty: true
+					});
+				}
+
+				return res.json({
+					success: true,
+					data: userData.data,
+					timestamp: userData.timestamp || userData.updatedAt || userData.createdAt
+				});
+			} else if (type === 'health') {
+				// 普通用户可以查看所有人的 health 数据
+				let healthData = await TimelineData.find({ type: dbType })
+					.sort({ time: -1, createdAt: -1 })
+					.lean();
+
+				// 如果没有找到，尝试兼容查询
+				if (healthData.length === 0) {
+					const compatibleTypes = ['health', 'healthData'];
+					for (const compatibleType of compatibleTypes) {
+						healthData = await TimelineData.find({ type: compatibleType })
+							.sort({ time: -1, createdAt: -1 })
+							.lean();
+						if (healthData.length > 0) break;
+					}
+				}
+
+				// 处理数据格式
+				const processedData = healthData.map(doc => {
+					if (Array.isArray(doc.data)) {
+						return doc.data;
+					} else {
+						return [doc];
+					}
+				}).flat();
+
+				return res.json({
+			success: true,
+					data: processedData,
+					count: processedData.length,
+					message: `找到${processedData.length}条健康数据`
+		});
 			}
 		}
-		
-		console.log(`📊 最终查询结果: 找到${timelineItems.length}条${type}数据`);
-		if (timelineItems.length > 0) {
-			console.log(`📝 第一条数据样例:`, JSON.stringify(timelineItems[0], null, 2));
-		}
-
-		res.json({
-			success: true,
-			data: timelineItems
-		});
 	} catch (error) {
 		console.error('获取timeline数据失败:', error);
-		res.status(500).json({
+		return res.status(500).json({
 			success: false,
-			message: '获取timeline数据失败'
+			message: '获取timeline数据失败: ' + error.message
 		});
 	}
 });
@@ -2810,31 +3157,6 @@ app.put('/api/timeline-data/:id', authenticateToken, requireDeveloperOrAdmin, as
 		res.status(500).json({
 			success: false,
 			message: '更新timeline数据失败'
-		});
-	}
-});
-
-// 删除timeline数据
-app.delete('/api/timeline-data/:id', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
-	try {
-		const timelineData = await TimelineData.findByIdAndDelete(req.params.id);
-
-		if (!timelineData) {
-			return res.status(404).json({
-				success: false,
-				message: 'Timeline数据不存在'
-			});
-		}
-
-		res.json({
-			success: true,
-			message: 'Timeline数据删除成功'
-		});
-	} catch (error) {
-		console.error('删除timeline数据失败:', error);
-		res.status(500).json({
-			success: false,
-			message: '删除timeline数据失败'
 		});
 	}
 });
