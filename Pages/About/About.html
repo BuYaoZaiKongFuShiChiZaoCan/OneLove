@@ -13,7 +13,7 @@
 	<meta name="author" content="祁富强">
 	<meta property="og:image" content="../../images/logo.png">
 	<meta name="og:title" content="祁富强">
-	<meta name="og:url" content="http://apicloud.fun">
+	<meta name="og:url" content="https://yibiling.netlify.app/pages/about/abou">
 	<meta name="og:description" content="">
 	<meta name="apple-mobile-web-app-title" content="祁富强">
 
@@ -1284,9 +1284,35 @@
 
 				const items = Array.isArray(data) ? data : [];
 				container.innerHTML = '';
+				
+				// 检查是否有数据
 				if (items.length === 0) {
 					const text = statusText || '暂无数据';
-					if (text.includes('请登录')) {
+					
+					// 根据容器类型显示不同的提示
+					if (containerId === 'myPastContainer') {
+						if (globalUserRole === 'user') {
+							// 普通用户没有myPast数据时显示创建提示
+							container.innerHTML = `
+								<div class="timeline-empty">
+									<div style="text-align: center; padding: 20px;">
+										<p>您还没有创建任何个人记录</p>
+										<p style="color: #666; font-size: 14px;">点击右上角的"➕ 添加新项目"开始记录您的人生轨迹</p>
+									</div>
+								</div>`;
+						} else {
+							container.innerHTML = `<div class="timeline-empty">${text}</div>`;
+						}
+					} else if (containerId === 'healthContainer') {
+						// Health数据为空时的提示
+						container.innerHTML = `
+							<div class="timeline-empty">
+								<div style="text-align: center; padding: 20px;">
+									<p>暂无健康记录</p>
+									<p style="color: #666; font-size: 14px;">管理员可以添加健康相关的记录</p>
+								</div>
+							</div>`;
+					} else if (text.includes('请登录')) {
 						container.innerHTML = `
 							<div class="timeline-empty">${text}
 								<button id="goLoginBtn" style="margin-left:12px;background:#16A085;color:#fff;border:none;padding:4px 10px;border-radius:4px;cursor:pointer">去登录</button>
@@ -1571,7 +1597,7 @@
 							rightDiv.appendChild(actionsDiv);
 
 							// 管理员只能看到编辑按钮和添加条目按钮
-							if (globalUserRole === 'admin') {
+							if (globalUserRole === 'admin' && containerId !== 'myPastContainer') {
 								deleteButton.style.display = 'none';
 							}
 						}
@@ -1670,6 +1696,11 @@
 					document.getElementById('addHealthBtn').onclick = () => showAddForm('healthData');
 					document.getElementById('addChangelogBtn').onclick = () => showAddChangelogForm();
 				} else {
+					// 普通用户：仅显示 myPast 的新增按钮
+					if (globalUserRole === 'user') {
+						document.getElementById('addMyPastBtn').style.display = 'inline-block';
+						document.getElementById('addMyPastBtn').onclick = () => showAddForm('myPastData');
+					}
 					console.log('隐藏管理按钮 - 用户角色:', globalUserRole);
 				}
 
@@ -1692,12 +1723,11 @@
 			// 加载所有数据的函数
 			async function loadAllData() {
 				try {
-					// 并行加载所有数据
-					const [changelogPromise, myPastPromise, healthPromise] = await Promise.allSettled([
-						loadChangelogFromAPI(),
-						loadTimelineData('myPast'),
-						loadTimelineData('health')
-					]);
+					// 根据用户角色决定加载哪些数据
+					const promises = [loadChangelogFromAPI(), loadTimelineData('myPast'), loadTimelineData('health')];
+					
+					const results = await Promise.allSettled(promises);
+					const [changelogPromise, myPastPromise, healthPromise] = results;
 
 					// 处理changelog数据
 					if (changelogPromise.status === 'fulfilled') {
@@ -1725,8 +1755,8 @@
 						});
 					}
 
-					// 处理Health数据
-					if (healthPromise.status === 'fulfilled') {
+					// 处理Health数据（所有人都能看见）
+					if (healthPromise && healthPromise.status === 'fulfilled') {
 						const hp = healthPromise.value || { items: [], statusText: '' };
 						const list = Array.isArray(hp.items) ? hp.items : [];
 						console.log('Health数据:', list);
@@ -2544,6 +2574,10 @@
 				return globalUserRole === 'developer' || globalUserRole === 'admin';
 			}
 
+			function canEditMyPast() {
+				return globalUserRole === 'developer' || globalUserRole === 'admin' || globalUserRole === 'user';
+			}
+
 			function canDelete() {
 				return globalUserRole === 'developer';
 			}
@@ -2954,16 +2988,26 @@
 						content: [{
 							itemContent: content
 						}],
-						images: images ? images.split(',').map(url => url.trim()) : [],
-						videos: videos ? videos.split(',').map(url => url.trim()) : []
+						images: images ? images.split(',').map(url => url.trim()).filter(url => url) : [],
+						videos: videos ? videos.split(',').map(url => url.trim()).filter(url => url) : []
 					};
 
-					const requestData = {
-						type: type === 'myPastData' ? 'myPast' : 'health',
-						data: [timelineItem] // 确保data是数组
-					};
+					console.log('准备发送的数据:', timelineItem);
 
-					const response = await fetch(`${apiBaseUrl}/timeline-data`, {
+					// 普通用户的 myPast 使用子项接口；其他仍走通用接口
+					let response;
+					if (type === 'myPastData') {
+						response = await fetch(`${apiBaseUrl}/timeline-data/myPast/items`, {
+							method: 'POST',
+							headers: {
+								'Authorization': `Bearer ${token}`,
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify(timelineItem)
+						});
+					} else {
+						const requestData = { type: 'health', data: [timelineItem] };
+						response = await fetch(`${apiBaseUrl}/timeline-data`, {
 						method: 'POST',
 						headers: {
 							'Authorization': `Bearer ${token}`,
@@ -2971,8 +3015,10 @@
 						},
 						body: JSON.stringify(requestData)
 					});
+					}
 
 					const result = await response.json();
+					console.log('服务器响应:', result);
 
 					if (result.success) {
 						// 关闭表单
