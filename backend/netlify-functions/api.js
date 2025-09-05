@@ -261,7 +261,7 @@ app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
 		// 开发者可查看所有用户该类型数据
 		if (allUsers === 'true' && (req.user?.role === 'developer' || req.user?.role === 'admin')) {
 			// 兼容旧数据结构：直接查询type字段
-			let docs = await TimelineData.find({ type }).sort({ timestamp: -1 }).limit(200);
+			let docs = await TimelineData.find({ type }).populate('userId', 'username name').sort({ timestamp: -1 }).limit(200);
 			
 			// 如果没有找到数据，尝试查询兼容的字段名
 			if (docs.length === 0) {
@@ -274,7 +274,7 @@ app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
 				
 				const compatibleType = compatibleTypes[type];
 				if (compatibleType) {
-					docs = await TimelineData.find({ type: compatibleType }).limit(200);
+					docs = await TimelineData.find({ type: compatibleType }).populate('userId', 'username name').limit(200);
 				}
 			}
 
@@ -294,11 +294,14 @@ app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
 				return new Date(timestampB) - new Date(timestampA);
 			});
 
-			const payload = docs.map(doc => ({
-				userId: doc.userId || 'system', // 使用'system'而不是'unknown'
-				data: Array.isArray(doc.data) ? doc.data : [doc], // 如果没有data字段，将整个文档作为数据
-				timestamp: doc.timestamp || doc.updatedAt || doc.createdAt
-			}));
+			const payload = docs.map(doc => {
+				const userDisplayName = doc.userId ? (doc.userId.username || doc.userId.name || doc.userId._id) : 'system';
+				return {
+					userId: userDisplayName, // 使用用户名而不是ID
+					data: Array.isArray(doc.data) ? doc.data : [doc], // 如果没有data字段，将整个文档作为数据
+					timestamp: doc.timestamp || doc.updatedAt || doc.createdAt
+				};
+			});
 			
 			return res.json({ success: true, data: payload, count: payload.length });
 		}
@@ -505,10 +508,11 @@ app.post('/api/timeline-data/:type/items', authenticateToken, async (req, res) =
 		// 查找或创建文档
 		let doc = await TimelineData.findOne({ userId: targetUserId, type });
 		if (!doc) {
-			// 创建新文档
+			// 创建新文档，避免命中历史唯一索引(type+title)冲突
 			doc = new TimelineData({ 
 				userId: targetUserId, 
 				type, 
+				title: String(targetUserId),
 				data: [newItem], 
 				timestamp: new Date(),
 				createdBy: targetUserId,
@@ -584,8 +588,32 @@ app.delete('/api/timeline-data/:type/items/:itemId', authenticateToken, async (r
 			return res.status(403).json({ success: false, message: '普通用户仅能删除自己的 myPast 数据' });
 		}
 
-		const targetUserId = req.user.userId;
-		const doc = await TimelineData.findOne({ userId: targetUserId, type });
+		let doc;
+		if (isPrivileged) {
+			// 开发者/管理员：搜索所有用户的文档来找到要删除的条目（兼容旧/新type）
+			const compatibleTypes = [type, 'myPast', 'myPastData', 'health', 'healthData'];
+			console.log(`🔍 Netlify开发者删除调试 - 搜索类型: ${compatibleTypes.join(', ')}, 目标itemId: ${itemId}`);
+			const docs = await TimelineData.find({ type: { $in: compatibleTypes } });
+			console.log(`🔍 Netlify找到 ${docs.length} 个文档`);
+			
+			// 详细调试每个文档
+			docs.forEach((d, index) => {
+				console.log(`🔍 Netlify文档 ${index}: userId=${d.userId}, type=${d.type}, data长度=${Array.isArray(d.data) ? d.data.length : 'N/A'}`);
+				if (Array.isArray(d.data)) {
+					d.data.forEach((item, itemIndex) => {
+						console.log(`🔍 Netlify  条目 ${itemIndex}: _id=${item._id}, title=${item.title}`);
+					});
+				}
+			});
+			
+			doc = docs.find(d => d && Array.isArray(d.data) && d.data.some(item => item && item._id === itemId));
+			console.log(`🔍 Netlify找到匹配的文档: ${doc ? '是' : '否'}`);
+		} else {
+			// 普通用户：只能删除自己的数据（兼容旧/新type）
+			const targetUserId = req.user.userId;
+			doc = await TimelineData.findOne({ userId: targetUserId, type: { $in: [type, 'myPast', 'myPastData', 'health', 'healthData'] } });
+		}
+
 		if (!doc || !Array.isArray(doc.data)) {
 			return res.status(404).json({ success: false, message: '未找到数据' });
 		}
@@ -596,6 +624,7 @@ app.delete('/api/timeline-data/:type/items/:itemId', authenticateToken, async (r
 			return res.status(404).json({ success: false, message: '未找到该条目' });
 		}
 		doc.timestamp = new Date();
+		doc.updatedBy = req.user.userId;
 		await doc.save();
 		return res.json({ success: true, message: '删除成功' });
 	} catch (error) {
