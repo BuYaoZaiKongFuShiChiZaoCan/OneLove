@@ -30,6 +30,7 @@ let songs = [
 	/* happy·爱人先爱己 所有人都没有我的快乐重要 */
 	"李克勤-护花使者 ", // 无mp3文件
 	"Nathan Evans - Wellerman (Sea Shanty) ", // 无mp3文件
+	"回首掏 (伴奏)-一只小胖胖",
 	"兰花草-半吨兄弟",
 	"许巍 - 曾经的你 (Live)",
 	"许巍 - 旅行 (Live)",

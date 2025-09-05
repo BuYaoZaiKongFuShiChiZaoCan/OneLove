@@ -893,6 +893,7 @@
 			color: #9aa3ab;
 			display: flex;
 			align-items: center;
+			justify-content: center;
 			gap: 10px;
 			flex-wrap: wrap
 		}
@@ -1568,7 +1569,11 @@
 
 					// 添加编辑按钮（使用全局权限状态）
 					try {
-						if (isUserLoggedIn() && canEdit()) {
+						// 检查权限：开发者/管理员可以编辑所有内容，普通用户只能编辑自己的myPast
+						const canEditThisItem = canEdit() || (globalUserRole === 'user' && containerId === 'myPastContainer');
+						const canDeleteThisItem = canDelete() || (globalUserRole === 'user' && containerId === 'myPastContainer');
+						
+						if (isUserLoggedIn() && (canEditThisItem || canDeleteThisItem)) {
 							// 创建按钮容器
 							const actionsDiv = document.createElement('div');
 							actionsDiv.className = 'timeline-actions';
@@ -1584,21 +1589,30 @@
 								actionsDiv.appendChild(addItemButton);
 							}
 
-							const editButton = document.createElement('button');
-							editButton.textContent = '编辑';
-							editButton.onclick = () => editTimelineItem(item, containerId);
+							// 只有有编辑权限的用户才显示编辑按钮
+							if (canEditThisItem) {
+								const editButton = document.createElement('button');
+								editButton.textContent = '编辑';
+								editButton.onclick = () => editTimelineItem(item, containerId);
+								actionsDiv.appendChild(editButton);
+							}
 
-							const deleteButton = document.createElement('button');
-							deleteButton.textContent = '删除';
-							deleteButton.onclick = () => deleteTimelineItem(item, containerId);
+							// 只有有删除权限的用户才显示删除按钮
+							if (canDeleteThisItem) {
+								const deleteButton = document.createElement('button');
+								deleteButton.textContent = '删除';
+								deleteButton.onclick = () => deleteTimelineItem(item, containerId);
+								actionsDiv.appendChild(deleteButton);
+							}
 
-							actionsDiv.appendChild(editButton);
-							actionsDiv.appendChild(deleteButton);
 							rightDiv.appendChild(actionsDiv);
 
 							// 管理员只能看到编辑按钮和添加条目按钮
 							if (globalUserRole === 'admin' && containerId !== 'myPastContainer') {
-								deleteButton.style.display = 'none';
+								const deleteBtn = actionsDiv.querySelector('button:last-child');
+								if (deleteBtn && deleteBtn.textContent === '删除') {
+									deleteBtn.style.display = 'none';
+								}
 							}
 						}
 					} catch (error) {
@@ -1750,9 +1764,16 @@
 						const list = Array.isArray(mp.items) ? mp.items : [];
 						console.log('My Past数据:', list);
 						renderTimeline('myPastContainer', list, {
-							iconText: '📅', titleField: 'title', timeField: 'time', contentField: 'content', imagesField: 'images', videosField: 'videos',
-							statusText: mp.statusText
+							iconText: '📅', 
+							titleField: 'title', 
+							timeField: 'time', 
+							contentField: 'content', 
+							imagesField: 'images', 
+							videosField: 'videos',
+							statusText: mp.statusText || ''
 						});
+						console.log('myPast数据渲染完成');
+						showDebugInfo(`myPast数据刷新完成\n共${list.length}条记录`);
 					}
 
 					// 处理Health数据（所有人都能看见）
@@ -1761,9 +1782,16 @@
 						const list = Array.isArray(hp.items) ? hp.items : [];
 						console.log('Health数据:', list);
 						renderTimeline('healthContainer', list, {
-							iconText: '🏥', titleField: 'title', timeField: 'time', contentField: 'content', imagesField: 'images', videosField: 'videos',
-							statusText: hp.statusText
+							iconText: '🏥', 
+							titleField: 'title', 
+							timeField: 'time', 
+							contentField: 'content', 
+							imagesField: 'images', 
+							videosField: 'videos',
+							statusText: hp.statusText || ''
 						});
+						console.log('health数据渲染完成');
+						showDebugInfo(`health数据刷新完成\n共${list.length}条记录`);
 					}
 
 					console.log('所有数据加载完成');
@@ -2017,7 +2045,8 @@
 			async function editTimelineItem(item, containerId) {
 				console.log('编辑项目:', item, '用户角色:', globalUserRole, '编辑权限:', globalHasEditPermission);
 
-				if (canEdit()) {
+				// 检查权限：开发者/管理员可以编辑所有内容，普通用户只能编辑自己的myPast
+				if (canEdit() || (globalUserRole === 'user' && containerId === 'myPastContainer')) {
 					// 根据容器类型确定编辑类型
 					if (containerId === 'versionLogContainer') {
 						showEditChangelogForm(item);
@@ -2025,7 +2054,7 @@
 						showEditTimelineForm(item, containerId);
 					}
 				} else {
-					alert('权限不足，只有开发者和管理员可以编辑');
+					alert('权限不足，只有开发者和管理员可以编辑，普通用户只能编辑自己的My Past条目');
 				}
 			}
 
@@ -2247,7 +2276,18 @@
 						videos: videos ? videos.split(',').map(url => url.trim()) : []
 					};
 
-					const response = await fetch(`${apiBaseUrl}/timeline-data/${itemId}`, {
+					// 根据容器类型确定编辑的API端点
+					let editUrl;
+					if (containerId === 'myPastContainer') {
+						// 普通用户编辑自己的 myPast 子条目
+						editUrl = `${apiBaseUrl}/timeline-data/myPast/items/${itemId}`;
+					} else {
+						editUrl = `${apiBaseUrl}/timeline-data/${itemId}`;
+					}
+
+					console.log('编辑URL:', editUrl);
+
+					const response = await fetch(editUrl, {
 						method: 'PUT',
 						headers: {
 							'Authorization': `Bearer ${token}`,
@@ -2265,17 +2305,8 @@
 						// 显示加载状态
 						showLoadingMessage('编辑成功，正在刷新数据...');
 
-						// 重新加载数据
-						const type = containerId === 'myPastContainer' ? 'myPast' : 'health';
-						const data = await loadTimelineData(type);
-						renderTimeline(containerId, data, {
-							iconText: containerId === 'myPastContainer' ? '📅' : '🏥',
-							titleField: 'title',
-							timeField: 'time',
-							contentField: 'content',
-							imagesField: 'images',
-							videosField: 'videos'
-						});
+						// 重新加载所有数据以确保UI同步
+						await loadAllData();
 
 						// 隐藏加载状态
 						hideLoadingMessage();
@@ -2424,7 +2455,8 @@
 			async function deleteTimelineItem(item, containerId) {
 				console.log('删除项目:', item, '用户角色:', globalUserRole, '删除权限:', globalHasDeletePermission);
 
-				if (globalHasDeletePermission) {
+				// 检查权限：开发者可以删除所有内容，普通用户只能删除自己的myPast
+				if (globalHasDeletePermission || (globalUserRole === 'user' && containerId === 'myPastContainer')) {
 					if (confirm('确定要删除这个项目吗？此操作不可恢复！')) {
 						try {
 							const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -2441,6 +2473,9 @@
 							let deleteUrl;
 							if (containerId === 'versionLogContainer') {
 								deleteUrl = `${apiBaseUrl}/changelog/${item._id}`;
+							} else if (containerId === 'myPastContainer') {
+								// 普通用户删除自己的 myPast 子条目
+								deleteUrl = `${apiBaseUrl}/timeline-data/myPast/items/${item._id}`;
 							} else {
 								deleteUrl = `${apiBaseUrl}/timeline-data/${item._id}`;
 							}
@@ -2461,7 +2496,7 @@
 								// 显示加载状态
 								showLoadingMessage('删除成功，正在刷新数据...');
 
-								// 重新加载数据
+								// 重新加载所有数据以确保UI同步
 								await loadAllData();
 
 								// 重新处理锚点跳转
@@ -2481,7 +2516,7 @@
 						}
 					}
 				} else {
-					alert('权限不足，只有开发者可以删除项目');
+					alert('权限不足，只有开发者可以删除所有项目，普通用户只能删除自己的My Past条目');
 				}
 			}
 
@@ -2954,6 +2989,13 @@
 
 			// 提交新条目
 			async function submitNewItem(type) {
+				// 防止重复提交
+				const submitBtn = document.querySelector('#addItemForm button[type="submit"]');
+				if (submitBtn) {
+					submitBtn.disabled = true;
+					submitBtn.textContent = '⏳ 提交中...';
+				}
+
 				try {
 					const title = document.getElementById('addTitle').value.trim();
 					const content = document.getElementById('addContent').value.trim();
@@ -3008,13 +3050,13 @@
 					} else {
 						const requestData = { type: 'health', data: [timelineItem] };
 						response = await fetch(`${apiBaseUrl}/timeline-data`, {
-						method: 'POST',
-						headers: {
-							'Authorization': `Bearer ${token}`,
-							'Content-Type': 'application/json'
-						},
-						body: JSON.stringify(requestData)
-					});
+							method: 'POST',
+							headers: {
+								'Authorization': `Bearer ${token}`,
+								'Content-Type': 'application/json'
+							},
+							body: JSON.stringify(requestData)
+						});
 					}
 
 					const result = await response.json();
@@ -3024,20 +3066,49 @@
 						// 关闭表单
 						closeAddForm();
 
+						// 显示成功提示
+						showSuccessMessage('添加成功！');
+
+						// 显示调试信息
+						showDebugInfo(`添加成功！\n类型: ${type}\n正在刷新数据...`);
+
 						// 显示加载状态
 						showLoadingMessage('添加成功，正在刷新数据...');
 
-						// 重新加载数据
-						const data = await loadTimelineData(type === 'myPastData' ? 'myPast' : 'health');
-						const containerId = type === 'myPastData' ? 'myPastContainer' : 'healthContainer';
-						renderTimeline(containerId, data, {
-							iconText: type === 'myPastData' ? '📅' : '🏥',
-							titleField: 'title',
-							timeField: 'time',
-							contentField: 'content',
-							imagesField: 'images',
-							videosField: 'videos'
-						});
+						// 重新加载数据并刷新页面显示
+						if (type === 'myPastData') {
+							// 对于myPast数据，重新加载并渲染
+							console.log('重新加载myPast数据...');
+							const data = await loadTimelineData('myPast');
+							console.log('重新加载的myPast数据:', data);
+							renderTimeline('myPastContainer', data.items || [], {
+								iconText: '📅', 
+								titleField: 'title', 
+								timeField: 'time', 
+								contentField: 'content', 
+								imagesField: 'images', 
+								videosField: 'videos',
+								statusText: data.statusText || ''
+							});
+							console.log('myPast数据渲染完成');
+							showDebugInfo(`myPast数据刷新完成\n共${data.items ? data.items.length : 0}条记录`);
+						} else {
+							// 对于health数据，重新加载并渲染
+							console.log('重新加载health数据...');
+							const data = await loadTimelineData('health');
+							console.log('重新加载的health数据:', data);
+							renderTimeline('healthContainer', data.items || [], {
+								iconText: '🏥', 
+								titleField: 'title', 
+								timeField: 'time', 
+								contentField: 'content', 
+								imagesField: 'images', 
+								videosField: 'videos',
+								statusText: data.statusText || ''
+							});
+							console.log('health数据渲染完成');
+							showDebugInfo(`health数据刷新完成\n共${data.items ? data.items.length : 0}条记录`);
+						}
 
 						// 隐藏加载状态
 						hideLoadingMessage();
@@ -3050,6 +3121,13 @@
 				} catch (error) {
 					console.error('添加失败:', error);
 					alert('添加失败，请稍后重试');
+				} finally {
+					// 恢复按钮状态
+					const submitBtn = document.querySelector('#addItemForm button[type="submit"]');
+					if (submitBtn) {
+						submitBtn.disabled = false;
+						submitBtn.textContent = '添加';
+					}
 				}
 			}
 
@@ -3458,6 +3536,36 @@
 					item.style.transform = 'translateY(0)';
 				}, index * 100);
 			});
+		});
+	</script>
+
+	<!-- 调试信息显示区域 -->
+	<div id="debugInfo" style="position: fixed; bottom: 20px; left: 20px; background: rgba(0,0,0,0.8); color: white; padding: 10px; border-radius: 5px; font-size: 12px; max-width: 300px; z-index: 9999; display: none;">
+		<div><strong>调试信息</strong></div>
+		<div id="debugContent"></div>
+		<button onclick="document.getElementById('debugInfo').style.display='none'" style="background: #16A085; color: white; border: none; padding: 2px 8px; border-radius: 3px; cursor: pointer; margin-top: 5px;">关闭</button>
+	</div>
+
+	<script>
+		// 显示调试信息的函数
+		function showDebugInfo(message) {
+			const debugInfo = document.getElementById('debugInfo');
+			const debugContent = document.getElementById('debugContent');
+			if (debugInfo && debugContent) {
+				debugContent.textContent = message;
+				debugInfo.style.display = 'block';
+				// 5秒后自动隐藏
+				setTimeout(() => {
+					debugInfo.style.display = 'none';
+				}, 5000);
+			}
+		}
+
+		// 在页面加载完成后显示初始调试信息
+		document.addEventListener('DOMContentLoaded', function() {
+			setTimeout(() => {
+				showDebugInfo(`页面加载完成\n用户角色: ${globalUserRole}\n编辑权限: ${globalHasEditPermission}\n删除权限: ${globalHasDeletePermission}`);
+			}, 1000);
 		});
 	</script>
 </body>
