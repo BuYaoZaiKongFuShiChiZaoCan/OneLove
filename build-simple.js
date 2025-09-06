@@ -1,8 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
 
-console.log('🔨 开始构建 Netlify Functions...');
+console.log('🔨 开始构建 Netlify Functions (简化版)...');
 
 // 确保 netlify-functions 目录存在
 const functionsDir = path.join(__dirname, 'backend', 'netlify-functions');
@@ -11,8 +10,7 @@ if (!fs.existsSync(functionsDir)) {
     console.log('✅ 创建 netlify-functions 目录');
 }
 
-// 复制 package.json 到 netlify-functions 目录
-const packageJsonPath = path.join(functionsDir, 'package.json');
+// 创建 package.json
 const packageJson = {
     "name": "onelove-api-functions",
     "version": "1.0.0",
@@ -39,37 +37,21 @@ const packageJson = {
     }
 };
 
-fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
-console.log('✅ 更新 package.json');
+fs.writeFileSync(path.join(functionsDir, 'package.json'), JSON.stringify(packageJson, null, 2));
+console.log('✅ 创建 package.json');
 
-// 复制必要的文件到 functions 目录
-const apiJsPath = path.join(functionsDir, 'api.js');
+// 创建 api.js 入口文件
 const apiContent = `// Netlify Functions 入口点
 // 直接导出合并后的server.js的handler
 module.exports = require('../server.js').handler;
 `;
-fs.writeFileSync(apiJsPath, apiContent);
+fs.writeFileSync(path.join(functionsDir, 'api.js'), apiContent);
 console.log('✅ 创建 api.js 入口文件');
 
-// 创建一个构建时间戳文件
-const timestampFile = path.join(functionsDir, 'build-timestamp.txt');
+// 创建构建时间戳
 const timestamp = new Date().toISOString();
-fs.writeFileSync(timestampFile, `Build time: ${timestamp}`);
+fs.writeFileSync(path.join(functionsDir, 'build-timestamp.txt'), `Build time: ${timestamp}`);
 console.log('✅ 创建构建时间戳文件');
-
-// 安装依赖
-try {
-    console.log('📦 正在安装 Functions 依赖...');
-    execSync('npm install --production', { 
-        cwd: functionsDir, 
-        stdio: 'inherit',
-        timeout: 120000 // 2分钟超时
-    });
-    console.log('✅ Functions 依赖安装完成');
-} catch (error) {
-    console.error('❌ Functions 依赖安装失败:', error.message);
-    // 不退出，继续构建过程
-}
 
 console.log('🎉 Netlify Functions 构建完成！');
 console.log(`📅 构建时间: ${timestamp}`);
