@@ -5,6 +5,7 @@
 // 导入必要的模块
 const express = require('express');        // Express框架 - 用于创建Web服务器
 const cors = require('cors');              // CORS中间件 - 处理跨域请求
+const serverless = require('serverless-http'); // Netlify Functions支持
 
 const morgan = require('morgan');          // 日志中间件 - 记录请求日志
 const path = require('path');              // 路径模块 - 处理文件路径
@@ -3088,4 +3089,6 @@ if (require.main === module) {
   })();
 }
 
+// 导出app和serverless handler
 module.exports = app;
+module.exports.handler = serverless(app);

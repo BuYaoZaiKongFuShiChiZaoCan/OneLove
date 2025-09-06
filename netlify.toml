@@ -1,14 +1,14 @@
 [build]
   publish = "."
   command = "npm run build"
-  functions = "backend/netlify-functions"
+  functions = "backend"
 
 [build.environment]
   NODE_VERSION = "18"
   NODE_ENV = "production"
 
 [functions]
-  directory = "backend/netlify-functions"
+  directory = "backend"
   node_bundler = "esbuild"
   external_node_modules = ["express", "cors", "bcryptjs", "jsonwebtoken", "mongoose", "dotenv", "morgan", "helmet", "express-validator", "multer", "serverless-http"]
 
