@@ -1,6 +1,6 @@
 // 数据恢复脚本 - 恢复被删除的changelog版本
 const mongoose = require('mongoose');
-const Changelog = require('./onelove-backend/models/Changelog');
+const Changelog = require('./backend/models/Changelog');
 
 // 数据库连接配置
 const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://OneLoveAdminQi:LG.2457_AtlasQiAdminOneLove@onelove.bepz2u0.mongodb.net/?retryWrites=true&w=majority&appName=OneLove';
