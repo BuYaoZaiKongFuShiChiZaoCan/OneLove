@@ -8,20 +8,25 @@ const mongoose = require('mongoose');
 const connectDB = async () => {
   try {
     // 获取数据库连接字符串（从环境变量或使用本地连接）
-    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/onelove_db';
+    const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/onelove_db';
+    const dbName = process.env.DB_NAME || 'OneLove';
     
     console.log('🔗 正在连接数据库...');
     
     // 连接数据库
     const conn = await mongoose.connect(mongoURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 5000, // 5秒超时
-      socketTimeoutMS: 45000, // 45秒socket超时
+      serverSelectionTimeoutMS: 8000,
+      connectTimeoutMS: 8000,
+      socketTimeoutMS: 45000,
+      maxPoolSize: 5,
+      minPoolSize: 0,
+      family: 4,
+      dbName: dbName
     });
 
     console.log(`✅ MongoDB 连接成功: ${conn.connection.host}`);
     console.log(`📊 数据库名称: ${conn.connection.name}`);
+    return true;
     
     // 监听连接事件
     mongoose.connection.on('error', (err) => {
@@ -45,23 +50,13 @@ const connectDB = async () => {
 
   } catch (error) {
     console.error('❌ 数据库连接失败:', error.message);
-    
-    // 如果是开发环境，提供更详细的错误信息
-    if (process.env.NODE_ENV === 'development') {
-      console.log('\n🔧 故障排除建议:');
-      console.log('1. 检查MONGODB_URI环境变量是否正确');
-      console.log('2. 确认MongoDB Atlas网络访问设置');
-      console.log('3. 验证用户名和密码是否正确');
-      console.log('4. 检查网络连接是否正常');
-    }
-    
-    // 在开发环境中，我们可以继续运行（使用内存数据）
-    if (process.env.NODE_ENV === 'development') {
-      console.log('⚠️ 开发模式：将使用内存数据继续运行');
-      return;
-    }
-    
-    process.exit(1);
+    global.__lastDbError = {
+      name: error.name,
+      code: error.code,
+      message: error.message
+    };
+    // 在无服务器环境或生产环境，不应直接退出进程；返回 false 由上层决定降级策略
+    return false;
   }
 };
 

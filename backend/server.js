@@ -85,38 +85,7 @@ require('dotenv').config({ path: './config.env' });
 // ========================================
 // 连接数据库
 // ========================================
-const connectDB = async () => {
-	try {
-		// 仅使用环境变量提供的连接串；未配置时退回本地开发地址，避免把云端凭据写进仓库
-		const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/onelove';
-
-		console.log('🔗 正在连接数据库...');
-		console.log('🔧 环境变量检查 -> has MONGODB_URI:', !!process.env.MONGODB_URI);
-
-		const conn = await mongoose.connect(mongoURI, {
-			serverSelectionTimeoutMS: 5000,
-			socketTimeoutMS: 45000,
-			// 一些无服务器平台（如 Netlify）可能优先使用 IPv6 出口，而免费/共享 Atlas 项目不支持 IPv6 白名单。
-			// 强制使用 IPv4 以提升连通性。
-			family: 4,
-		});
-
-		console.log(`✅ MongoDB 连接成功: ${conn.connection.host}`);
-		console.log(`📊 数据库名称: ${conn.connection.name}`);
-		return true;
-
-	} catch (error) {
-		console.error('❌ 数据库连接失败:', error.message);
-		// 记录最近一次错误，供 /api/health 返回
-		global.__lastDbError = {
-			name: error.name,
-			code: error.code,
-			message: error.message
-		};
-		console.log('⚠️ 开发模式：将使用内存数据继续运行');
-		return false;
-	}
-};
+const connectDB = require('./config/database');
 
 // ========================================
 // 数据模型
