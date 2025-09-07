@@ -104,6 +104,12 @@ const connectDB = async () => {
 
 	} catch (error) {
 		console.error('❌ 数据库连接失败:', error.message);
+		// 记录最近一次错误，供 /api/health 返回
+		global.__lastDbError = {
+			name: error.name,
+			code: error.code,
+			message: error.message
+		};
 		console.log('⚠️ 开发模式：将使用内存数据继续运行');
 		return false;
 	}
@@ -474,7 +480,8 @@ app.get('/api/health', (req, res) => {
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
     env: {
       hasMONGODB_URI: Boolean(process.env.MONGODB_URI)
-    }
+    },
+    dbError: global.__lastDbError || null
   });
 });
 
