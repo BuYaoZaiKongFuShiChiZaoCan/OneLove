@@ -85,9 +85,10 @@ require('dotenv').config({ path: './config.env' });
 // ========================================
 const connectDB = async () => {
 	try {
-		const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://OneLoveAdminQi:LG.2457_AtlasQiAdminOneLove@onelove.bepz2u0.mongodb.net/?retryWrites=true&w=majority&appName=OneLove';
+		const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://OneLoveAdminQi:LG.2457_AtlasQiAdminOneLove@onelove.bepz2u0.mongodb.net/onelove?retryWrites=true&w=majority&appName=OneLove';
 
 		console.log('🔗 正在连接数据库...');
+		console.log('🔧 环境变量检查 -> has MONGODB_URI:', !!process.env.MONGODB_URI);
 
 		const conn = await mongoose.connect(mongoURI, {
 			serverSelectionTimeoutMS: 5000,
@@ -382,6 +383,10 @@ app.get('/api/info', (req, res) => {
     version: APP_VERSION,
     timestamp: new Date().toISOString(),
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    env: {
+      hasMONGODB_URI: Boolean(process.env.MONGODB_URI),
+      nodeEnv: process.env.NODE_ENV || 'development'
+    },
     endpoints: {
 			'/api/auth/register': '用户注册',
 			'/api/auth/login': '用户登录',
@@ -463,7 +468,10 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
     version: APP_VERSION,
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    env: {
+      hasMONGODB_URI: Boolean(process.env.MONGODB_URI)
+    }
   });
 });
 
