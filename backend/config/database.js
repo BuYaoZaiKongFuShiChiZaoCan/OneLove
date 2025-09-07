@@ -7,6 +7,11 @@ const mongoose = require('mongoose');
 // 数据库连接函数
 const connectDB = async () => {
   try {
+    // 已连接直接返回，避免无服务器环境重复建连
+    if (mongoose.connection && mongoose.connection.readyState === 1) {
+      return true;
+    }
+
     // 获取数据库连接字符串（从环境变量或使用本地连接）
     const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/onelove_db';
     const dbName = process.env.DB_NAME || 'OneLove';
