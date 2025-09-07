@@ -71,7 +71,7 @@ if (mongoose.models.TimelineData) {
 // 创建Express应用实例
 const app = express();
 
-// 设置端口号（本地开发使用3001，生产环境使用环境变量）
+// 设置端口号
 const PORT = process.env.PORT || (process.env.NODE_ENV === 'development' ? 2457 : 3000);
 
 // JWT密钥（生产必须从环境变量提供；本地/临时环境随机生成以避免将密钥写入仓库）
@@ -96,6 +96,9 @@ const connectDB = async () => {
 		const conn = await mongoose.connect(mongoURI, {
 			serverSelectionTimeoutMS: 5000,
 			socketTimeoutMS: 45000,
+			// 一些无服务器平台（如 Netlify）可能优先使用 IPv6 出口，而免费/共享 Atlas 项目不支持 IPv6 白名单。
+			// 强制使用 IPv4 以提升连通性。
+			family: 4,
 		});
 
 		console.log(`✅ MongoDB 连接成功: ${conn.connection.host}`);
