@@ -14,9 +14,17 @@ const bcrypt = require('bcryptjs');        // 密码加密
 const jwt = require('jsonwebtoken');       // JWT令牌
 const fs = require('fs');                  // 文件系统模块
 
-// 读取package.json获取版本号
-const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8'));
-const APP_VERSION = packageJson.version;
+// 读取package.json获取版本号（在无服务器环境中可能不存在，需容错）
+let APP_VERSION = 'dev';
+try {
+  const packageJsonPath = path.join(__dirname, 'package.json');
+  if (fs.existsSync(packageJsonPath)) {
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    APP_VERSION = packageJson.version || APP_VERSION;
+  }
+} catch (_) {
+  // 忽略读取失败，使用默认版本
+}
 
 // 导入中间件
 const { requireAdmin } = require('./middleware/auth');
