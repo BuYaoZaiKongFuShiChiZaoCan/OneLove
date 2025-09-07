@@ -6,6 +6,9 @@
 [build.environment]
   NODE_VERSION = "18"
   NODE_ENV = "production"
+  # 避免机密扫描对常见键名/文档文件误报（不影响真正的环境变量注入）
+  SECRETS_SCAN_OMIT_KEYS = "PORT,NODE_ENV,CORS_ORIGIN,JWT_SECRET,MONGODB_URI"
+  SECRETS_SCAN_OMIT_PATHS = ".netlify/plugins/**,**/README*.md,**/README*.bak,**/package-lock.json,Pages/**,backend/config.env.example"
 
 [functions]
   directory = "backend/netlify-functions"
