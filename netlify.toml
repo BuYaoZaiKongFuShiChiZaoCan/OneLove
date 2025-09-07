@@ -35,7 +35,7 @@
 
 [dev]
   command = "npm run dev"
-  port = 3000
+  port = 2457
   publish = "."
   framework = "#static"
 

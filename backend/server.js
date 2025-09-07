@@ -72,7 +72,7 @@ if (mongoose.models.TimelineData) {
 const app = express();
 
 // 设置端口号（本地开发使用3001，生产环境使用环境变量）
-const PORT = process.env.PORT || (process.env.NODE_ENV === 'development' ? 3000 : 3001);
+const PORT = process.env.PORT || (process.env.NODE_ENV === 'development' ? 2457 : 3000);
 
 // JWT密钥（生产必须从环境变量提供；本地/临时环境随机生成以避免将密钥写入仓库）
 const crypto = require('crypto');
