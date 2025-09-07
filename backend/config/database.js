@@ -4,6 +4,10 @@
 
 const mongoose = require('mongoose');
 
+// 单例缓存，适配无服务器环境
+let connectPromise = null;
+let hasListenersBound = false;
+
 // 数据库连接函数
 const connectDB = async () => {
   try {
@@ -18,40 +22,54 @@ const connectDB = async () => {
     
     console.log('🔗 正在连接数据库...');
     
-    // 连接数据库
-    const conn = await mongoose.connect(mongoURI, {
-      serverSelectionTimeoutMS: 8000,
-      connectTimeoutMS: 8000,
-      socketTimeoutMS: 45000,
-      maxPoolSize: 5,
-      minPoolSize: 0,
-      family: 4,
-      dbName: dbName
-    });
+    // 绑定一次事件监听
+    if (!hasListenersBound) {
+      hasListenersBound = true;
+      mongoose.connection.on('error', (err) => {
+        console.error('❌ MongoDB 连接错误:', err);
+      });
+      mongoose.connection.on('disconnected', () => {
+        console.log('⚠️ MongoDB 连接断开');
+      });
+      mongoose.connection.on('reconnected', () => {
+        console.log('🔄 MongoDB 重新连接成功');
+      });
+    }
+
+    // 带重试的连接（最多3次指数退避）
+    const maxAttempts = 3;
+    const baseDelayMs = 400;
+    const attemptConnect = async (attempt) => {
+      try {
+        const conn = await mongoose.connect(mongoURI, {
+          serverSelectionTimeoutMS: 8000,
+          connectTimeoutMS: 8000,
+          socketTimeoutMS: 45000,
+          maxPoolSize: 5,
+          minPoolSize: 0,
+          family: 4,
+          dbName: dbName
+        });
+        return conn;
+      } catch (err) {
+        if (attempt < maxAttempts) {
+          const delay = baseDelayMs * Math.pow(2, attempt - 1);
+          console.log(`⏳ 连接失败，第${attempt}次重试后等待 ${delay}ms:`, err.message);
+          await new Promise(r => setTimeout(r, delay));
+          return attemptConnect(attempt + 1);
+        }
+        throw err;
+      }
+    };
+
+    if (!connectPromise) {
+      connectPromise = attemptConnect(1);
+    }
+    const conn = await connectPromise;
 
     console.log(`✅ MongoDB 连接成功: ${conn.connection.host}`);
     console.log(`📊 数据库名称: ${conn.connection.name}`);
     return true;
-    
-    // 监听连接事件
-    mongoose.connection.on('error', (err) => {
-      console.error('❌ MongoDB 连接错误:', err);
-    });
-
-    mongoose.connection.on('disconnected', () => {
-      console.log('⚠️ MongoDB 连接断开');
-    });
-
-    mongoose.connection.on('reconnected', () => {
-      console.log('🔄 MongoDB 重新连接成功');
-    });
-
-    // 优雅关闭
-    process.on('SIGINT', async () => {
-      await mongoose.connection.close();
-      console.log('📦 MongoDB 连接已关闭');
-      process.exit(0);
-    });
 
   } catch (error) {
     console.error('❌ 数据库连接失败:', error.message);
@@ -65,4 +83,10 @@ const connectDB = async () => {
   }
 };
 
-module.exports = connectDB; 
+// 导出状态/实例给调用方（可选使用）
+const getMongoose = () => mongoose;
+const getConnectionState = () => mongoose.connection?.readyState ?? 0;
+
+module.exports = connectDB;
+module.exports.getMongoose = getMongoose;
+module.exports.getConnectionState = getConnectionState;
