@@ -13,12 +13,11 @@
   external_node_modules = ["express", "cors", "bcryptjs", "jsonwebtoken", "mongoose", "dotenv", "morgan", "helmet", "express-validator", "multer", "serverless-http"]
 
 # 环境变量配置
-# 生产环境变量：不要把敏感信息写进仓库！
-# 请在 Netlify 后台（Site settings → Build & deploy → Environment）配置以下变量：
-# - JWT_SECRET
-# - MONGODB_URI
-# - CORS_ORIGIN (可选)
-# - NODE_ENV=production (可选)
+[context.production.environment]
+  NODE_ENV = "production"
+  JWT_SECRET = "OneLove_JWT_Secret_2024_Production_Key_For_Security"
+  MONGODB_URI = "mongodb+srv://OneLoveAdminQi:LG.2457_AtlasQiAdminOneLove@onelove.bepz2u0.mongodb.net/onelove?retryWrites=true&w=majority&appName=OneLove"
+  CORS_ORIGIN = "https://yibiling.netlify.app"
 
 [[redirects]]
   from = "/api/*"

@@ -74,8 +74,10 @@ const app = express();
 // 设置端口号（本地开发使用3001，生产环境使用环境变量）
 const PORT = process.env.PORT || (process.env.NODE_ENV === 'development' ? 3000 : 3001);
 
-// JWT密钥
-const JWT_SECRET = process.env.JWT_SECRET || 'OneLove_JWT_Secret_2024_Production_Key_For_Security';
+// JWT密钥（生产必须从环境变量提供；本地/临时环境随机生成以避免将密钥写入仓库）
+const crypto = require('crypto');
+const isProduction = (process.env.NODE_ENV || '').toLowerCase() === 'production';
+const JWT_SECRET = process.env.JWT_SECRET || (isProduction ? '' : crypto.randomBytes(32).toString('hex'));
 
 // 加载环境变量
 require('dotenv').config({ path: './config.env' });
@@ -85,7 +87,8 @@ require('dotenv').config({ path: './config.env' });
 // ========================================
 const connectDB = async () => {
 	try {
-		const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://OneLoveAdminQi:LG.2457_AtlasQiAdminOneLove@onelove.bepz2u0.mongodb.net/onelove?retryWrites=true&w=majority&appName=OneLove';
+		// 仅使用环境变量提供的连接串；未配置时退回本地开发地址，避免把云端凭据写进仓库
+		const mongoURI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/onelove';
 
 		console.log('🔗 正在连接数据库...');
 		console.log('🔧 环境变量检查 -> has MONGODB_URI:', !!process.env.MONGODB_URI);
