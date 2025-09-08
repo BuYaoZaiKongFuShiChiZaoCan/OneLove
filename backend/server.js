@@ -5,6 +5,7 @@
 // 导入必要的模块
 const express = require('express');        // Express框架 - 用于创建Web服务器
 const cors = require('cors');              // CORS中间件 - 处理跨域请求
+const serverless = require('serverless-http'); // Netlify Functions支持
 
 const morgan = require('morgan');          // 日志中间件 - 记录请求日志
 const path = require('path');              // 路径模块 - 处理文件路径
@@ -13,9 +14,17 @@ const bcrypt = require('bcryptjs');        // 密码加密
 const jwt = require('jsonwebtoken');       // JWT令牌
 const fs = require('fs');                  // 文件系统模块
 
-// 读取package.json获取版本号
-const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8'));
-const APP_VERSION = packageJson.version;
+// 读取package.json获取版本号（在无服务器环境中可能不存在，需容错）
+let APP_VERSION = 'dev';
+try {
+  const packageJsonPath = path.join(__dirname, 'package.json');
+  if (fs.existsSync(packageJsonPath)) {
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    APP_VERSION = packageJson.version || APP_VERSION;
+  }
+} catch (_) {
+  // 忽略读取失败，使用默认版本
+}
 
 // 导入中间件
 const { requireAdmin } = require('./middleware/auth');
@@ -62,11 +71,13 @@ if (mongoose.models.TimelineData) {
 // 创建Express应用实例
 const app = express();
 
-// 设置端口号（本地开发使用3001，生产环境使用环境变量）
-const PORT = process.env.PORT || (process.env.NODE_ENV === 'development' ? 3000 : 3001);
+// 设置端口号
+const PORT = process.env.PORT || (process.env.NODE_ENV === 'development' ? 2457 : 3000);
 
-// JWT密钥
-const JWT_SECRET = process.env.JWT_SECRET || 'OneLove_JWT_Secret_2024_Production_Key_For_Security';
+// JWT密钥（生产必须从环境变量提供；本地/临时环境随机生成以避免将密钥写入仓库）
+const crypto = require('crypto');
+const isProduction = (process.env.NODE_ENV || '').toLowerCase() === 'production';
+const JWT_SECRET = process.env.JWT_SECRET || (isProduction ? '' : crypto.randomBytes(32).toString('hex'));
 
 // 加载环境变量
 require('dotenv').config({ path: './config.env' });
@@ -74,27 +85,7 @@ require('dotenv').config({ path: './config.env' });
 // ========================================
 // 连接数据库
 // ========================================
-const connectDB = async () => {
-	try {
-		const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://OneLoveAdminQi:LG.2457_AtlasQiAdminOneLove@onelove.bepz2u0.mongodb.net/?retryWrites=true&w=majority&appName=OneLove';
-
-		console.log('🔗 正在连接数据库...');
-
-		const conn = await mongoose.connect(mongoURI, {
-			serverSelectionTimeoutMS: 5000,
-			socketTimeoutMS: 45000,
-		});
-
-		console.log(`✅ MongoDB 连接成功: ${conn.connection.host}`);
-		console.log(`📊 数据库名称: ${conn.connection.name}`);
-		return true;
-
-	} catch (error) {
-		console.error('❌ 数据库连接失败:', error.message);
-		console.log('⚠️ 开发模式：将使用内存数据继续运行');
-		return false;
-	}
-};
+const connectDB = require('./config/database');
 
 // ========================================
 // 数据模型
@@ -373,6 +364,10 @@ app.get('/api/info', (req, res) => {
     version: APP_VERSION,
     timestamp: new Date().toISOString(),
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    env: {
+      hasMONGODB_URI: Boolean(process.env.MONGODB_URI),
+      nodeEnv: process.env.NODE_ENV || 'development'
+    },
     endpoints: {
 			'/api/auth/register': '用户注册',
 			'/api/auth/login': '用户登录',
@@ -454,7 +449,11 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'development',
     version: APP_VERSION,
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    env: {
+      hasMONGODB_URI: Boolean(process.env.MONGODB_URI)
+    },
+    dbError: global.__lastDbError || null
   });
 });
 
@@ -3088,4 +3087,6 @@ if (require.main === module) {
   })();
 }
 
+// 导出app和serverless handler
 module.exports = app;
+module.exports.handler = serverless(app);

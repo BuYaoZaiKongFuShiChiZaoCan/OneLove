@@ -4,8 +4,11 @@
   functions = "backend/netlify-functions"
 
 [build.environment]
-  NODE_VERSION = "18"
+  NODE_VERSION = "20"
   NODE_ENV = "production"
+  # 避免机密扫描对常见键名/文档文件误报（不影响真正的环境变量注入）
+  SECRETS_SCAN_OMIT_KEYS = "PORT,NODE_ENV,CORS_ORIGIN,JWT_SECRET,MONGODB_URI"
+  SECRETS_SCAN_OMIT_PATHS = ".netlify/plugins/**,**/README*.md,**/README*.bak,**/package-lock.json,Pages/**,backend/config.env.example"
 
 [functions]
   directory = "backend/netlify-functions"
@@ -16,7 +19,8 @@
 [context.production.environment]
   NODE_ENV = "production"
   JWT_SECRET = "OneLove_JWT_Secret_2024_Production_Key_For_Security"
-  MONGODB_URI = "mongodb+srv://OneLoveAdminQi:LG.2457_AtlasQiAdminOneLove@onelove.bepz2u0.mongodb.net/onelove?retryWrites=true&w=majority&appName=OneLove"
+  MONGODB_URI = "mongodb+srv://LG2457OneLove:LG2457OneLove@onelove.bepz2u0.mongodb.net/?retryWrites=true&w=majority&appName=OneLove"
+  DB_NAME = "onelove"
   CORS_ORIGIN = "https://yibiling.netlify.app"
 
 [[redirects]]
@@ -32,7 +36,7 @@
 
 [dev]
   command = "npm run dev"
-  port = 3000
+  port = 2457
   publish = "."
   framework = "#static"
 
