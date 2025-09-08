@@ -14,6 +14,9 @@ const bcrypt = require('bcryptjs');        // 密码加密
 const jwt = require('jsonwebtoken');       // JWT令牌
 const fs = require('fs');                  // 文件系统模块
 
+// 优先加载环境变量，确保后续读取到正确的配置（例如 JWT_SECRET）
+require('dotenv').config({ path: './config.env' });
+
 // 读取package.json获取版本号（在无服务器环境中可能不存在，需容错）
 let APP_VERSION = 'dev';
 try {
@@ -79,8 +82,6 @@ const crypto = require('crypto');
 const isProduction = (process.env.NODE_ENV || '').toLowerCase() === 'production';
 const JWT_SECRET = process.env.JWT_SECRET || (isProduction ? '' : crypto.randomBytes(32).toString('hex'));
 
-// 加载环境变量
-require('dotenv').config({ path: './config.env' });
 
 // ========================================
 // 连接数据库
