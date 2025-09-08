@@ -15,7 +15,8 @@ const jwt = require('jsonwebtoken');       // JWT令牌
 const fs = require('fs');                  // 文件系统模块
 
 // 优先加载环境变量，确保后续读取到正确的配置（例如 JWT_SECRET）
-require('dotenv').config({ path: './config.env' });
+const envPath = path.join(__dirname, 'config.env');
+require('dotenv').config({ path: envPath });
 
 // 读取package.json获取版本号（在无服务器环境中可能不存在，需容错）
 let APP_VERSION = 'dev';
@@ -552,7 +553,13 @@ app.post('/api/auth/login', securityAudit, loggerMiddleware('LOGIN', '/api/auth/
 			});
 		}
 
-		// 检查数据库连接状态
+		// 检查数据库连接状态（若未连接则先尝试连接一次）
+		if (mongoose.connection.readyState !== 1) {
+			try {
+				await connectDB();
+			} catch (_) {}
+		}
+
 		if (mongoose.connection.readyState !== 1) {
 			// 数据库未连接，使用模拟数据
 			if (username === 'admin' && password === 'admin123') {

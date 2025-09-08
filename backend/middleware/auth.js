@@ -5,8 +5,9 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-// 加载环境变量
-require('dotenv').config({ path: './config.env' });
+// 加载环境变量（兼容函数环境路径）
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, 'config.env') });
 
 // JWT密钥（从环境变量获取，开发环境使用默认值）
 const JWT_SECRET = process.env.JWT_SECRET || 'OneLove_JWT_Secret_2024_Production_Key_For_Security';
