@@ -37,6 +37,9 @@ let songs = [
 	"许巍 - 蓝莲花",
 	/* happyEnd */
 	"彩云之南-徐千雅",
+	/* li·刘某人 黄某人 奖励哥 */
+	"Lemon Tree - Fool’s Garden",
+	/* li·end */
 	/* shw */
 	"别怕我伤心-张信哲",
 	"胡彦斌-你要的全拿走",
