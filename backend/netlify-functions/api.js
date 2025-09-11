@@ -126,6 +126,8 @@ const phoneSchema = new mongoose.Schema({
 
 const Password = mongoose.models.Password || mongoose.model('Password', passwordSchema);
 const Phone = mongoose.models.Phone || mongoose.model('Phone', phoneSchema);
+const fs = require('fs');
+const path = require('path');
 
 // 连接数据库
 const connectDB = async () => {
@@ -992,13 +994,15 @@ app.get('/api/userdata/stats', authenticateToken, async (req, res) => {
 		const passwordCount = await Password.countDocuments({ userId });
 		const phoneDoc = await Phone.findOne({ userId });
 		const phoneCount = phoneDoc ? Object.keys(phoneDoc.data || {}).length : 0;
+		const noteCount = 0;
 
 		return res.json({
 			success: true,
 			data: {
-				total: passwordCount + phoneCount,
+				total: passwordCount + phoneCount + noteCount,
 				passwords: passwordCount,
 				phones: phoneCount,
+				notes: noteCount,
 				lastLogin: user.lastLogin || null
 			}
 		});
@@ -1283,6 +1287,68 @@ app.get('/api/userdata/access-logs', authenticateToken, async (req, res) => {
 // 访问统计
 app.get('/api/userdata/access-stats', authenticateToken, async (req, res) => {
 	return res.json({ success: true, data: { total: 0 } });
+});
+
+// ========== 数据迁移：从仓库 JSON 文件导入到当前用户 ==========
+// 仅开发者/管理员可用。用于将仓库根目录的 password.json / phone.json 导入 MongoDB
+app.post('/api/migrate/from-files', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
+    try {
+        const dbConnected = await connectDB();
+        if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+        const userId = req.user.userId;
+
+        // 解析文件路径：函数位于 backend/netlify-functions，下跳两级到项目根目录
+        const rootDir = path.resolve(__dirname, '../../');
+        const passwordJsonPath = path.join(rootDir, 'password.json');
+        const phoneJsonPath = path.join(rootDir, 'phone.json');
+
+        let importedPasswords = 0;
+        let importedPhones = 0;
+
+        // 导入密码
+        if (fs.existsSync(passwordJsonPath)) {
+            const raw = fs.readFileSync(passwordJsonPath, 'utf8');
+            const obj = JSON.parse(raw || '{}');
+
+            // 清理当前用户原有密码
+            await Password.deleteMany({ userId });
+
+            const docs = [];
+            Object.keys(obj || {}).forEach(category => {
+                const data = obj[category];
+                if (data && typeof data === 'object') {
+                    docs.push({ userId, category, data });
+                }
+            });
+            if (docs.length > 0) {
+                await Password.insertMany(docs);
+                importedPasswords = docs.length;
+            }
+        }
+
+        // 导入手机
+        if (fs.existsSync(phoneJsonPath)) {
+            const raw = fs.readFileSync(phoneJsonPath, 'utf8');
+            const obj = JSON.parse(raw || '{}');
+
+            await Phone.findOneAndDelete({ userId });
+            await Phone.create({ userId, data: obj || {} });
+            importedPhones = Object.keys(obj || {}).length;
+        }
+
+        return res.json({
+            success: true,
+            message: '导入完成',
+            data: {
+                importedPasswords,
+                importedPhones
+            }
+        });
+    } catch (error) {
+        console.error('❌ 从文件导入失败:', error);
+        return res.status(500).json({ success: false, message: '从文件导入失败: ' + error.message });
+    }
 });
 
 module.exports.handler = serverless(app);
