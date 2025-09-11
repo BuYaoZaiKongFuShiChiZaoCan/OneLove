@@ -13,8 +13,16 @@ app.use(cors());
 app.use(express.json());
 
 // 环境变量
-const JWT_SECRET = process.env.JWT_SECRET || 'OneLove_JWT_Secret_2024_Production_Key_For_Security';
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://OneLoveAdminQi:LG.2457_AtlasQiAdminOneLove@onelove.bepz2u0.mongodb.net/onelove?retryWrites=true&w=majority&appName=OneLove';
+const JWT_SECRET = process.env.JWT_SECRET;
+const MONGODB_URI = process.env.MONGODB_URI;
+const APP_VERSION = process.env.APP_VERSION || '1.0.0';
+if (!JWT_SECRET) {
+	console.error('配置缺失: JWT_SECRET 未设置');
+}
+if (!MONGODB_URI) {
+	console.error('配置缺失: MONGODB_URI 未设置');
+}
+
 
 console.log('🔧 API初始化 - 环境变量检查:');
 console.log('JWT_SECRET:', JWT_SECRET ? '已设置' : '使用默认值');
@@ -64,6 +72,60 @@ const timelineDataSchema = new mongoose.Schema({
 });
 
 const TimelineData = mongoose.models.TimelineData || mongoose.model('TimelineData', timelineDataSchema);
+
+// ========== 加密工具与密码/手机模型 ==========
+const Encryption = require('../utils/encryption');
+
+const passwordSchema = new mongoose.Schema({
+	userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+	category: { type: String, required: true },
+	data: { type: mongoose.Schema.Types.Mixed, required: true },
+	isEncrypted: { type: Boolean, default: false },
+	encryptionIv: { type: String, default: null },
+	createdAt: { type: Date, default: Date.now },
+	updatedAt: { type: Date, default: Date.now }
+});
+
+passwordSchema.pre('save', function (next) {
+	if (this.isModified('data') && !this.isEncrypted) {
+		const encrypted = Encryption.encryptObject(this.data);
+		if (encrypted) {
+			this.data = encrypted.encrypted;
+			this.encryptionIv = encrypted.iv;
+			this.isEncrypted = true;
+		}
+	}
+	this.updatedAt = new Date();
+	next();
+});
+
+passwordSchema.post('find', function (docs) {
+	if (docs && Array.isArray(docs)) {
+		docs.forEach(doc => {
+			if (doc.isEncrypted && doc.encryptionIv) {
+				const decrypted = Encryption.decryptObject(doc.data, doc.encryptionIv);
+				if (decrypted) doc.data = decrypted;
+			}
+		});
+	}
+});
+
+passwordSchema.post('findOne', function (doc) {
+	if (doc && doc.isEncrypted && doc.encryptionIv) {
+		const decrypted = Encryption.decryptObject(doc.data, doc.encryptionIv);
+		if (decrypted) doc.data = decrypted;
+	}
+});
+
+const phoneSchema = new mongoose.Schema({
+	userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+	data: { type: mongoose.Schema.Types.Mixed, required: true },
+	createdAt: { type: Date, default: Date.now },
+	updatedAt: { type: Date, default: Date.now }
+});
+
+const Password = mongoose.models.Password || mongoose.model('Password', passwordSchema);
+const Phone = mongoose.models.Phone || mongoose.model('Phone', phoneSchema);
 
 // 连接数据库
 const connectDB = async () => {
@@ -129,6 +191,37 @@ app.get('/api/health', async (req, res) => {
 		environment: 'netlify-functions',
 		database: dbConnected ? 'connected' : 'disconnected'
 	});
+});
+
+// API信息
+app.get('/api/info', (req, res) => {
+	res.json({
+		message: '欢迎使用 OneLove 无服务器API（Netlify Functions）',
+		version: APP_VERSION,
+		timestamp: new Date().toISOString(),
+		environment: 'netlify-functions',
+		database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+		endpoints: {
+			'/api/auth/register': '用户注册',
+			'/api/auth/login': '用户登录',
+			'/api/auth/me': '获取用户信息',
+			'/api/auth/profile': '更新用户信息',
+			'/api/auth/password': '修改密码',
+			'/api/auth/logout': '用户登出',
+			'/api/health': '健康检查',
+			'/api/changelog': '版本信息'
+		}
+	});
+});
+
+// 简单数据（用于前端连通性测试）
+app.get('/api/data', (req, res) => {
+	const data = {
+		message: '这是来自 Netlify Functions 的数据',
+		timestamp: new Date().toISOString(),
+		random: Math.random()
+	};
+	res.json({ success: true, data });
 });
 
 // 用户角色检查
@@ -886,7 +979,7 @@ app.get('/api/users/:id', async (req, res) => {
 	}
 });
 
-// ========== UserData 统计（占位实现，避免404） ==========
+// ========== UserData 统计 ==========
 app.get('/api/userdata/stats', authenticateToken, async (req, res) => {
 	try {
 		const dbConnected = await connectDB();
@@ -895,63 +988,225 @@ app.get('/api/userdata/stats', authenticateToken, async (req, res) => {
 		const user = await User.findById(req.user.userId);
 		if (!user) return res.status(404).json({ success: false, message: '用户不存在' });
 
-		// 占位统计，后续可接入真实 passwords/phones/backups 集合
-		const stats = {
-			passwords: 0,
-			phones: 0,
-			backups: 0,
-			accessLogs: 0,
-			lastLogin: user.lastLogin || null
-		};
+		const userId = user._id;
+		const passwordCount = await Password.countDocuments({ userId });
+		const phoneDoc = await Phone.findOne({ userId });
+		const phoneCount = phoneDoc ? Object.keys(phoneDoc.data || {}).length : 0;
 
-		return res.json({ success: true, data: stats });
+		return res.json({
+			success: true,
+			data: {
+				total: passwordCount + phoneCount,
+				passwords: passwordCount,
+				phones: phoneCount,
+				lastLogin: user.lastLogin || null
+			}
+		});
 	} catch (error) {
 		console.error('❌ 获取用户数据统计失败:', error);
 		return res.status(500).json({ success: false, message: '统计失败' });
 	}
 });
 
-// ========== UserData 密码/手机 CRUD 与查询（占位实现） ==========
-// 密码列表
+// ========== UserData 密码/手机 CRUD 与查询 ==========
+// 获取密码数据
 app.get('/api/userdata/passwords', authenticateToken, async (req, res) => {
-	return res.json({ success: true, data: [] });
-});
-// 密码查询
-app.get('/api/userdata/passwords/query', authenticateToken, async (req, res) => {
-	return res.json({ success: true, data: [] });
-});
-// 新增密码
-app.post('/api/userdata/passwords', authenticateToken, async (req, res) => {
-	return res.json({ success: true, data: { id: 'placeholder', ...req.body } });
-});
-// 更新密码
-app.put('/api/userdata/passwords/:id', authenticateToken, async (req, res) => {
-	return res.json({ success: true, data: { id: req.params.id, ...req.body } });
-});
-// 删除密码
-app.delete('/api/userdata/passwords/:id', authenticateToken, async (req, res) => {
-	return res.json({ success: true, message: 'deleted' });
-});
-// 通过分类名删除密码
-app.delete('/api/userdata/passwords/category/:category', authenticateToken, async (req, res) => {
-	return res.json({ success: true, message: 'deleted by category', category: req.params.category });
+	try {
+		const dbConnected = await connectDB();
+		if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+		const userId = req.user.userId;
+		const passwords = await Password.find({ userId });
+
+		const formattedData = {};
+		const passwordIds = {};
+		passwords.forEach(p => {
+			formattedData[p.category] = p.data;
+			passwordIds[p.category] = p._id;
+		});
+
+		return res.json({ success: true, data: formattedData, ids: passwordIds });
+	} catch (error) {
+		console.error('❌ 获取密码列表失败:', error);
+		return res.status(500).json({ success: false, message: '获取密码数据失败' });
+	}
 });
 
-// 手机列表
+// 查询密码ID（按分类）
+app.get('/api/userdata/passwords/query', authenticateToken, async (req, res) => {
+	try {
+		const dbConnected = await connectDB();
+		if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+		const userId = req.user.userId;
+		const { category } = req.query;
+		if (!category) return res.status(400).json({ success: false, message: '分类名不能为空' });
+
+		const password = await Password.findOne({ userId, category });
+		if (!password) return res.status(404).json({ success: false, message: '密码不存在' });
+		return res.json({ success: true, id: password._id, category: password.category });
+	} catch (error) {
+		console.error('❌ 查询密码ID失败:', error);
+		return res.status(500).json({ success: false, message: '查询失败' });
+	}
+});
+
+// 新增密码
+app.post('/api/userdata/passwords', authenticateToken, async (req, res) => {
+	try {
+		const dbConnected = await connectDB();
+		if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+		const userId = req.user.userId;
+		const { category, data } = req.body || {};
+		if (!category || !data) return res.status(400).json({ success: false, message: '分类和数据不能为空' });
+
+		const created = await Password.create({ userId, category, data });
+		return res.json({ success: true, message: '密码添加成功', data: created });
+	} catch (error) {
+		console.error('❌ 添加密码失败:', error);
+		return res.status(500).json({ success: false, message: '添加失败' });
+	}
+});
+
+// 更新密码
+app.put('/api/userdata/passwords/:id', authenticateToken, async (req, res) => {
+	try {
+		const dbConnected = await connectDB();
+		if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+		const userId = req.user.userId;
+		const passwordId = req.params.id;
+		const { category, data } = req.body || {};
+
+		const updated = await Password.findOneAndUpdate(
+			{ _id: passwordId, userId },
+			{ category, data, updatedAt: new Date(), isEncrypted: false },
+			{ new: true }
+		);
+		if (!updated) return res.status(404).json({ success: false, message: '密码不存在或无权限修改' });
+		return res.json({ success: true, message: '密码更新成功', data: updated });
+	} catch (error) {
+		console.error('❌ 更新密码失败:', error);
+		return res.status(500).json({ success: false, message: '更新失败' });
+	}
+});
+
+// 删除密码（按ID）
+app.delete('/api/userdata/passwords/:id', authenticateToken, async (req, res) => {
+	try {
+		const dbConnected = await connectDB();
+		if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+		const userId = req.user.userId;
+		const passwordId = req.params.id;
+		const deleted = await Password.findOneAndDelete({ _id: passwordId, userId });
+		if (!deleted) return res.status(404).json({ success: false, message: '密码不存在或无权限删除' });
+		return res.json({ success: true, message: '密码删除成功' });
+	} catch (error) {
+		console.error('❌ 删除密码失败:', error);
+		return res.status(500).json({ success: false, message: '删除失败' });
+	}
+});
+
+// 通过分类名删除密码
+app.delete('/api/userdata/passwords/category/:category', authenticateToken, async (req, res) => {
+	try {
+		const dbConnected = await connectDB();
+		if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+		const userId = req.user.userId;
+		const category = decodeURIComponent(req.params.category);
+		const deleted = await Password.findOneAndDelete({ userId, category });
+		if (!deleted) return res.status(404).json({ success: false, message: '密码不存在或无权限删除' });
+		return res.json({ success: true, message: '密码删除成功' });
+	} catch (error) {
+		console.error('❌ 通过分类名删除密码失败:', error);
+		return res.status(500).json({ success: false, message: '删除失败' });
+	}
+});
+
+// 获取手机数据
 app.get('/api/userdata/phones', authenticateToken, async (req, res) => {
-	return res.json({ success: true, data: [] });
+	try {
+		const dbConnected = await connectDB();
+		if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+		const userId = req.user.userId;
+		const phoneDoc = await Phone.findOne({ userId });
+		return res.json({ success: true, data: phoneDoc ? phoneDoc.data : {} });
+	} catch (error) {
+		console.error('❌ 获取手机数据失败:', error);
+		return res.status(500).json({ success: false, message: '获取失败' });
+	}
 });
-// 新增手机
+
+// 新增或覆盖手机数据
 app.post('/api/userdata/phones', authenticateToken, async (req, res) => {
-	return res.json({ success: true, data: { id: 'placeholder', ...req.body } });
+	try {
+		const dbConnected = await connectDB();
+		if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+		const userId = req.user.userId;
+		const { data } = req.body || {};
+		if (!data || typeof data !== 'object') return res.status(400).json({ success: false, message: '手机数据格式错误' });
+
+		let phoneDoc = await Phone.findOne({ userId });
+		if (!phoneDoc) {
+			phoneDoc = await Phone.create({ userId, data });
+		} else {
+			phoneDoc.data = data;
+			phoneDoc.updatedAt = new Date();
+			await phoneDoc.save();
+		}
+		return res.json({ success: true, message: '手机数据保存成功' });
+	} catch (error) {
+		console.error('❌ 保存手机数据失败:', error);
+		return res.status(500).json({ success: false, message: '保存失败' });
+	}
 });
-// 更新手机
+
+// 更新单个手机记录键值对
 app.put('/api/userdata/phones/:id', authenticateToken, async (req, res) => {
-	return res.json({ success: true, data: { id: req.params.id, ...req.body } });
+	try {
+		const dbConnected = await connectDB();
+		if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+		const userId = req.user.userId;
+		const { key, value } = req.body || {};
+		if (!key) return res.status(400).json({ success: false, message: '缺少 key' });
+		const phoneDoc = await Phone.findOne({ userId });
+		if (!phoneDoc) return res.status(404).json({ success: false, message: '未找到手机数据' });
+		phoneDoc.data[key] = value;
+		phoneDoc.updatedAt = new Date();
+		await phoneDoc.save();
+		return res.json({ success: true, message: '更新成功' });
+	} catch (error) {
+		console.error('❌ 更新手机数据失败:', error);
+		return res.status(500).json({ success: false, message: '更新失败' });
+	}
 });
-// 删除手机
+
+// 删除单个手机记录（按键）
 app.delete('/api/userdata/phones/:id', authenticateToken, async (req, res) => {
-	return res.json({ success: true, message: 'deleted' });
+	try {
+		const dbConnected = await connectDB();
+		if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+		const userId = req.user.userId;
+		const key = req.params.id;
+		const phoneDoc = await Phone.findOne({ userId });
+		if (!phoneDoc || !phoneDoc.data || !(key in phoneDoc.data)) {
+			return res.status(404).json({ success: false, message: '该手机记录不存在' });
+		}
+		delete phoneDoc.data[key];
+		phoneDoc.updatedAt = new Date();
+		await phoneDoc.save();
+		return res.json({ success: true, message: '删除成功' });
+	} catch (error) {
+		console.error('❌ 删除手机数据失败:', error);
+		return res.status(500).json({ success: false, message: '删除失败' });
+	}
 });
 
 // ========== Admin 管理端（占位实现，需更细权限时可切换为 requireAdmin） ==========
@@ -976,11 +1231,11 @@ app.delete('/api/admin/phones/:id', authenticateToken, requireAdmin, async (req,
 	return res.json({ success: true, message: 'admin deleted phone', id: req.params.id });
 });
 // 管理更新用户角色
-app.put('/api/admin/users/:id/role', authenticateToken, requireAdmin, async (req, res) => {
+app.put('/api/admin/users/:id/role', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
 	return res.json({ success: true, message: 'role updated (placeholder)', id: req.params.id, role: req.body?.role || 'user' });
 });
 // 管理禁用/启用用户
-app.put('/api/admin/users/:id/status', authenticateToken, requireAdmin, async (req, res) => {
+app.put('/api/admin/users/:id/status', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
 	return res.json({ success: true, message: 'status updated (placeholder)', id: req.params.id, isActive: !!req.body?.isActive });
 });
 
