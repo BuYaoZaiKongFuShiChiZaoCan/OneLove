@@ -12,16 +12,17 @@
   node_bundler = "esbuild"
   external_node_modules = ["express", "cors", "bcryptjs", "jsonwebtoken", "mongoose", "dotenv", "morgan", "helmet", "express-validator", "multer", "serverless-http"]
 
-# 环境变量配置
+# 生产环境占位（真实值放 Netlify 面板）
 [context.production.environment]
   NODE_ENV = "production"
-  JWT_SECRET = "OneLove_JWT_Secret_2024_Production_Key_For_Security"
-  MONGODB_URI = "mongodb+srv://OneLoveAdminQi:LG.2457_AtlasQiAdminOneLove@onelove.bepz2u0.mongodb.net/onelove?retryWrites=true&w=majority&appName=OneLove"
-  CORS_ORIGIN = "https://yibiling.netlify.app"
+  JWT_SECRET = "REPLACE_IN_NETLIFY_DASHBOARD"
+  MONGODB_URI = "REPLACE_IN_NETLIFY_DASHBOARD"
+  CORS_ORIGIN = "https://uplove.netlify.app"
+  APP_VERSION = "1.0.0"
 
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/api/:splat"
+  to = "/.netlify/functions/api/api/:splat"
   status = 200
   force = true
 
