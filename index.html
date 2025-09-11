@@ -589,15 +589,6 @@
 			<div class="side-menu-actions" id="sideMenuActions" style="display: none;">
 				<h3><i class="fas fa-tools"></i> 快速操作</h3>
 				<div class="action-buttons">
-					<a href="#" class="btn-action" id="addPasswordBtn">
-						<i class="fas fa-key"></i> 添加密码
-					</a>
-					<a href="#" class="btn-action" id="addPhoneBtn">
-						<i class="fas fa-phone"></i> 添加电话
-					</a>
-					<a href="#" class="btn-action" id="addNoteBtn">
-						<i class="fas fa-sticky-note"></i> 添加笔记
-					</a>
 					<button class="btn-action" onclick="showRestReminder()">
 						<i class="fas fa-clock"></i> 休息提醒
 					</button>
@@ -949,6 +940,9 @@
 			let baseRestTime = 180; // 基础休息时间3分钟
 			let accumulatedTime = 0; // 累计工作时长（秒）
 			let lastStartTime = null; // 上次开始工作的时间
+
+			// 屏幕锁定时间戳存储键
+			const SCREEN_LOCKED_AT_KEY = 'restScreenLockedAt';
 
 			// 获取屏幕亮度建议
 			function getBrightnessSuggestion() {
@@ -1369,6 +1363,71 @@
 					saveAccumulatedTime();
 
 					console.log(`累计工作时长：${Math.floor(accumulatedTime / 60)}分${accumulatedTime % 60}秒`);
+				}
+			}
+
+			// 记录/读取/清除屏幕锁定时间戳
+			function recordScreenLockedTimestamp() {
+				try { localStorage.setItem(SCREEN_LOCKED_AT_KEY, Date.now().toString()); } catch (e) { /* 忽略 */ }
+			}
+			function getScreenLockedTimestamp() {
+				try { return parseInt(localStorage.getItem(SCREEN_LOCKED_AT_KEY) || ''); } catch (e) { return NaN; }
+			}
+			function clearScreenLockedTimestamp() {
+				try { localStorage.removeItem(SCREEN_LOCKED_AT_KEY); } catch (e) { /* 忽略 */ }
+			}
+
+			// 屏幕长时间熄灭后的重置
+			function resetRestStateForLongScreenOff() {
+				console.log('检测到屏幕长时间熄灭（>2分钟），重置休息提醒与累计');
+				// 隐藏蒙层并结束休息
+				try { hideRestReminder(); } catch (e) { /* 若未显示忽略 */ }
+				// 清理计时器
+				if (restTimer) { clearTimeout(restTimer); restTimer = null; }
+				if (breakTimer) { clearTimeout(breakTimer); breakTimer = null; }
+				// 重置累计
+				resetAccumulatedTime();
+			}
+
+			// 初始化屏幕状态监控（Idle Detection API）
+			async function setupScreenStateMonitor() {
+				if (!('IdleDetector' in window)) {
+					console.warn('IdleDetector API 不可用，无法检测设备屏幕锁定状态');
+					return;
+				}
+				try {
+					const permission = await window.IdleDetector.requestPermission();
+					if (permission !== 'granted') {
+						console.warn('未授予空闲检测权限，屏幕状态监控不可用');
+						return;
+					}
+					const idleDetector = new window.IdleDetector({ threshold: 60000 }); // 1分钟阈值
+					idleDetector.addEventListener('change', () => {
+						const { screenState, userState } = idleDetector;
+						console.log(`IdleDetector 变化：screen=${screenState}, user=${userState}`);
+						if (screenState === 'locked') {
+							recordScreenLockedTimestamp();
+							if (!isInBreak) {
+								stopAccumulatingTime();
+							}
+						} else if (screenState === 'unlocked') {
+							const lockedAt = getScreenLockedTimestamp();
+							clearScreenLockedTimestamp();
+							if (lockedAt && !Number.isNaN(lockedAt)) {
+								const elapsedMs = Date.now() - lockedAt;
+								if (elapsedMs >= 120000) { // 超过2分钟
+									resetRestStateForLongScreenOff();
+								}
+							}
+							if (!isInBreak) {
+								startAccumulatingTime();
+							}
+						}
+					});
+					await idleDetector.start();
+					console.log('屏幕状态监控已启动（IdleDetector）');
+				} catch (err) {
+					console.warn('初始化屏幕状态监控失败：', err);
 				}
 			}
 
@@ -1809,37 +1868,10 @@
 
 			}
 
-			// 页面加载完成后启动计时
+			// 页面加载完成后逻辑
 			window.addEventListener('load', function () {
-
 				// 添加退出登录事件监听器
 				addLogoutEventListener();
-
-				// 添加快速操作按钮事件监听器
-				const addPasswordBtn = document.getElementById('addPasswordBtn');
-				const addPhoneBtn = document.getElementById('addPhoneBtn');
-				const addNoteBtn = document.getElementById('addNoteBtn');
-
-				if (addPasswordBtn) {
-					addPasswordBtn.addEventListener('click', function (e) {
-						e.preventDefault();
-						alert('添加密码功能开发中...');
-					});
-				}
-
-				if (addPhoneBtn) {
-					addPhoneBtn.addEventListener('click', function (e) {
-						e.preventDefault();
-						alert('添加电话功能开发中...');
-					});
-				}
-
-				if (addNoteBtn) {
-					addNoteBtn.addEventListener('click', function (e) {
-						e.preventDefault();
-						alert('添加笔记功能开发中...');
-					});
-				}
 
 				// 检查用户认证状态
 				checkUserAuth();
@@ -1849,32 +1881,11 @@
 					checkUserAuth();
 				});
 
-
-
 				// 添加其他事件监听器
 				addEventListeners();
 
-
-
-				// 加载累计时长
-				loadAccumulatedTime();
-
-				// 检查是否需要立即休息
-				if (checkImmediateRest()) {
-					// 立即进入休息状态
-					setTimeout(() => {
-						showRestReminder();
-					}, 1000); // 延迟1秒显示，确保页面完全加载
-				} else {
-					// 开始累计工作时长
-					startAccumulatingTime();
-				}
-
-				// 延迟5秒后开始正常计时
-				setTimeout(() => {
-					startRestTimer();
-					console.log('休息提醒功能已启动，每45分钟提醒一次');
-				}, 5000);
+				// 启动屏幕状态监控
+				setupScreenStateMonitor();
 			});
 
 			// 页面可见性变化时处理 - 已取消页面隐藏时停止计时功能

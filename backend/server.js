@@ -2325,6 +2325,13 @@ app.get('/api/changelog/:id', async (req, res) => {
 // 更新changelog
 app.put('/api/changelog/:id', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
 	try {
+		// 确保数据库已连接
+		if (mongoose.connection.readyState !== 1) {
+			const dbConnected = await (typeof connectDB === 'function' ? connectDB() : Promise.resolve(false));
+			if (!dbConnected || mongoose.connection.readyState !== 1) {
+				return res.status(503).json({ success: false, message: '数据库未连接，无法更新changelog' });
+			}
+		}
 		const { version, time } = req.body;
 		const changelog = await Changelog.findByIdAndUpdate(
 			req.params.id,
@@ -2370,6 +2377,13 @@ app.delete('/api/changelog/:id', authenticateToken, requireDeveloperOrAdmin, asy
 // 添加changelog条目
 app.post('/api/changelog/:id/items', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
 	try {
+		// 确保数据库已连接
+		if (mongoose.connection.readyState !== 1) {
+			const dbConnected = await (typeof connectDB === 'function' ? connectDB() : Promise.resolve(false));
+			if (!dbConnected || mongoose.connection.readyState !== 1) {
+				return res.status(503).json({ success: false, message: '数据库未连接，无法添加条目' });
+			}
+		}
 		const { itemTime, itemContent, useAutoTime = true } = req.body;
 		const changelog = await Changelog.findById(req.params.id);
 
@@ -2403,6 +2417,13 @@ app.post('/api/changelog/:id/items', authenticateToken, requireDeveloperOrAdmin,
 // 更新changelog条目
 app.put('/api/changelog/:id/items/:itemIndex', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
 	try {
+		// 确保数据库已连接
+		if (mongoose.connection.readyState !== 1) {
+			const dbConnected = await (typeof connectDB === 'function' ? connectDB() : Promise.resolve(false));
+			if (!dbConnected || mongoose.connection.readyState !== 1) {
+				return res.status(503).json({ success: false, message: '数据库未连接，无法更新条目' });
+			}
+		}
 		const { itemTime, itemContent, useAutoTime = true } = req.body;
 		const itemIndex = parseInt(req.params.itemIndex);
 		const changelog = await Changelog.findById(req.params.id);
@@ -2444,6 +2465,13 @@ app.put('/api/changelog/:id/items/:itemIndex', authenticateToken, requireDevelop
 // 删除changelog某个子条目
 app.delete('/api/changelog/:id/items/:itemIndex', authenticateToken, requireDeveloperOrAdmin, async (req, res) => {
 	try {
+		// 确保数据库已连接
+		if (mongoose.connection.readyState !== 1) {
+			const dbConnected = await (typeof connectDB === 'function' ? connectDB() : Promise.resolve(false));
+			if (!dbConnected || mongoose.connection.readyState !== 1) {
+				return res.status(503).json({ success: false, message: '数据库未连接，无法删除条目' });
+			}
+		}
 		const itemIndex = parseInt(req.params.itemIndex);
 		const changelogId = req.params.id;
 		console.log('[DELETE /api/changelog/:id/items/:itemIndex]', { changelogId, itemIndex });

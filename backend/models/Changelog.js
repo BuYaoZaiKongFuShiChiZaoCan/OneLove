@@ -44,6 +44,22 @@ const changelogSchema = new mongoose.Schema({
 	}
 });
 
+// 在校验前进行容错处理，确保 order 为有效数字
+changelogSchema.pre('validate', function (next) {
+  try {
+    const value = this.order;
+    const num = Number(value);
+    if (Number.isFinite(num)) {
+      this.order = num;
+    } else {
+      this.order = 0;
+    }
+  } catch (_) {
+    this.order = 0;
+  }
+  next();
+});
+
 // 更新时间戳
 changelogSchema.pre('save', function (next) {
 	this.updatedAt = new Date();
