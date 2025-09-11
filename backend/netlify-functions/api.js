@@ -138,12 +138,15 @@ const connectDB = async () => {
 		}
 
 		console.log('🔗 正在连接数据库...');
+		// 显式传入 dbName，防止未在连接串内指定时默认到 test
+		const explicitDbName = process.env.MONGODB_DB || 'onelove';
 		await mongoose.connect(MONGODB_URI, {
 			serverSelectionTimeoutMS: 10000,
 			socketTimeoutMS: 45000,
+			dbName: explicitDbName,
 		});
 
-		console.log('✅ MongoDB 连接成功');
+		console.log('✅ MongoDB 连接成功，使用数据库:', mongoose.connection?.name || explicitDbName);
 		return true;
 	} catch (error) {
 		console.error('❌ 数据库连接失败:', error.message);
