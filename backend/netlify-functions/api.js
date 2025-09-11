@@ -1022,6 +1022,16 @@ app.get('/api/userdata/passwords', authenticateToken, async (req, res) => {
 		const dbConnected = await connectDB();
 		if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
 
+		// 仅开发者可请求所有用户数据（管理员不包含在内）
+		if (String(req.query.all).toLowerCase() === 'true') {
+			const role = req.user?.role;
+			if (role !== 'developer') {
+				return res.status(403).json({ success: false, message: '需要开发者权限' });
+			}
+			const all = await Password.find().populate('userId', 'username email role');
+			return res.json({ success: true, data: all, count: all.length });
+		}
+
 		const userId = req.user.userId;
 		const passwords = await Password.find({ userId });
 
@@ -1138,6 +1148,16 @@ app.get('/api/userdata/phones', authenticateToken, async (req, res) => {
 	try {
 		const dbConnected = await connectDB();
 		if (!dbConnected) return res.status(500).json({ success: false, message: '数据库连接失败' });
+
+		// 仅开发者可请求所有用户数据（管理员不包含在内）
+		if (String(req.query.all).toLowerCase() === 'true') {
+			const role = req.user?.role;
+			if (role !== 'developer') {
+				return res.status(403).json({ success: false, message: '需要开发者权限' });
+			}
+			const allPhones = await Phone.find().populate('userId', 'username email role');
+			return res.json({ success: true, data: allPhones, count: allPhones.length });
+		}
 
 		const userId = req.user.userId;
 		const phoneDoc = await Phone.findOne({ userId });

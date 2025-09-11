@@ -300,6 +300,7 @@
 
 	<script>
 		const API_BASE = window.location.origin + '/api';
+		let isDeveloperMode = false;
 
 		// 获取认证令牌的函数
 		function getAuthToken() {
@@ -334,31 +335,52 @@
 			}
 		}
 
-		// 加载手机数据
+		// 加载手机数据（支持开发者查看全量）
 		async function loadPhones() {
 			try {
 				const authToken = getAuthToken();
-				const response = await fetch(`${API_BASE}/userdata/phones`, {
-					headers: {
-						'Authorization': `Bearer ${authToken}`
-					}
-				});
-
-				if (!response.ok) {
-					throw new Error('获取手机数据失败');
+				// 获取当前用户角色
+				const meResp = await fetch(`${API_BASE}/auth/me`, { headers: { 'Authorization': `Bearer ${authToken}` } });
+				if (meResp.ok) {
+					const me = await meResp.json();
+					isDeveloperMode = me?.data?.user?.role === 'developer';
 				}
 
+				const url = isDeveloperMode ? `${API_BASE}/userdata/phones?all=true` : `${API_BASE}/userdata/phones`;
+				const response = await fetch(url, { headers: { 'Authorization': `Bearer ${authToken}` } });
+				if (!response.ok) throw new Error('获取手机数据失败');
+
 				const data = await response.json();
-				phonesData = data.data;
+				if (isDeveloperMode) {
+					// 合并所有用户号码映射，并标注归属
+					const merged = {};
+					(data.data || []).forEach(doc => {
+						const owner = doc?.userId?.username || doc?.userId?.email || '未知用户';
+						const map = doc?.data || {};
+						Object.entries(map).forEach(([number, info]) => {
+							let v = info;
+							if (v && typeof v === 'object') {
+								v = { ...v, __owner: owner };
+							} else {
+								v = { value: v, __owner: owner };
+							}
+							merged[number] = v;
+						});
+					});
+					phonesData = merged;
+				} else {
+					phonesData = data.data;
+				}
+
 				displayPhones(phonesData);
 			} catch (error) {
 				console.error('加载手机数据失败:', error);
 				document.getElementById('phonesContainer').innerHTML = `
-                    <div class="error">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        加载手机数据失败: ${error.message}
-                    </div>
-                `;
+						<div class="error">
+							<i class="fas fa-exclamation-triangle"></i>
+							加载手机数据失败: ${error.message}
+						</div>
+					`;
 			}
 		}
 
@@ -423,6 +445,9 @@
 				location = '未知';
 			}
 
+			// 开发者模式下显示归属用户
+			const owner = (typeof info === 'object' && info !== null) ? info.__owner : undefined;
+
 			return `
                 <div class="phone-card">
                     <div class="header">
@@ -440,6 +465,7 @@
                         </div>
                     </div>
                     <div class="phone-info">
+                        ${isDeveloperMode && owner ? `<div class="info-item"><div class="label">归属用户</div><div class="value">${owner}</div></div>` : ''}
                         <div class="info-item">
                             <div class="label">套餐</div>
                             <div class="value">${plan}</div>
