@@ -993,9 +993,32 @@ app.get('/api/userdata/stats', authenticateToken, async (req, res) => {
 		const user = await User.findById(req.user.userId);
 		if (!user) return res.status(404).json({ success: false, message: '用户不存在' });
 
+		// 开发者：返回全站汇总
+		if (user.role === 'developer') {
+			const [passwordCount, phoneDocs] = await Promise.all([
+				Password.countDocuments({}),
+				Phone.find({}, 'data')
+			]);
+			const phoneCount = phoneDocs.reduce((sum, doc) => sum + Object.keys(doc.data || {}).length, 0);
+			const noteCount = 0;
+			return res.json({
+				success: true,
+				data: {
+					total: passwordCount + phoneCount + noteCount,
+					passwords: passwordCount,
+					phones: phoneCount,
+					notes: noteCount,
+					lastLogin: user.lastLogin || null
+				}
+			});
+		}
+
+		// 非开发者：仅统计本人
 		const userId = user._id;
-		const passwordCount = await Password.countDocuments({ userId });
-		const phoneDoc = await Phone.findOne({ userId });
+		const [passwordCount, phoneDoc] = await Promise.all([
+			Password.countDocuments({ userId }),
+			Phone.findOne({ userId })
+		]);
 		const phoneCount = phoneDoc ? Object.keys(phoneDoc.data || {}).length : 0;
 		const noteCount = 0;
 
