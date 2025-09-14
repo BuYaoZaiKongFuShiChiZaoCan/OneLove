@@ -26,24 +26,7 @@ async function testRealUsers() {
     // 测试常见密码
     const commonPasswords = [
       'admin123',
-      'admin',
-      'password',
-      '123456',
-      'user123',
-      'user',
-      'developer123',
-      'dev123',
-      'qi123',
-      'onelove123',
-      'onelove',
-      'AdminQi123',
-      'DeveloperQi123',
-      'Qi123456',
-      'OneLove2024',
-      '2024',
-      '123456789',
-      'qwerty',
-      'abc123'
+      "testUser",
     ];
     
     for (const user of users) {

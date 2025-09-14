@@ -12,6 +12,7 @@ const mongoose = require('mongoose');      // 导入mongoose
 const bcrypt = require('bcryptjs');        // 密码加密
 const jwt = require('jsonwebtoken');       // JWT令牌
 const fs = require('fs');                  // 文件系统模块
+const { promisify } = require('util');     // 将回调函数转换为Promise
 
 // 读取package.json获取版本号
 const packageJson = JSON.parse(fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8'));
@@ -1036,6 +1037,234 @@ app.get('/api/data', (req, res) => {
     success: true,
     data: data
   });
+});
+
+// 文件类型图标映射 - 使用通配符和分类匹配
+const fileTypePatterns = [
+  // 代码文件 - 使用通配符匹配
+  { pattern: /\.(html?|htm|css|js|json|xml|php|py|java|cpp?|c|cs|go|rb|swift|kt|ts|jsx|vue|svelte|mhtml|ps1|bat|sh|bash|zsh|fish|r|m|pl|scala|clj|hs|lua|dart|rs|php|rb|pl|sh|ps1|bat|cmd|vbs|ahk)$/i, icon: 'fas fa-file-code' },
+  
+  // 文档文件
+  { pattern: /\.(md|txt|rtf|docx?|odt|pdf|xps|pptx?|ppt|odp)$/i, icon: 'fas fa-file-word' },
+  { pattern: /\.(xlsx?|xls|ods|csv)$/i, icon: 'fas fa-file-excel' },
+  { pattern: /\.(pptx?|ppt|odp)$/i, icon: 'fas fa-file-powerpoint' },
+  { pattern: /\.pdf$/i, icon: 'fas fa-file-pdf' },
+  
+  // 图片文件
+  { pattern: /\.(jpg|jpeg|png|gif|svg|ico|bmp|tiff?|webp|psd|ai|eps|raw|cr2|nef|arw|dng)$/i, icon: 'fas fa-file-image' },
+  
+  // 音频文件
+  { pattern: /\.(mp3|wav|flac|aac|ogg|wma|m4a|opus|aiff|au|ra|wv)$/i, icon: 'fas fa-file-audio' },
+  
+  // 视频文件
+  { pattern: /\.(mp4|avi|mov|wmv|flv|webm|mkv|m4v|3gp|mpeg|mpg|m2v|asf|rm|rmvb)$/i, icon: 'fas fa-file-video' },
+  
+  // 压缩文件
+  { pattern: /\.(zip|rar|7z|tar|gz|bz2|xz|lz4|arj|ace|cab|deb|rpm|dmg|pkg|iso|img)$/i, icon: 'fas fa-file-archive' },
+  
+  // 数据库文件
+  { pattern: /\.(db|sqlite|sql|mdb|accdb|frm|myd|myi|ibd)$/i, icon: 'fas fa-database' },
+  
+  // 字体文件
+  { pattern: /\.(ttf|otf|woff|woff2|eot)$/i, icon: 'fas fa-font' },
+  
+  // 可执行文件
+  { pattern: /\.(exe|msi|dmg|pkg|deb|rpm|app|appx|msix)$/i, icon: 'fas fa-cog' },
+  
+  // 系统文件
+  { pattern: /\.(iso|img|bin|dll|so|dylib)$/i, icon: 'fas fa-compact-disc' },
+  
+  // 配置文件
+  { pattern: /\.(ini|cfg|conf|config|yaml|yml|toml|properties|env)$/i, icon: 'fas fa-file-alt' },
+  
+  // 日志文件
+  { pattern: /\.(log|out|err)$/i, icon: 'fas fa-file-alt' },
+  
+  // 临时文件
+  { pattern: /\.(tmp|temp|cache|bak|backup|old|swp|swo|~)$/i, icon: 'fas fa-file-alt' }
+];
+
+// 排除的文件类型和文件名模式
+const excludedFiles = {
+  // 排除的文件扩展名
+  extensions: [
+    'tmp', 'temp', 'cache', 'log', 'bak', 'backup', 'old',
+    'swp', 'swo', '~', 'DS_Store', 'Thumbs.db', 'desktop.ini',
+    'node_modules', '.git', '.svn', '.hg', '.bzr'
+  ],
+  // 排除的文件名模式（支持通配符）
+  patterns: [
+    '*.tmp', '*.temp', '*.cache', '*.log', '*.bak', '*.backup', '*.old',
+    '.*', 'node_modules', '.git*', '.svn*', '.DS_Store', 'Thumbs.db',
+    'desktop.ini', '*.swp', '*.swo', '*.~*'
+  ],
+  // 排除的目录名
+  directories: [
+    'node_modules', '.git', '.svn', '.hg', '.bzr', '__pycache__',
+    '.vscode', '.idea', '.vs', 'bin', 'obj', 'dist', 'build',
+    'coverage', '.nyc_output', 'logs', 'temp', 'tmp'
+  ]
+};
+
+// 获取文件图标 - 使用模式匹配
+function getFileIcon(fileName) {
+  // 遍历所有模式，找到匹配的图标
+  for (const { pattern, icon } of fileTypePatterns) {
+    if (pattern.test(fileName)) {
+      return icon;
+    }
+  }
+  
+  // 如果没有匹配到任何模式，返回通用文件图标
+  return 'fas fa-file';
+}
+
+// 检查文件是否应该被排除
+function shouldExcludeFile(fileName, isDirectory = false) {
+  const name = fileName.toLowerCase();
+  
+  // 检查目录排除列表
+  if (isDirectory) {
+    return excludedFiles.directories.some(dir => 
+      name === dir || name.includes(dir)
+    );
+  }
+  
+  // 检查文件扩展名排除列表
+  const extension = name.split('.').pop();
+  if (excludedFiles.extensions.includes(extension)) {
+    return true;
+  }
+  
+  // 检查文件名模式排除列表
+  return excludedFiles.patterns.some(pattern => {
+    if (pattern.includes('*')) {
+      const regex = new RegExp(pattern.replace(/\*/g, '.*'));
+      return regex.test(name);
+    }
+    return name === pattern;
+  });
+}
+
+// 递归扫描目录结构
+async function scanDirectory(dirPath, relativePath = '') {
+  const result = {};
+  
+  try {
+    const items = await promisify(fs.readdir)(dirPath, { withFileTypes: true });
+    
+    for (const item of items) {
+      // 检查是否应该排除此文件/目录
+      if (shouldExcludeFile(item.name, item.isDirectory())) {
+        continue; // 跳过被排除的文件/目录
+      }
+      
+      const itemPath = path.join(dirPath, item.name);
+      const itemRelativePath = path.join(relativePath, item.name);
+      
+      if (item.isDirectory()) {
+        // 递归扫描子目录
+        const subDir = await scanDirectory(itemPath, itemRelativePath);
+        // 包含所有目录，即使是空的
+        result[item.name] = subDir;
+      } else if (item.isFile()) {
+        // 文件信息
+        const stats = await promisify(fs.stat)(itemPath);
+        result[item.name] = {
+          type: 'file',
+          icon: getFileIcon(item.name),
+          size: stats.size,
+          modified: stats.mtime,
+          path: itemRelativePath.replace(/\\/g, '/') // 统一使用正斜杠
+        };
+      }
+    }
+  } catch (error) {
+    console.error(`扫描目录失败: ${dirPath}`, error);
+  }
+  
+  return result;
+}
+
+// 获取Data目录结构API
+app.get('/api/data/structure', async (req, res) => {
+  try {
+    // Data目录的绝对路径
+    const dataDir = path.join(__dirname, '..', 'Data');
+    
+    // 检查Data目录是否存在
+    try {
+      await promisify(fs.access)(dataDir);
+    } catch (error) {
+      return res.status(404).json({
+        success: false,
+        message: 'Data目录不存在'
+      });
+    }
+    
+    // 扫描Data目录结构
+    console.log('🔍 开始扫描Data目录:', dataDir);
+    const structure = await scanDirectory(dataDir);
+    console.log('📊 扫描结果:', JSON.stringify(structure, null, 2));
+    
+    res.json({
+      success: true,
+      data: structure,
+      timestamp: new Date().toISOString(),
+      excludedFiles: excludedFiles // 返回排除配置信息
+    });
+    
+  } catch (error) {
+    console.error('获取Data目录结构失败:', error);
+    res.status(500).json({
+      success: false,
+      message: '获取目录结构失败',
+      error: error.message
+    });
+  }
+});
+
+// 获取排除文件配置API
+app.get('/api/data/excluded-files', (req, res) => {
+  res.json({
+    success: true,
+    data: excludedFiles,
+    message: '获取排除文件配置成功'
+  });
+});
+
+// 更新排除文件配置API（需要管理员权限）
+app.post('/api/data/excluded-files', authenticateToken, requireAdmin, (req, res) => {
+  try {
+    const { extensions, patterns, directories } = req.body;
+    
+    // 验证输入数据
+    if (!Array.isArray(extensions) || !Array.isArray(patterns) || !Array.isArray(directories)) {
+      return res.status(400).json({
+        success: false,
+        message: '配置数据格式错误'
+      });
+    }
+    
+    // 更新排除配置
+    excludedFiles.extensions = extensions;
+    excludedFiles.patterns = patterns;
+    excludedFiles.directories = directories;
+    
+    res.json({
+      success: true,
+      message: '排除文件配置更新成功',
+      data: excludedFiles
+    });
+    
+  } catch (error) {
+    console.error('更新排除文件配置失败:', error);
+    res.status(500).json({
+      success: false,
+      message: '更新配置失败',
+      error: error.message
+    });
+  }
 });
 
 // 用户数据统计API
