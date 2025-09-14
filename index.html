@@ -639,6 +639,18 @@
 				<span id="mainButton">√</span>
 			</div>
 			<script src="./scripts/maxImportant.js"></script>
+			<script src="./scripts/dataFolderList.js"></script>
+
+			<!-- Data文件夹列表显示区域 -->
+			<div id="dataFolderList" class="data-folder-container">
+				<div class="folder-header-controls">
+					<h3><i class="fas fa-folder-open"></i> 数据文件夹</h3>
+					<button id="excludeConfigBtn" class="config-btn" title="配置排除文件">
+						<i class="fas fa-cog"></i>
+					</button>
+				</div>
+				<div id="folderTree" class="folder-tree"></div>
+			</div>
 
 			<div id="audioMvPanel"></div>
 		</div>
@@ -831,6 +843,64 @@
 	</footer>
 	<!-- 最大化-蒙版 -->
 	<dialog id="dog" onclose="delMaxScreeen()"></dialog>
+	
+	<!-- 排除文件配置模态框 -->
+	<dialog id="excludeConfigModal" class="exclude-config-modal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3><i class="fas fa-filter"></i> 排除文件配置</h3>
+				<button class="close-btn" onclick="closeExcludeConfig()">
+					<i class="fas fa-times"></i>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="config-section">
+					<h4><i class="fas fa-file-alt"></i> 排除的文件扩展名</h4>
+					<div class="config-list" id="extensionsList">
+						<!-- 动态生成 -->
+					</div>
+					<div class="add-item">
+						<input type="text" id="newExtension" placeholder="添加新的文件扩展名 (如: tmp)">
+						<button onclick="addExcludeItem('extensions')">
+							<i class="fas fa-plus"></i> 添加
+						</button>
+					</div>
+				</div>
+				
+				<div class="config-section">
+					<h4><i class="fas fa-search"></i> 排除的文件名模式</h4>
+					<div class="config-list" id="patternsList">
+						<!-- 动态生成 -->
+					</div>
+					<div class="add-item">
+						<input type="text" id="newPattern" placeholder="添加新的模式 (如: *.tmp)">
+						<button onclick="addExcludeItem('patterns')">
+							<i class="fas fa-plus"></i> 添加
+						</button>
+					</div>
+				</div>
+				
+				<div class="config-section">
+					<h4><i class="fas fa-folder"></i> 排除的目录名</h4>
+					<div class="config-list" id="directoriesList">
+						<!-- 动态生成 -->
+					</div>
+					<div class="add-item">
+						<input type="text" id="newDirectory" placeholder="添加新的目录名 (如: node_modules)">
+						<button onclick="addExcludeItem('directories')">
+							<i class="fas fa-plus"></i> 添加
+						</button>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button class="btn-secondary" onclick="closeExcludeConfig()">取消</button>
+				<button class="btn-primary" onclick="saveExcludeConfig()">
+					<i class="fas fa-save"></i> 保存配置
+				</button>
+			</div>
+		</div>
+	</dialog>
 	<script>
 		// 对话框组件加载完成
 		if (typeof NProgress !== 'undefined' && document.body && document.body.style) {
