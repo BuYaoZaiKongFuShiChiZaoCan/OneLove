@@ -175,7 +175,6 @@ async function initDataFolderList() {
             // 生成文件夹树
             console.log('📁 生成文件夹树，数据结构:', structure);
             const treeHTML = generateFolderTree(structure);
-            console.log('🌳 生成的HTML:', treeHTML);
             folderTree.innerHTML = treeHTML;
             
             // 默认展开第一层文件夹

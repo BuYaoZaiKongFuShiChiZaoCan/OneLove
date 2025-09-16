@@ -63,7 +63,7 @@ if (mongoose.models.TimelineData) {
 // 创建Express应用实例
 const app = express();
 
-// 设置端口号（本地开发使用3001，生产环境使用环境变量）
+// 设置端口号（本地开发使用2457，生产环境使用环境变量）
 const PORT = process.env.PORT || (process.env.NODE_ENV === 'development' ? 3000 : 3001);
 
 // JWT密钥
