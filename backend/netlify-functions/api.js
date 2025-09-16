@@ -5,6 +5,8 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');                  // 文件系统模块
+const { promisify } = require('util');     // 将回调函数转换为Promise
 
 const app = express();
 
@@ -214,7 +216,8 @@ app.get('/api/info', (req, res) => {
 			'/api/auth/password': '修改密码',
 			'/api/auth/logout': '用户登出',
 			'/api/health': '健康检查',
-			'/api/changelog': '版本信息'
+			'/api/changelog': '版本信息',
+			'/api/data/structure': '获取Data目录结构'
 		}
 	});
 });

@@ -38,7 +38,7 @@ let songs = [
 	/* happyEnd */
 	"If-丁可",
 	"彩云之南-徐千雅",
-	/* li·刘某人 黄某人 奖励哥 */
+	/* li·刘某人 黄某人 */
 	"Lemon Tree - Fool’s Garden",
 	"有何不可-许嵩",
 	"那女孩对我说",
