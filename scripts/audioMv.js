@@ -58,6 +58,16 @@ let mvList = [
 		desc: "来迟是戴羽彤的一首歌曲，由卡文填词，三珊谱曲，筱明编曲，一寸光年团队制作。歌词表达了一种错过爱情的悲哀和后悔，反复唱出“我这一次终究还是来得太迟”。"
 	},
 	{
+		id: "精忠报国-洪屠刚",
+		type: "video/mp4",
+		title: "【精忠报国】洪屠刚",
+		srcLocalhost: "./music/mv/屠洪刚《精忠报国》MV_高清1080P在线观看平台_腾讯视频.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "《精忠报国》"
+
+	},
+	{
 		id: "别怕我伤心-张信哲",
 		type: "video/mp4",
 		title: "【4K修复】《别怕我伤心》张信哲_60FPS(高保真音质)",
