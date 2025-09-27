@@ -223,7 +223,7 @@ app.get('/api/info', (req, res) => {
 });
 
 // 简单数据（用于前端连通性测试）
-app.get('/api/data', authenticateToken, (req, res) => {
+app.get('/api/data', (req, res) => {
 	const data = {
 		message: '这是来自 Netlify Functions 的数据',
 		timestamp: new Date().toISOString(),
@@ -233,41 +233,41 @@ app.get('/api/data', authenticateToken, (req, res) => {
 });
 
 // 获取Data目录结构API
-app.get('/api/data/structure', authenticateToken, async (req, res) => {
+app.get('/api/data/structure', async (req, res) => {
+  try {
+	// Data目录的绝对路径
+	const dataDir = path.join(__dirname, '..', 'Data');
+	
+	// 检查Data目录是否存在
 	try {
-		// Data目录的绝对路径
-		const dataDir = path.join(__dirname, '..', 'Data');
-
-		// 检查Data目录是否存在
-		try {
-			await promisify(fs.access)(dataDir);
-		} catch (error) {
-			return res.status(404).json({
-				success: false,
-				message: 'Data目录不存在'
-			});
-		}
-
-		// 扫描Data目录结构
-		console.log('🔍 开始扫描Data目录:', dataDir);
-		const structure = await scanDirectory(dataDir);
-		console.log('📊 扫描结果:', JSON.stringify(structure, null, 2));
-
-		res.json({
-			success: true,
-			data: structure,
-			timestamp: new Date().toISOString(),
-			excludedFiles: excludedFiles // 返回排除配置信息
-		});
-
+	  await promisify(fs.access)(dataDir);
 	} catch (error) {
-		console.error('获取Data目录结构失败:', error);
-		res.status(500).json({
-			success: false,
-			message: '获取目录结构失败',
-			error: error.message
-		});
+	  return res.status(404).json({
+		success: false,
+		message: 'Data目录不存在'
+	  });
 	}
+	
+	// 扫描Data目录结构
+	console.log('🔍 开始扫描Data目录:', dataDir);
+	const structure = await scanDirectory(dataDir);
+	console.log('📊 扫描结果:', JSON.stringify(structure, null, 2));
+	
+	res.json({
+	  success: true,
+	  data: structure,
+	  timestamp: new Date().toISOString(),
+	  excludedFiles: excludedFiles // 返回排除配置信息
+	});
+	
+  } catch (error) {
+	console.error('获取Data目录结构失败:', error);
+	res.status(500).json({
+	  success: false,
+	  message: '获取目录结构失败',
+	  error: error.message
+	});
+  }
 });
 
 // 用户角色检查
@@ -401,16 +401,16 @@ app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
 		if (allUsers === 'true' && (req.user?.role === 'developer' || req.user?.role === 'admin')) {
 			// 兼容旧数据结构：直接查询type字段
 			let docs = await TimelineData.find({ type }).populate('userId', 'username name').sort({ timestamp: -1 }).limit(200);
-
+			
 			// 如果没有找到数据，尝试查询兼容的字段名
 			if (docs.length === 0) {
 				const compatibleTypes = {
 					'myPast': 'myPastData',
 					'health': 'healthData',
-					'work': 'workData',
+					'work': 'workData', 
 					'study': 'studyData'
 				};
-
+				
 				const compatibleType = compatibleTypes[type];
 				if (compatibleType) {
 					docs = await TimelineData.find({ type: compatibleType }).populate('userId', 'username name').limit(200);
@@ -441,7 +441,7 @@ app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
 					timestamp: doc.timestamp || doc.updatedAt || doc.createdAt
 				};
 			});
-
+			
 			return res.json({ success: true, data: payload, count: payload.length });
 		}
 
@@ -449,24 +449,24 @@ app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
 		if (type === 'myPast') {
 			// 普通用户只能查看自己的 myPast 数据
 			let userData = await TimelineData.findOne({
-				userId: req.user.userId,
-				type: type
-			}).sort({ timestamp: -1 });
+			userId: req.user.userId,
+			type: type
+		}).sort({ timestamp: -1 });
 
-			// 如果没有找到数据，尝试查询兼容的字段名
+		// 如果没有找到数据，尝试查询兼容的字段名
 			if (!userData) {
-				const compatibleTypes = {
+			const compatibleTypes = {
 					'myPast': 'myPastData'
-				};
-
-				const compatibleType = compatibleTypes[type];
-				if (compatibleType) {
+			};
+			
+			const compatibleType = compatibleTypes[type];
+			if (compatibleType) {
 					userData = await TimelineData.findOne({
-						userId: req.user.userId,
-						type: compatibleType
-					}).sort({ timestamp: -1 });
-				}
+					userId: req.user.userId,
+					type: compatibleType
+				}).sort({ timestamp: -1 });
 			}
+		}
 
 			if (!userData || !Array.isArray(userData.data) || userData.data.length === 0) {
 				return res.json({
@@ -492,12 +492,12 @@ app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
 
 			// 如果没有找到数据，尝试查询兼容的字段名
 			if (healthData.length === 0) {
-				const compatibleTypes = {
+			const compatibleTypes = {
 					'health': 'healthData'
-				};
-
-				const compatibleType = compatibleTypes[type];
-				if (compatibleType) {
+			};
+			
+			const compatibleType = compatibleTypes[type];
+			if (compatibleType) {
 					healthData = await TimelineData.find({ type: compatibleType })
 						.sort({ time: -1, createdAt: -1 })
 						.lean();
@@ -513,12 +513,12 @@ app.get('/api/timeline-data/:type', authenticateToken, async (req, res) => {
 				}
 			}).flat();
 
-			return res.json({
-				success: true,
+		return res.json({
+			success: true,
 				data: processedData,
 				count: processedData.length,
 				message: `找到${processedData.length}条健康数据`
-			});
+		});
 		}
 	} catch (error) {
 		console.error(`❌ 获取${type}数据错误:`, error);
@@ -582,7 +582,7 @@ app.delete('/api/timeline-data/:id', authenticateToken, async (req, res) => {
 
 		// 权限：普通用户仅能删除自己的 myPast 数据；开发者/管理员可删除任意数据
 		const isPrivileged = req.user?.role === 'developer' || req.user?.role === 'admin';
-
+		
 		if (isPrivileged) {
 			// 开发者/管理员可以删除任意数据
 			const deletedDoc = await TimelineData.findByIdAndDelete(id);
@@ -599,7 +599,7 @@ app.delete('/api/timeline-data/:id', authenticateToken, async (req, res) => {
 			if (doc.userId !== req.user.userId || doc.type !== 'myPast') {
 				return res.status(403).json({ success: false, message: '权限不足，只能删除自己的 myPast 数据' });
 			}
-
+			
 			await TimelineData.findByIdAndDelete(id);
 			return res.json({ success: true, message: '删除成功' });
 		}
@@ -623,7 +623,7 @@ app.post('/api/timeline-data/:type/items', authenticateToken, async (req, res) =
 
 		const targetUserId = req.user.userId;
 		const item = req.body && typeof req.body === 'object' ? req.body : null;
-
+		
 		// 验证必要字段
 		if (!item || !item.title || !item.time) {
 			return res.status(400).json({ success: false, message: '缺少必要字段：title、time' });
@@ -635,8 +635,8 @@ app.post('/api/timeline-data/:type/items', authenticateToken, async (req, res) =
 		}
 
 		// 添加发布者信息
-		const newItem = {
-			...item,
+		const newItem = { 
+			...item, 
 			_id: item._id || new mongoose.Types.ObjectId().toString(),
 			createdBy: targetUserId,
 			createdAt: new Date(),
@@ -648,11 +648,11 @@ app.post('/api/timeline-data/:type/items', authenticateToken, async (req, res) =
 		let doc = await TimelineData.findOne({ userId: targetUserId, type });
 		if (!doc) {
 			// 创建新文档，避免命中历史唯一索引(type+title)冲突
-			doc = new TimelineData({
-				userId: targetUserId,
-				type,
+			doc = new TimelineData({ 
+				userId: targetUserId, 
+				type, 
 				title: String(targetUserId),
-				data: [newItem],
+				data: [newItem], 
 				timestamp: new Date(),
 				createdBy: targetUserId,
 				updatedBy: targetUserId
@@ -734,7 +734,7 @@ app.delete('/api/timeline-data/:type/items/:itemId', authenticateToken, async (r
 			console.log(`🔍 Netlify开发者删除调试 - 搜索类型: ${compatibleTypes.join(', ')}, 目标itemId: ${itemId}`);
 			const docs = await TimelineData.find({ type: { $in: compatibleTypes } });
 			console.log(`🔍 Netlify找到 ${docs.length} 个文档`);
-
+			
 			// 详细调试每个文档
 			docs.forEach((d, index) => {
 				console.log(`🔍 Netlify文档 ${index}: userId=${d.userId}, type=${d.type}, data长度=${Array.isArray(d.data) ? d.data.length : 'N/A'}`);
@@ -744,7 +744,7 @@ app.delete('/api/timeline-data/:type/items/:itemId', authenticateToken, async (r
 					});
 				}
 			});
-
+			
 			doc = docs.find(d => d && Array.isArray(d.data) && d.data.some(item => item && item._id === itemId));
 			console.log(`🔍 Netlify找到匹配的文档: ${doc ? '是' : '否'}`);
 		} else {
