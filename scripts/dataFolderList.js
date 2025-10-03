@@ -143,18 +143,7 @@ async function fetchDataStructure() {
         // 如果API不可用，使用静态数据作为后备
         return {
             "biJi": {
-                "api小白使用教程.html": { type: "file", icon: "fas fa-file-code" },
-                "本地数据.html": { type: "file", icon: "fas fa-file-code" },
-                "JavaScript实现搜索功能.html": { type: "file", icon: "fas fa-file-code" },
-                "SEO优化设置.html": { type: "file", icon: "fas fa-file-code" },
-                "信息提交模板.docx": { type: "file", icon: "fas fa-file-word" },
-                "喜羊羊与灰太狼之星座分析.jpg": { type: "file", icon: "fas fa-file-image" },
-                "摆钟的工作原理.mhtml": { type: "file", icon: "fas fa-file-code" },
-                "杀毒软件测评-EPIC病毒.md": { type: "file", icon: "fas fa-file-alt" },
-                "编程学习经历阶段.html": { type: "file", icon: "fas fa-file-code" },
-                "网站历史.html": { type: "file", icon: "fas fa-file-code" },
-                "羊历3010年.txt": { type: "file", icon: "fas fa-file-alt" },
-                "音乐api.html": { type: "file", icon: "fas fa-file-code" }
+                "本地数据.html": { type: "file", icon: "fas fa-file-code" }
             },
             "Resources": {}
         };
