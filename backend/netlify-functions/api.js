@@ -234,6 +234,104 @@ async function scanDirectory(dirPath) {
   }
 }
 
+// 辅助函数：将数组结构转换为前端期望的对象结构
+function convertArrayToObjectStructure(arrayItems, basePath = '') {
+  const result = {};
+  
+  arrayItems.forEach(item => {
+    // 确定图标类型
+    let icon = 'fas fa-file'; // 默认图标
+    if (item.type === 'directory') {
+      icon = 'fas fa-folder';
+    } else if (item.extension) {
+      // 根据文件扩展名设置不同图标
+      switch (item.extension) {
+        case '.html':
+        case '.htm':
+          icon = 'fas fa-file-code';
+          break;
+        case '.md':
+          icon = 'fas fa-file-alt';
+          break;
+        case '.json':
+          icon = 'fas fa-file-json';
+          break;
+        case '.txt':
+          icon = 'fas fa-file-text';
+          break;
+        case '.png':
+        case '.jpg':
+        case '.jpeg':
+        case '.gif':
+        case '.bmp':
+          icon = 'fas fa-image';
+          break;
+        case '.svg':
+          icon = 'fas fa-file-image';
+          break;
+        case '.pdf':
+          icon = 'fas fa-file-pdf';
+          break;
+        case '.doc':
+        case '.docx':
+          icon = 'fas fa-file-word';
+          break;
+        case '.xls':
+        case '.xlsx':
+          icon = 'fas fa-file-excel';
+          break;
+        case '.ppt':
+        case '.pptx':
+          icon = 'fas fa-file-powerpoint';
+          break;
+        case '.zip':
+        case '.rar':
+        case '.7z':
+          icon = 'fas fa-file-archive';
+          break;
+        case '.js':
+          icon = 'fab fa-js';
+          break;
+        case '.css':
+          icon = 'fab fa-css3-alt';
+          break;
+        case '.php':
+          icon = 'fab fa-php';
+          break;
+        case '.py':
+          icon = 'fab fa-python';
+          break;
+        case '.mp3':
+        case '.wav':
+        case '.ogg':
+          icon = 'fas fa-file-audio';
+          break;
+        case '.mp4':
+        case '.avi':
+        case '.mov':
+          icon = 'fas fa-file-video';
+          break;
+      }
+    }
+    
+    if (item.type === 'directory' && item.items && item.items.length > 0) {
+      // 递归处理子目录
+      result[item.name] = convertArrayToObjectStructure(item.items, basePath + item.name + '/');
+    } else {
+      // 处理文件
+      result[item.name] = {
+        type: item.type,
+        icon: icon,
+        size: item.size || 0,
+        modified: item.modified ? new Date(item.modified).toISOString() : new Date().toISOString(),
+        path: basePath + item.name
+      };
+    }
+  });
+  
+  return result;
+}
+
 // 连接数据库
 const connectDB = async () => {
 	try {
@@ -339,51 +437,138 @@ app.get('/api/data/structure', async (req, res) => {
   try {
     console.log('🔍 尝试获取Data目录结构');
     
-    // Data目录的绝对路径
-    const dataDir = path.join(__dirname, '..', 'Data');
-    console.log('📂 目标Data目录路径:', dataDir);
+    // 尝试多个可能的Data目录路径
+    const possiblePaths = [
+      // 在Netlify Functions环境中，尝试相对于当前文件的路径
+      path.join(__dirname, '..', '..', 'Data'),
+      // 尝试相对于backend目录的路径
+      path.join(__dirname, '..', 'Data'),
+      // 尝试在不同的部署环境中可能的路径
+      path.join(process.cwd(), 'Data'),
+      // 绝对路径（仅在本地开发时有效）
+      'd:/学习笔记/项目/My/H5/OneLove/Data'
+    ];
     
-    // 检查Data目录是否存在
-    try {
-      await promisify(fs.access)(dataDir);
-      console.log('✅ Data目录存在');
-    } catch (error) {
-      console.error('❌ Data目录不存在:', error.message);
-      // 在Netlify环境中，我们可能没有实际的文件系统访问权限
-      // 返回一个模拟的结构，让前端能够正常工作
+    let dataDir = null;
+    
+    // 测试所有可能的路径，找到第一个存在的
+    for (const testPath of possiblePaths) {
+      try {
+        await promisify(fs.access)(testPath);
+        console.log('✅ 找到有效Data目录:', testPath);
+        dataDir = testPath;
+        break;
+      } catch (e) {
+        console.log('❌ 路径不存在:', testPath);
+      }
+    }
+    
+    // 如果没有找到有效的Data目录，记录详细信息并尝试其他方案
+    if (!dataDir) {
+      console.error('❌ 所有尝试的Data目录路径都不存在');
+      console.log('📋 项目目录信息:');
+      console.log('- 当前工作目录:', process.cwd());
+      console.log('- __dirname:', __dirname);
+      
+      // 在Netlify环境中，尝试列出当前目录内容来帮助诊断
+      try {
+        const currentDirFiles = await promisify(fs.readdir)(__dirname);
+        console.log('📁 当前目录文件:', currentDirFiles);
+        
+        const parentDirFiles = await promisify(fs.readdir)(path.join(__dirname, '..'));
+        console.log('📁 父目录文件:', parentDirFiles);
+      } catch (dirError) {
+        console.error('❌ 无法读取目录内容:', dirError.message);
+      }
+      
+      // 在这种情况下，我们可能确实无法访问真实文件系统
+      // 返回带有诊断信息的模拟数据，而不是空数据
+      const diagnosticMockData = {
+        '诊断信息.txt': {
+          type: 'file',
+          icon: 'fas fa-file-alt',
+          size: 0,
+          modified: new Date().toISOString(),
+          path: '诊断信息.txt'
+        },
+        '路径问题说明': {
+          type: 'file',
+          icon: 'fas fa-file-alt',
+          size: 0,
+          modified: new Date().toISOString(),
+          path: '路径问题说明.txt'
+        }
+      };
+      
       return res.json({
         success: true,
-        data: [],
-        message: '在Netlify环境中使用模拟数据',
+        data: diagnosticMockData,
+        message: '无法访问Data目录，请检查路径和权限配置',
         timestamp: new Date().toISOString(),
-        environment: 'netlify-production',
-        excludedFiles: excludedFiles // 返回完整的排除配置对象
+        environment: 'path-not-found',
+        attemptedPaths: possiblePaths,
+        currentWorkingDir: process.cwd(),
+        dirname: __dirname,
+        excludedFiles: excludedFiles
       });
     }
     
     // 扫描Data目录结构
-    console.log('🔍 开始扫描Data目录');
-    const structure = await scanDirectory(dataDir);
-    console.log('📊 扫描完成，发现项目数:', structure.length);
+    console.log('🔍 开始扫描Data目录:', dataDir);
+    const arrayStructure = await scanDirectory(dataDir);
+    console.log('📊 扫描完成，发现项目数:', arrayStructure.length);
+    
+    // 转换为前端期望的对象结构
+    const objectStructure = convertArrayToObjectStructure(arrayStructure);
+    console.log('🔄 已将数组结构转换为对象结构');
     
     res.json({
       success: true,
-      data: structure,
+      data: objectStructure,
       timestamp: new Date().toISOString(),
+      directory: dataDir,
+      realData: true,
       excludedFiles: excludedFiles // 返回完整的排除配置对象
     });
     
   } catch (error) {
     console.error('❌ 获取Data目录结构失败:', error);
-    // 即使失败，也返回一个基本响应让前端能够继续工作
+    console.error('❌ 错误详情:', error.stack);
+    
+    // 提供详细的错误诊断信息，而不是简单的模拟数据
+    const errorDiagnosticData = {
+      '错误日志.txt': {
+        type: 'file',
+        icon: 'fas fa-file-alt',
+        size: 0,
+        modified: new Date().toISOString(),
+        path: '错误日志.txt'
+      },
+      '技术支持信息': {
+        type: 'file',
+        icon: 'fas fa-file-alt',
+        size: 0,
+        modified: new Date().toISOString(),
+        path: '技术支持信息.txt'
+      }
+    };
+    
     res.status(200).json({
-      success: true,
-      data: [],
-      message: '在生产环境中使用模拟数据',
+      success: false, // 明确标记为失败
+      data: errorDiagnosticData,
+      message: '获取Data目录结构时发生错误',
       error: error.message,
+      errorType: error.constructor.name,
       timestamp: new Date().toISOString(),
-      environment: 'netlify-error-recovery',
-      excludedFiles: excludedFiles // 返回完整的排除配置对象
+      environment: process.env.NETLIFY ? 'netlify-production' : 'unknown',
+      diagnostics: {
+        attemptedPaths: possiblePaths || [],
+        currentWorkingDir: process.cwd(),
+        dirname: __dirname,
+        nodeVersion: process.version,
+        memoryUsage: process.memoryUsage()
+      },
+      excludedFiles: excludedFiles
     });
   }
 });
