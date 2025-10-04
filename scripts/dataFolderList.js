@@ -122,62 +122,31 @@ function openFile(filePath) {
 
 // 动态获取Data目录结构
 async function fetchDataStructure() {
-    console.log('🔍 开始获取Data目录结构');
-    
-    // 尝试获取Data目录的API接口
-    // 添加timeout和错误重试机制
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超时
-    
     try {
-        const response = await fetch('/api/data/structure', {
-            signal: controller.signal,
-            credentials: 'include', // 确保携带cookie
-            headers: {
-                'Content-Type': 'application/json',
-                'Cache-Control': 'no-cache'
-            }
-        });
-        
-        clearTimeout(timeoutId); // 清除超时计时器
-        
-        console.log('📡 响应状态码:', response.status);
-        
+        // 尝试获取Data目录的API接口
+        const response = await fetch('/api/data/structure');
         if (response.ok) {
-            try {
-                const result = await response.json();
-                console.log('📊 解析响应成功:', JSON.stringify(result).substring(0, 200) + '...');
-                
-                if (result.success) {
-                    console.log('✅ 成功获取动态目录结构');
-                    console.log('📋 排除配置:', result.excludedFiles);
-                    return result.data;
-                } else {
-                    throw new Error(result.message || 'API返回失败');
-                }
-            } catch (jsonError) {
-                console.error('❌ JSON解析错误:', jsonError);
-                throw new Error('解析API响应失败: ' + jsonError.message);
+            const result = await response.json();
+            if (result.success) {
+                console.log('✅ 成功获取动态目录结构');
+                console.log('📋 排除配置:', result.excludedFiles);
+                return result.data;
+            } else {
+                throw new Error(result.message || 'API返回失败');
             }
         } else {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
     } catch (error) {
-        clearTimeout(timeoutId); // 确保清除超时计时器
+        console.warn('⚠️ 无法获取动态目录结构，使用静态数据:', error.message);
         
-        console.error('❌ 获取Data目录结构失败:', error.message);
-        
-        // 添加更详细的错误类型判断
-        if (error.name === 'AbortError') {
-            console.error('⏱️ 请求超时，服务器响应时间过长');
-        } else if (error.message.includes('Failed to fetch')) {
-            console.error('🔌 网络连接问题，确保服务器已启动且可访问');
-        } else if (error.message.includes('404')) {
-            console.error('⚠️ API端点不存在，请检查后端服务是否正确部署');
-        }
-        
-        // 抛出错误，不使用静态数据后备，确保总是尝试获取真实的Data目录
-        throw new Error('无法获取Data目录结构，请检查服务器状态');
+        // 如果API不可用，使用静态数据作为后备
+        return {
+            "biJi": {
+                "本地数据.html": { type: "file", icon: "fas fa-file-code" }
+            },
+            "Resources": {}
+        };
     }
 }
 
@@ -217,98 +186,9 @@ async function initDataFolderList() {
             }, 100);
             
         } catch (error) {
-            console.error('❌ 初始化文件夹列表失败:', error.message);
-            // 显示错误消息，而不是使用静态数据
-            folderTree.innerHTML = `
-                <div class="error-message">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <p>无法获取Data目录结构</p>
-                    <p class="error-detail">错误详情: ${error.message}</p>
-                    <p class="error-tip">请确保后端服务已启动并正常运行</p>
-                    <button onclick="initDataFolderList()" class="retry-btn">
-                        <i class="fas fa-sync-alt"></i> 重试
-                    </button>
-                </div>
-            `;
-            
-            // 动态添加CSS样式
-            addErrorStyles();
+            console.error('加载文件夹结构失败:', error);
+            folderTree.innerHTML = '<div class="error">加载失败，请刷新页面重试</div>';
         }
-    } else {
-        console.warn('⚠️ 未找到folderTree元素');
-    }
-}
-
-// 添加错误消息样式
-function addErrorStyles() {
-    // 检查样式是否已存在
-    if (!document.getElementById('data-folder-error-styles')) {
-        const style = document.createElement('style');
-        style.id = 'data-folder-error-styles';
-        style.textContent = `
-            .error-message {
-                padding: 20px;
-                background-color: #f8d7da;
-                border: 1px solid #f5c6cb;
-                border-radius: 8px;
-                text-align: center;
-                color: #721c24;
-                font-family: Arial, sans-serif;
-                margin: 20px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            }
-            
-            .error-message i.fas {
-                font-size: 48px;
-                margin-bottom: 15px;
-                display: block;
-            }
-            
-            .error-message p {
-                margin: 8px 0;
-                line-height: 1.5;
-            }
-            
-            .error-detail {
-                font-size: 14px;
-                opacity: 0.8;
-                font-family: monospace;
-                word-break: break-word;
-            }
-            
-            .error-tip {
-                font-size: 14px;
-                font-style: italic;
-            }
-            
-            .retry-btn {
-                background-color: #dc3545;
-                color: white;
-                border: none;
-                padding: 10px 20px;
-                border-radius: 4px;
-                margin-top: 15px;
-                cursor: pointer;
-                font-size: 14px;
-                display: inline-flex;
-                align-items: center;
-                gap: 5px;
-                transition: background-color 0.3s;
-            }
-            
-            .retry-btn:hover {
-                background-color: #c82333;
-            }
-            
-            .loading {
-                text-align: center;
-                padding: 40px;
-                font-size: 16px;
-                color: #666;
-                font-family: Arial, sans-serif;
-            }
-        `;
-        document.head.appendChild(style);
     }
 }
 
@@ -430,19 +310,8 @@ async function saveExcludeConfig() {
 }
 
 // 页面加载完成后初始化
-function initializeDataFolder() {
-    console.log('📝 准备初始化Data文件夹列表...');
-    
-    // 添加延迟，确保服务完全初始化
-    setTimeout(() => {
-        console.log('⏰ 延迟执行初始化...');
-        initDataFolderList();
-    }, 2000); // 延迟2秒执行
-}
-
 document.addEventListener('DOMContentLoaded', function() {
-    // 使用延迟初始化函数
-    initializeDataFolder();
+    initDataFolderList();
     
     // 添加配置按钮事件监听器
     const configBtn = document.getElementById('excludeConfigBtn');
