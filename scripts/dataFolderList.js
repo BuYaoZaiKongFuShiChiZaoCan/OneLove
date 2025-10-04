@@ -223,16 +223,7 @@ function getStaticDataStructure() {
     console.log('使用静态数据结构');
     // 基于实际文件结构创建更完整的静态数据
     return {
-        "biJi": {
-            "网站历史.html": { type: "file", icon: "fas fa-file-code", size: 1024, modified: new Date().toISOString() },
-            "项目笔记.md": { type: "file", icon: "fas fa-file-alt", size: 2048, modified: new Date().toISOString() },
-            "重要文档.txt": { type: "file", icon: "fas fa-file-text", size: 512, modified: new Date().toISOString() }
-        },
         "Resources": {
-            "test": {
-                "测试文件.txt": { type: "file", icon: "fas fa-file-text", size: 1024, modified: new Date().toISOString() },
-                "测试图片.png": { type: "file", icon: "fas fa-image", size: 5678, modified: new Date().toISOString() }
-            },
             "icons": {
                 "icon1.png": { type: "file", icon: "fas fa-image", size: 2048, modified: new Date().toISOString() },
                 "icon2.svg": { type: "file", icon: "fas fa-file-image", size: 512, modified: new Date().toISOString() }
@@ -241,13 +232,6 @@ function getStaticDataStructure() {
         "music": {
             "playlist.json": { type: "file", icon: "fas fa-file-json", size: 2000, modified: new Date().toISOString() },
             "favorites.txt": { type: "file", icon: "fas fa-file-text", size: 300, modified: new Date().toISOString() }
-        },
-        "images": {
-            "示例图片.png": { type: "file", icon: "fas fa-image", size: 8900, modified: new Date().toISOString() },
-            "screenshots": {
-                "截图1.png": { type: "file", icon: "fas fa-image", size: 12345, modified: new Date().toISOString() },
-                "截图2.png": { type: "file", icon: "fas fa-image", size: 6789, modified: new Date().toISOString() }
-            }
         },
         "文档.html": { type: "file", icon: "fas fa-file-code", size: 3072, modified: new Date().toISOString() },
         "说明.md": { type: "file", icon: "fas fa-file-alt", size: 1500, modified: new Date().toISOString() }
