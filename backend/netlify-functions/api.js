@@ -126,6 +126,18 @@ const phoneSchema = new mongoose.Schema({
 
 const Password = mongoose.models.Password || mongoose.model('Password', passwordSchema);
 const Phone = mongoose.models.Phone || mongoose.model('Phone', phoneSchema);
+
+// 文件系统结构模型
+const fileSystemStructureSchema = new mongoose.Schema({
+  structure: { type: mongoose.Schema.Types.Mixed, required: true },
+  excludedFiles: { type: mongoose.Schema.Types.Mixed, required: true },
+  directory: { type: String, required: true },
+  isRealData: { type: Boolean, default: true },
+  timestamp: { type: Date, default: Date.now },
+  environment: { type: String, required: true }
+});
+
+const FileSystemStructure = mongoose.models.FileSystemStructure || mongoose.model('FileSystemStructure', fileSystemStructureSchema);
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
@@ -437,6 +449,42 @@ app.get('/api/data/structure', async (req, res) => {
   try {
     console.log('🔍 尝试获取Data目录结构');
     
+    // 检测是否为生产环境
+    const isProductionEnvironment = process.env.NETLIFY || process.env.NODE_ENV === 'production';
+    
+    // 在生产环境中，首先尝试从数据库获取数据
+    if (isProductionEnvironment) {
+      console.log('🌐 检测到生产环境，尝试从数据库获取文件结构数据');
+      try {
+        const dbConnected = await connectDB();
+        if (dbConnected) {
+          // 获取最新的文件结构数据
+          const latestStructure = await FileSystemStructure.findOne().sort({ timestamp: -1 });
+          
+          if (latestStructure) {
+            console.log('✅ 成功从数据库获取文件结构数据');
+            return res.json({
+              success: true,
+              data: latestStructure.structure,
+              timestamp: latestStructure.timestamp.toISOString(),
+              directory: latestStructure.directory || 'database-sourced',
+              realData: latestStructure.isRealData,
+              isProductionEnvironment: true,
+              dataSource: 'database',
+              excludedFiles: latestStructure.excludedFiles || excludedFiles
+            });
+          } else {
+            console.warn('⚠️  数据库中没有找到文件结构数据');
+            // 继续执行，尝试扫描文件系统
+          }
+        } else {
+          console.warn('⚠️  数据库连接失败，尝试扫描文件系统');
+        }
+      } catch (dbError) {
+        console.error('❌ 从数据库获取数据时发生错误:', dbError);
+        // 继续执行，尝试扫描文件系统
+      }
+    }
     // 尝试多个可能的Data目录路径
     const possiblePaths = [
       // 在Netlify Functions环境中，尝试相对于当前文件的路径
@@ -522,12 +570,47 @@ app.get('/api/data/structure', async (req, res) => {
     const objectStructure = convertArrayToObjectStructure(arrayStructure);
     console.log('🔄 已将数组结构转换为对象结构');
     
+    // 检测是否为本地环境
+    const isLocalEnvironment = !process.env.NETLIFY && process.env.NODE_ENV !== 'production';
+    
+    // 在本地环境中，将数据上传到数据库
+    if (isLocalEnvironment) {
+      console.log('🖥️  检测到本地环境，准备将数据上传到数据库');
+      try {
+        const dbConnected = await connectDB();
+        if (dbConnected) {
+          // 检查是否已存在最新的文件结构数据
+          const existingStructure = await FileSystemStructure.findOne().sort({ timestamp: -1 });
+          
+          // 创建新的数据结构记录
+          const newFileSystemStructure = new FileSystemStructure({
+            structure: objectStructure,
+            excludedFiles: excludedFiles,
+            directory: dataDir,
+            isRealData: true,
+            environment: 'local-development'
+          });
+          
+          await newFileSystemStructure.save();
+          console.log('✅ 数据成功上传到数据库');
+        } else {
+          console.warn('⚠️  数据库连接失败，无法上传数据');
+        }
+      } catch (dbError) {
+        console.error('❌ 上传数据到数据库时发生错误:', dbError);
+      }
+    } else {
+      console.log('🌐 检测到生产环境，将从数据库获取数据或返回扫描结果');
+    }
+    
     res.json({
       success: true,
       data: objectStructure,
       timestamp: new Date().toISOString(),
       directory: dataDir,
       realData: true,
+      isLocalEnvironment: isLocalEnvironment,
+      dataUploaded: isLocalEnvironment,
       excludedFiles: excludedFiles // 返回完整的排除配置对象
     });
     
