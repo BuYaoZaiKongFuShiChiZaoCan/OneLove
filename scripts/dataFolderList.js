@@ -14,23 +14,49 @@ function formatFileSize(bytes) {
 
 // 格式化日期
 function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    if (!dateString) return '';
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('zh-CN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch (error) {
+        console.warn('日期格式化错误:', error);
+        return '';
+    }
 }
 
 // 生成文件夹树HTML
 function generateFolderTree(structure, level = 0) {
-    let html = '';
+    // 防御性检查
+    if (!structure || typeof structure !== 'object') {
+        console.error('无效的目录结构:', structure);
+        return '<div class="empty-message">无效的目录结构</div>';
+    }
     
-    for (const [name, content] of Object.entries(structure)) {
-        const isFolder = typeof content === 'object' && !content.type;
-        const isFile = content && content.type === 'file';
+    let html = '';
+    const entries = Object.entries(structure);
+    
+    if (entries.length === 0) {
+        return '<div class="empty-folder">空文件夹</div>';
+    }
+    
+    for (const [name, content] of entries) {
+        // 调试信息
+        console.log(`处理项: ${name}`, content);
+        
+        // 改进文件夹检测逻辑
+        const isFolder = content && typeof content === 'object' && !content.type && !Array.isArray(content);
+        
+        // 改进文件检测逻辑 - 更灵活地识别文件
+        const hasFileExtension = name.includes('.') && typeof name === 'string';
+        const isFile = content && (content.type === 'file' || hasFileExtension);
+        
+        console.log(`${name} 是文件夹: ${isFolder}, 是文件: ${isFile}`);
         
         if (isFolder) {
             // 文件夹
@@ -52,14 +78,26 @@ function generateFolderTree(structure, level = 0) {
             `;
         } else if (isFile) {
             // 文件
-            const icon = content.icon || 'fas fa-file';
-            const filePath = content.path || `Data/${name}`;
-            const fileSize = content.size ? formatFileSize(content.size) : '';
-            const modifiedDate = content.modified ? formatDate(content.modified) : '';
+            const icon = content && content.icon ? content.icon : 'fas fa-file';
+            
+            // 构建正确的文件路径
+            let filePath = `Data/${name}`;
+            // 如果content中有path属性，优先使用
+            if (content && content.path) {
+                filePath = content.path;
+            } else if (name.includes('/')) {
+                filePath = `Data/${name}`;
+            }
+            
+            const fileSize = content && content.size ? formatFileSize(content.size) : '';
+            const modifiedDate = content && content.modified ? formatDate(content.modified) : '';
+            
+            // 安全转义文件路径
+            const safeFilePath = filePath.replace(/'/g, "\\'");
             
             html += `
                 <div class="file-item" style="margin-left: ${level * 20}px;">
-                    <div class="file-content" onclick="openFile('${filePath}')" title="大小: ${fileSize} | 修改时间: ${modifiedDate}">
+                    <div class="file-content" onclick="openFile('${safeFilePath}')" title="大小: ${fileSize || '未知'} | 修改时间: ${modifiedDate || '未知'} | 路径: ${filePath}">
                         <i class="fas fa-file file-icon"></i>
                         <i class="${icon} file-type-icon"></i>
                         <span class="file-name">${name}</span>
@@ -69,6 +107,22 @@ function generateFolderTree(structure, level = 0) {
                     </div>
                 </div>
             `;
+        } else {
+            // 处理未分类项目 - 检查是否有文件扩展名
+            if (typeof name === 'string' && name.includes('.') && name.trim() !== '') {
+                // 作为文件处理
+                const filePath = `Data/${name}`;
+                const safeFilePath = filePath.replace(/'/g, "\\'");
+                
+                html += `
+                    <div class="file-item" style="margin-left: ${level * 20}px;">
+                        <div class="file-content" onclick="openFile('${safeFilePath}')" title="路径: ${filePath}">
+                            <i class="fas fa-file file-icon"></i>
+                            <span class="file-name">${name}</span>
+                        </div>
+                    </div>
+                `;
+            }
         }
     }
     
@@ -99,25 +153,87 @@ function toggleFolder(folderId) {
 
 // 打开文件
 function openFile(filePath) {
-    // 根据文件类型决定如何打开
-    const extension = filePath.split('.').pop().toLowerCase();
-    
-    if (['html', 'htm', 'mhtml'].includes(extension)) {
-        // HTML文件直接打开
-        window.open(filePath, '_blank');
-    } else if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(extension)) {
-        // 图片文件在新窗口打开
-        window.open(filePath, '_blank');
-    } else if (['md', 'txt'].includes(extension)) {
-        // 文本文件尝试打开
-        window.open(filePath, '_blank');
-    } else {
-        // 其他文件类型提示下载
-        const link = document.createElement('a');
-        link.href = filePath;
-        link.download = filePath.split('/').pop();
-        link.click();
+    // 安全检查
+    if (!filePath || typeof filePath !== 'string') {
+        console.warn('⚠️ 无效的文件路径:', filePath);
+        return;
     }
+    
+    try {
+        console.log(`📂 打开文件: ${filePath}`);
+        
+        // 对文件路径进行安全处理
+        const safePath = filePath.trim();
+        
+        // 根据文件类型决定如何打开
+        const extension = safePath.split('.').pop()?.toLowerCase();
+        console.log(`  - 扩展名: ${extension}`);
+        
+        if (['html', 'htm', 'mhtml'].includes(extension)) {
+            // HTML文件直接打开
+            console.log(`  - 打开HTML文件`);
+            window.open(safePath, '_blank');
+        } else if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(extension)) {
+            // 图片文件在新窗口打开
+            console.log(`  - 打开图片文件`);
+            window.open(safePath, '_blank');
+        } else if (['md', 'txt'].includes(extension)) {
+            // 文本文件尝试打开
+            console.log(`  - 打开文本文件`);
+            window.open(safePath, '_blank');
+        } else {
+            // 其他文件类型提示下载
+            console.log(`  - 下载其他文件`);
+            const link = document.createElement('a');
+            link.href = safePath;
+            link.download = safePath.split('/').pop() || 'download';
+            document.body.appendChild(link);
+            link.click();
+            // 确保链接被移除
+            setTimeout(() => {
+                document.body.removeChild(link);
+            }, 100);
+        }
+    } catch (error) {
+        console.error('❌ 打开文件失败:', error);
+        alert('打开文件失败，请重试');
+    }
+}
+
+// 获取静态数据结构（模拟本地Data目录结构）
+function getStaticDataStructure() {
+    console.log('使用静态数据结构');
+    // 基于实际文件结构创建更完整的静态数据
+    return {
+        "biJi": {
+            "网站历史.html": { type: "file", icon: "fas fa-file-code", size: 1024, modified: new Date().toISOString() },
+            "项目笔记.md": { type: "file", icon: "fas fa-file-alt", size: 2048, modified: new Date().toISOString() },
+            "重要文档.txt": { type: "file", icon: "fas fa-file-text", size: 512, modified: new Date().toISOString() }
+        },
+        "Resources": {
+            "test": {
+                "测试文件.txt": { type: "file", icon: "fas fa-file-text", size: 1024, modified: new Date().toISOString() },
+                "测试图片.png": { type: "file", icon: "fas fa-image", size: 5678, modified: new Date().toISOString() }
+            },
+            "icons": {
+                "icon1.png": { type: "file", icon: "fas fa-image", size: 2048, modified: new Date().toISOString() },
+                "icon2.svg": { type: "file", icon: "fas fa-file-image", size: 512, modified: new Date().toISOString() }
+            }
+        },
+        "music": {
+            "playlist.json": { type: "file", icon: "fas fa-file-json", size: 2000, modified: new Date().toISOString() },
+            "favorites.txt": { type: "file", icon: "fas fa-file-text", size: 300, modified: new Date().toISOString() }
+        },
+        "images": {
+            "示例图片.png": { type: "file", icon: "fas fa-image", size: 8900, modified: new Date().toISOString() },
+            "screenshots": {
+                "截图1.png": { type: "file", icon: "fas fa-image", size: 12345, modified: new Date().toISOString() },
+                "截图2.png": { type: "file", icon: "fas fa-image", size: 6789, modified: new Date().toISOString() }
+            }
+        },
+        "文档.html": { type: "file", icon: "fas fa-file-code", size: 3072, modified: new Date().toISOString() },
+        "说明.md": { type: "file", icon: "fas fa-file-alt", size: 1500, modified: new Date().toISOString() }
+    };
 }
 
 // 动态获取Data目录结构
@@ -125,11 +241,15 @@ async function fetchDataStructure() {
     try {
         // 尝试获取Data目录的API接口
         const response = await fetch('/api/data/structure');
+        console.log('API响应状态:', response.status);
+        
         if (response.ok) {
             const result = await response.json();
-            if (result.success) {
+            console.log('API返回数据:', result);
+            
+            if (result.success && result.data) {
                 console.log('✅ 成功获取动态目录结构');
-                console.log('📋 排除配置:', result.excludedFiles);
+                console.log('📋 排除配置:', result.excludedFiles || '无');
                 return result.data;
             } else {
                 throw new Error(result.message || 'API返回失败');
@@ -140,55 +260,84 @@ async function fetchDataStructure() {
     } catch (error) {
         console.warn('⚠️ 无法获取动态目录结构，使用静态数据:', error.message);
         
-        // 如果API不可用，使用静态数据作为后备
-        return {
-            "biJi": {
-                "本地数据.html": { type: "file", icon: "fas fa-file-code" }
-            },
-            "Resources": {}
-        };
+        // 使用更完整的静态数据作为后备
+        return getStaticDataStructure();
     }
 }
 
 // 初始化文件夹列表
 async function initDataFolderList() {
+    console.log('🔄 开始初始化文件夹列表', new Date().toLocaleTimeString());
     const folderTree = document.getElementById('folderTree');
-    if (folderTree) {
-        try {
-            // 显示加载状态
-            folderTree.innerHTML = '<div class="loading">正在加载文件夹结构...</div>';
-            
-            // 获取数据结构
-            const structure = await fetchDataStructure();
-            
-            // 生成文件夹树
-            console.log('📁 生成文件夹树，数据结构:', structure);
-            const treeHTML = generateFolderTree(structure);
-            folderTree.innerHTML = treeHTML;
-            
-            // 默认展开第一层文件夹
-            const firstLevelFolders = folderTree.querySelectorAll('.folder-content');
-            firstLevelFolders.forEach(folder => {
-                folder.style.display = 'block';
-                const folderId = folder.id;
-                const arrow = document.getElementById(`arrow-${folderId}`);
-                if (arrow) {
-                    arrow.classList.remove('fa-chevron-right');
-                    arrow.classList.add('fa-chevron-down');
-                }
-            });
-            
-            // 添加加载完成动画
-            folderTree.style.opacity = '0';
-            setTimeout(() => {
-                folderTree.style.transition = 'opacity 0.3s ease';
-                folderTree.style.opacity = '1';
-            }, 100);
-            
-        } catch (error) {
-            console.error('加载文件夹结构失败:', error);
-            folderTree.innerHTML = '<div class="error">加载失败，请刷新页面重试</div>';
+    
+    if (!folderTree) {
+        console.warn('❌ 未找到文件夹树容器元素');
+        return;
+    }
+    
+    try {
+        // 显示加载状态
+        console.log('⏳ 显示加载状态...');
+        folderTree.innerHTML = '<div class="loading">正在加载文件夹结构...</div>';
+        
+        // 获取数据结构
+        console.log('🔍 获取数据结构...');
+        const startTime = performance.now();
+        const structure = await fetchDataStructure();
+        const fetchTime = performance.now() - startTime;
+        
+        // 验证数据结构
+        console.log(`✅ 数据结构获取完成，耗时: ${fetchTime.toFixed(2)}ms`);
+        if (!structure || typeof structure !== 'object') {
+            console.error('❌ 无效的数据结构:', structure);
+            throw new Error('获取的数据结构无效');
         }
+        
+        // 生成文件夹树
+        console.log('📁 开始生成文件夹树...');
+        console.log('📋 数据结构分析:', {
+            type: typeof structure,
+            entryCount: Object.keys(structure).length,
+            entries: Object.keys(structure)
+        });
+        
+        const treeHTML = generateFolderTree(structure);
+        folderTree.innerHTML = treeHTML;
+        console.log('✅ 文件夹树HTML生成完成');
+        
+        // 默认展开第一层文件夹
+        console.log('🔓 展开第一层文件夹...');
+        const firstLevelFolders = folderTree.querySelectorAll('.folder-content');
+        console.log(`📂 找到 ${firstLevelFolders.length} 个顶级文件夹`);
+        
+        firstLevelFolders.forEach((folder, index) => {
+            folder.style.display = 'block';
+            const folderId = folder.id;
+            const arrow = document.getElementById(`arrow-${folderId}`);
+            if (arrow) {
+                arrow.classList.remove('fa-chevron-right');
+                arrow.classList.add('fa-chevron-down');
+                console.log(`  - 展开文件夹 #${index}: ${folderId}`);
+            }
+        });
+        
+        // 检查是否有任何文件被渲染
+        const fileItems = folderTree.querySelectorAll('.file-item');
+        console.log(`📄 成功渲染 ${fileItems.length} 个文件项`);
+        
+        // 添加加载完成动画
+        console.log('✨ 应用加载完成动画...');
+        folderTree.style.opacity = '0';
+        setTimeout(() => {
+            folderTree.style.transition = 'opacity 0.3s ease';
+            folderTree.style.opacity = '1';
+            console.log('✅ 文件夹列表初始化完成', new Date().toLocaleTimeString());
+        }, 100);
+        
+    } catch (error) {
+        console.error('❌ 加载文件夹结构失败:', error);
+        console.error('错误详情:', { message: error.message, stack: error.stack });
+        folderTree.innerHTML = `<div class="error">加载失败: ${error.message || '未知错误'}，请刷新页面重试</div>`;
     }
 }
 

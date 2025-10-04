@@ -1189,40 +1189,144 @@ async function scanDirectory(dirPath, relativePath = '') {
 // 获取Data目录结构API
 app.get('/api/data/structure', async (req, res) => {
   try {
-    // Data目录的绝对路径
+    // Data目录的绝对路径 - 确保使用正确的路径分隔符
     const dataDir = path.join(__dirname, '..', 'Data');
+    console.log('🔍 开始处理/api/data/structure请求，Data目录路径:', dataDir);
     
     // 检查Data目录是否存在
     try {
       await promisify(fs.access)(dataDir);
+      console.log('✅ Data目录存在，开始扫描');
     } catch (error) {
+      console.error('❌ Data目录不存在或无法访问:', error.message);
       return res.status(404).json({
         success: false,
-        message: 'Data目录不存在'
+        message: 'Data目录不存在或无法访问',
+        path: dataDir
       });
     }
     
-    // 扫描Data目录结构
-    console.log('🔍 开始扫描Data目录:', dataDir);
+    // 先列出顶层目录内容，用于调试
+    try {
+      const topLevelItems = await promisify(fs.readdir)(dataDir, { withFileTypes: true });
+      console.log('📋 顶层目录内容数量:', topLevelItems.length);
+      console.log('📋 顶层目录项目:', topLevelItems.map(item => ({name: item.name, isDir: item.isDirectory()})).join(', '));
+    } catch (error) {
+      console.error('❌ 读取顶层目录内容失败:', error.message);
+    }
+    
+    // 扫描Data目录结构 - 使用修改后的扫描逻辑
     const structure = await scanDirectory(dataDir);
-    console.log('📊 扫描结果:', JSON.stringify(structure, null, 2));
+    console.log('📊 扫描结果类型:', typeof structure);
+    console.log('📊 扫描结果顶层键数量:', Object.keys(structure).length);
+    console.log('📊 扫描结果预览:', JSON.stringify(structure, null, 2).substring(0, 500) + '...');
     
     res.json({
       success: true,
       data: structure,
       timestamp: new Date().toISOString(),
-      excludedFiles: excludedFiles // 返回排除配置信息
+      path: dataDir,
+      scannedAt: new Date().toISOString()
     });
     
   } catch (error) {
-    console.error('获取Data目录结构失败:', error);
+    console.error('🚨 获取Data目录结构失败:', error);
     res.status(500).json({
       success: false,
       message: '获取目录结构失败',
-      error: error.message
+      error: error.message,
+      stack: error.stack
     });
   }
 });
+
+// 修复scanDirectory函数以确保正确处理文件和目录
+async function scanDirectory(dirPath, relativePath = '') {
+  const result = {};
+  
+  try {
+    console.log(`🔄 扫描目录: ${dirPath}，相对路径: ${relativePath}`);
+    const items = await promisify(fs.readdir)(dirPath, { withFileTypes: true });
+    console.log(`📋 找到 ${items.length} 个项目`);
+    
+    for (const item of items) {
+      const isDir = item.isDirectory();
+      const isFile = item.isFile();
+      
+      // 打印每个项目的基本信息
+      console.log(`  - ${item.name}: ${isDir ? '目录' : isFile ? '文件' : '其他'}`);
+      
+      // 检查是否应该排除此文件/目录 - 修改排除逻辑以避免过度排除
+      if (shouldExcludeFile(item.name, isDir)) {
+        console.log(`  ⚠️  排除: ${item.name}`);
+        continue; // 跳过被排除的文件/目录
+      }
+      
+      const itemPath = path.join(dirPath, item.name);
+      const itemRelativePath = path.join(relativePath, item.name);
+      
+      if (isDir) {
+        // 递归扫描子目录
+        console.log(`  📁 递归扫描子目录: ${itemPath}`);
+        const subDir = await scanDirectory(itemPath, itemRelativePath);
+        // 包含所有目录，即使是空的
+        result[item.name] = subDir;
+        console.log(`  📁 子目录 ${item.name} 扫描完成，包含 ${Object.keys(subDir).length} 个项目`);
+      } else if (isFile) {
+        try {
+          // 文件信息
+          console.log(`  📄 处理文件: ${itemPath}`);
+          const stats = await promisify(fs.stat)(itemPath);
+          result[item.name] = {
+            type: 'file',
+            icon: getFileIcon(item.name),
+            size: stats.size,
+            modified: stats.mtime,
+            path: itemRelativePath.replace(/\\/g, '/') // 统一使用正斜杠
+          };
+          console.log(`  📄 文件 ${item.name} 添加到结果中`);
+        } catch (err) {
+          console.error(`  ❌ 无法获取文件信息: ${itemPath}`, err.message);
+        }
+      }
+    }
+  } catch (error) {
+    console.error(`❌ 扫描目录失败: ${dirPath}`, error.message);
+    // 即使出错也返回空对象而不是崩溃
+  }
+  
+  return result;
+}
+
+// 修改shouldExcludeFile函数以避免过度排除
+function shouldExcludeFile(fileName, isDirectory = false) {
+  const name = fileName.toLowerCase();
+  
+  // 避免排除重要的应用目录
+  const importantDirs = ['biji', 'resources', 'music', 'images'];
+  if (isDirectory && importantDirs.some(dir => name.includes(dir))) {
+    console.log(`  ✅ 保留重要目录: ${fileName}`);
+    return false;
+  }
+  
+  // 检查目录排除列表 - 更严格地应用，只排除明确列出的系统目录
+  if (isDirectory) {
+    const shouldExclude = excludedFiles.directories.includes(name);
+    console.log(`  📁 目录排除检查 ${fileName}: ${shouldExclude ? '排除' : '保留'}`);
+    return shouldExclude;
+  }
+  
+  // 检查文件扩展名排除列表 - 放宽排除条件
+  const extension = name.split('.').pop();
+  // 只排除系统临时文件和配置文件，不排除用户文件
+  const systemExtensions = ['tmp', 'temp', 'cache', 'log', 'bak', 'backup', 'old', 'swp', 'swo'];
+  const isSystemFile = systemExtensions.includes(extension) || 
+                      name.startsWith('.') || 
+                      ['thumbs.db', 'desktop.ini', '.ds_store'].includes(name);
+                      
+  console.log(`  📄 文件排除检查 ${fileName}: ${isSystemFile ? '排除' : '保留'}`);
+  return isSystemFile;
+}
 
 // 获取排除文件配置API
 app.get('/api/data/excluded-files', (req, res) => {
