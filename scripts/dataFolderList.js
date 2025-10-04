@@ -120,7 +120,7 @@ function openFile(filePath) {
     }
 }
 
-// 动态获取Data目录结构 - 增强版
+// 动态获取Data目录结构
 async function fetchDataStructure() {
     console.log('🔍 开始获取Data目录结构');
     
@@ -172,6 +172,8 @@ async function fetchDataStructure() {
             console.error('⏱️ 请求超时，服务器响应时间过长');
         } else if (error.message.includes('Failed to fetch')) {
             console.error('🔌 网络连接问题，确保服务器已启动且可访问');
+        } else if (error.message.includes('404')) {
+            console.error('⚠️ API端点不存在，请检查后端服务是否正确部署');
         }
         
         // 抛出错误，不使用静态数据后备，确保总是尝试获取真实的Data目录
@@ -228,9 +230,85 @@ async function initDataFolderList() {
                     </button>
                 </div>
             `;
+            
+            // 动态添加CSS样式
+            addErrorStyles();
         }
     } else {
         console.warn('⚠️ 未找到folderTree元素');
+    }
+}
+
+// 添加错误消息样式
+function addErrorStyles() {
+    // 检查样式是否已存在
+    if (!document.getElementById('data-folder-error-styles')) {
+        const style = document.createElement('style');
+        style.id = 'data-folder-error-styles';
+        style.textContent = `
+            .error-message {
+                padding: 20px;
+                background-color: #f8d7da;
+                border: 1px solid #f5c6cb;
+                border-radius: 8px;
+                text-align: center;
+                color: #721c24;
+                font-family: Arial, sans-serif;
+                margin: 20px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            
+            .error-message i.fas {
+                font-size: 48px;
+                margin-bottom: 15px;
+                display: block;
+            }
+            
+            .error-message p {
+                margin: 8px 0;
+                line-height: 1.5;
+            }
+            
+            .error-detail {
+                font-size: 14px;
+                opacity: 0.8;
+                font-family: monospace;
+                word-break: break-word;
+            }
+            
+            .error-tip {
+                font-size: 14px;
+                font-style: italic;
+            }
+            
+            .retry-btn {
+                background-color: #dc3545;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 4px;
+                margin-top: 15px;
+                cursor: pointer;
+                font-size: 14px;
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                transition: background-color 0.3s;
+            }
+            
+            .retry-btn:hover {
+                background-color: #c82333;
+            }
+            
+            .loading {
+                text-align: center;
+                padding: 40px;
+                font-size: 16px;
+                color: #666;
+                font-family: Arial, sans-serif;
+            }
+        `;
+        document.head.appendChild(style);
     }
 }
 
@@ -352,8 +430,19 @@ async function saveExcludeConfig() {
 }
 
 // 页面加载完成后初始化
+function initializeDataFolder() {
+    console.log('📝 准备初始化Data文件夹列表...');
+    
+    // 添加延迟，确保服务完全初始化
+    setTimeout(() => {
+        console.log('⏰ 延迟执行初始化...');
+        initDataFolderList();
+    }, 2000); // 延迟2秒执行
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    initDataFolderList();
+    // 使用延迟初始化函数
+    initializeDataFolder();
     
     // 添加配置按钮事件监听器
     const configBtn = document.getElementById('excludeConfigBtn');
