@@ -30,6 +30,23 @@ workbox.setConfig({
 workbox.skipWaiting();
 workbox.clientsClaim();
 
+// 处理安装事件
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
+});
+
+// 处理激活事件
+self.addEventListener('activate', (event) => {
+  event.waitUntil(clients.claim());
+});
+
+// 处理消息事件，用于与主线程通信
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+
 var cacheList = ['/', '/index.html'];
 
 workbox.routing.registerRoute(

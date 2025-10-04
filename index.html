@@ -975,7 +975,6 @@
 		/* 如果浏览器支持加载完成后就开启PWA功能 */
 		if ("serviceWorker" in navigator) {
 			window.addEventListener("load", function () {
-				// 使用简单版本的 Service Worker，避免缓存错误
 				navigator.serviceWorker.register("./scripts/sw.js")
 					.then(function (registration) {
 						// console.log('Service Worker 注册成功:', registration.scope);
