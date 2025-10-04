@@ -302,7 +302,7 @@ app.use('/font', express.static(path.join(__dirname, '../font')));
 app.use('/webfonts', express.static(path.join(__dirname, '../webfonts')));
 app.use('/scripts', express.static(path.join(__dirname, '../scripts')));
 app.use('/time', express.static(path.join(__dirname, '../time')));
-app.use('/biJi', express.static(path.join(__dirname, '../biJi')));
+app.use('/Data', express.static(path.join(__dirname, '../Data')));
 
 // 添加额外的静态文件路径以处理子目录
 app.use('/music/lrc', express.static(path.join(__dirname, '../music/lrc')));

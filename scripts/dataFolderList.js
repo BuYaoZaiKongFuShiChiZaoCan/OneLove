@@ -81,12 +81,15 @@ function generateFolderTree(structure, level = 0) {
             const icon = content && content.icon ? content.icon : 'fas fa-file';
             
             // 构建正确的文件路径
-            let filePath = `Data/${name}`;
+            let filePath = name;
             // 如果content中有path属性，优先使用
             if (content && content.path) {
                 filePath = content.path;
-            } else if (name.includes('/')) {
-                filePath = `Data/${name}`;
+            }
+            
+            // 确保路径始终以"Data/"开头
+            if (!filePath.startsWith('Data/')) {
+                filePath = `Data/${filePath}`;
             }
             
             const fileSize = content && content.size ? formatFileSize(content.size) : '';
@@ -111,7 +114,13 @@ function generateFolderTree(structure, level = 0) {
             // 处理未分类项目 - 检查是否有文件扩展名
             if (typeof name === 'string' && name.includes('.') && name.trim() !== '') {
                 // 作为文件处理
-                const filePath = `Data/${name}`;
+                let filePath = name;
+                
+                // 确保路径始终以"Data/"开头
+                if (!filePath.startsWith('Data/')) {
+                    filePath = `Data/${filePath}`;
+                }
+                
                 const safeFilePath = filePath.replace(/'/g, "\\'");
                 
                 html += `
@@ -132,6 +141,7 @@ function generateFolderTree(structure, level = 0) {
 // 获取文件路径
 function getFilePath(fileName, level) {
     // 这里可以根据实际需要构建文件路径
+    // 确保路径始终以"Data/"开头
     return `Data/biJi/${fileName}`;
 }
 
@@ -163,7 +173,15 @@ function openFile(filePath) {
         console.log(`📂 打开文件: ${filePath}`);
         
         // 对文件路径进行安全处理
-        const safePath = filePath.trim();
+        let safePath = filePath.trim();
+        
+        // 确保路径始终以"Data/"开头
+        if (!safePath.startsWith('Data/')) {
+            console.log(`  - 路径缺少Data前缀，添加前缀`);
+            safePath = `Data/${safePath}`;
+        }
+        
+        console.log(`  - 修正后的路径: ${safePath}`);
         
         // 根据文件类型决定如何打开
         const extension = safePath.split('.').pop()?.toLowerCase();
