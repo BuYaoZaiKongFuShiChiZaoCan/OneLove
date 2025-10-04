@@ -120,25 +120,57 @@ function openFile(filePath) {
     }
 }
 
-// 动态获取Data目录结构
+// 动态获取Data目录结构 - 增强版
 async function fetchDataStructure() {
     try {
+        console.log('🔍 开始获取Data目录结构');
+        
         // 尝试获取Data目录的API接口
-        const response = await fetch('/api/data/structure');
+        // 添加timeout和错误重试机制
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超时
+        
+        const response = await fetch('/api/data/structure', {
+            signal: controller.signal,
+            credentials: 'include', // 确保携带cookie
+            headers: {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-cache'
+            }
+        });
+        
+        clearTimeout(timeoutId); // 清除超时计时器
+        
+        console.log('📡 响应状态码:', response.status);
+        
         if (response.ok) {
-            const result = await response.json();
-            if (result.success) {
-                console.log('✅ 成功获取动态目录结构');
-                console.log('📋 排除配置:', result.excludedFiles);
-                return result.data;
-            } else {
-                throw new Error(result.message || 'API返回失败');
+            try {
+                const result = await response.json();
+                console.log('📊 解析响应成功:', JSON.stringify(result).substring(0, 200) + '...');
+                
+                if (result.success) {
+                    console.log('✅ 成功获取动态目录结构');
+                    console.log('📋 排除配置:', result.excludedFiles);
+                    return result.data;
+                } else {
+                    throw new Error(result.message || 'API返回失败');
+                }
+            } catch (jsonError) {
+                console.error('❌ JSON解析错误:', jsonError);
+                throw new Error('解析API响应失败: ' + jsonError.message);
             }
         } else {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
     } catch (error) {
         console.warn('⚠️ 无法获取动态目录结构，使用静态数据:', error.message);
+        
+        // 添加更详细的错误类型判断
+        if (error.name === 'AbortError') {
+            console.warn('⏱️ 请求超时，服务器响应时间过长');
+        } else if (error.message.includes('Failed to fetch')) {
+            console.warn('🔌 网络连接问题，可能是服务器未启动或CORS问题');
+        }
         
         // 如果API不可用，使用静态数据作为后备
         return {
