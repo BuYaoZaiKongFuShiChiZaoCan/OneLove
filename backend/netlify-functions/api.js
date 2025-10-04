@@ -444,47 +444,27 @@ app.get('/api/data', (req, res) => {
 	res.json({ success: true, data });
 });
 
-// 获取Data目录结构API
+// 获取Data目录结构API - 在生产环境中完全禁用
 app.get('/api/data/structure', async (req, res) => {
+  // 检测是否为生产环境
+  const isProductionEnvironment = process.env.NETLIFY || process.env.NODE_ENV === 'production';
+  
+  // 在生产环境中，直接返回空响应，不执行任何相关代码
+  if (isProductionEnvironment) {
+    console.log('🚫 生产环境：Data目录结构功能已禁用');
+    return res.json({
+      success: false,
+      data: {},
+      message: '此功能在生产环境中不可用',
+      timestamp: new Date().toISOString(),
+      environment: 'production',
+      featureDisabled: true
+    });
+  }
+  
+  // 仅在非生产环境执行实际逻辑
   try {
     console.log('🔍 尝试获取Data目录结构');
-    
-    // 检测是否为生产环境
-    const isProductionEnvironment = process.env.NETLIFY || process.env.NODE_ENV === 'production';
-    
-    // 在生产环境中，首先尝试从数据库获取数据
-    if (isProductionEnvironment) {
-      console.log('🌐 检测到生产环境，尝试从数据库获取文件结构数据');
-      try {
-        const dbConnected = await connectDB();
-        if (dbConnected) {
-          // 获取最新的文件结构数据
-          const latestStructure = await FileSystemStructure.findOne().sort({ timestamp: -1 });
-          
-          if (latestStructure) {
-            console.log('✅ 成功从数据库获取文件结构数据');
-            return res.json({
-              success: true,
-              data: latestStructure.structure,
-              timestamp: latestStructure.timestamp.toISOString(),
-              directory: latestStructure.directory || 'database-sourced',
-              realData: latestStructure.isRealData,
-              isProductionEnvironment: true,
-              dataSource: 'database',
-              excludedFiles: latestStructure.excludedFiles || excludedFiles
-            });
-          } else {
-            console.warn('⚠️  数据库中没有找到文件结构数据');
-            // 继续执行，尝试扫描文件系统
-          }
-        } else {
-          console.warn('⚠️  数据库连接失败，尝试扫描文件系统');
-        }
-      } catch (dbError) {
-        console.error('❌ 从数据库获取数据时发生错误:', dbError);
-        // 继续执行，尝试扫描文件系统
-      }
-    }
     // 尝试多个可能的Data目录路径
     const possiblePaths = [
       // 在Netlify Functions环境中，尝试相对于当前文件的路径

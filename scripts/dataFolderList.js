@@ -46,17 +46,12 @@ function generateFolderTree(structure, level = 0) {
     }
     
     for (const [name, content] of entries) {
-        // 调试信息
-        console.log(`处理项: ${name}`, content);
-        
         // 改进文件夹检测逻辑
         const isFolder = content && typeof content === 'object' && !content.type && !Array.isArray(content);
         
         // 改进文件检测逻辑 - 更灵活地识别文件
         const hasFileExtension = name.includes('.') && typeof name === 'string';
         const isFile = content && (content.type === 'file' || hasFileExtension);
-        
-        console.log(`${name} 是文件夹: ${isFolder}, 是文件: ${isFile}`);
         
         if (isFolder) {
             // 文件夹
@@ -269,6 +264,21 @@ async function fetchDataStructure() {
 
 // 初始化文件夹列表
 async function initDataFolderList() {
+    // 检测是否为生产环境
+    const isProduction = window.location.hostname !== 'localhost' && 
+                       window.location.hostname !== '127.0.0.1' &&
+                       !window.location.hostname.endsWith('.local');
+    
+    // 在生产环境中，直接禁用功能，不执行任何初始化
+    if (isProduction) {
+        console.log('🚫 生产环境：Data文件夹列表功能已禁用');
+        const folderTree = document.getElementById('folderTree');
+        if (folderTree) {
+            folderTree.innerHTML = '<div class="disabled-message">此功能在生产环境中不可用</div>';
+        }
+        return;
+    }
+    
     console.log('🔄 开始初始化文件夹列表', new Date().toLocaleTimeString());
     const folderTree = document.getElementById('folderTree');
     
@@ -462,6 +472,22 @@ async function saveExcludeConfig() {
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
+    // 检测是否为生产环境
+    const isProduction = window.location.hostname !== 'localhost' && 
+                       window.location.hostname !== '127.0.0.1' &&
+                       !window.location.hostname.endsWith('.local');
+    
+    // 在生产环境中，隐藏配置按钮并禁用所有相关功能
+    if (isProduction) {
+        console.log('🚫 生产环境：禁用Data文件夹配置相关功能');
+        const configBtn = document.getElementById('excludeConfigBtn');
+        if (configBtn) {
+            configBtn.style.display = 'none';
+        }
+        return;
+    }
+    
+    // 仅在非生产环境初始化功能
     initDataFolderList();
     
     // 添加配置按钮事件监听器
