@@ -122,14 +122,14 @@ function openFile(filePath) {
 
 // 动态获取Data目录结构 - 增强版
 async function fetchDataStructure() {
+    console.log('🔍 开始获取Data目录结构');
+    
+    // 尝试获取Data目录的API接口
+    // 添加timeout和错误重试机制
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超时
+    
     try {
-        console.log('🔍 开始获取Data目录结构');
-        
-        // 尝试获取Data目录的API接口
-        // 添加timeout和错误重试机制
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10秒超时
-        
         const response = await fetch('/api/data/structure', {
             signal: controller.signal,
             credentials: 'include', // 确保携带cookie
@@ -163,22 +163,19 @@ async function fetchDataStructure() {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
     } catch (error) {
-        console.warn('⚠️ 无法获取动态目录结构，使用静态数据:', error.message);
+        clearTimeout(timeoutId); // 确保清除超时计时器
+        
+        console.error('❌ 获取Data目录结构失败:', error.message);
         
         // 添加更详细的错误类型判断
         if (error.name === 'AbortError') {
-            console.warn('⏱️ 请求超时，服务器响应时间过长');
+            console.error('⏱️ 请求超时，服务器响应时间过长');
         } else if (error.message.includes('Failed to fetch')) {
-            console.warn('🔌 网络连接问题，可能是服务器未启动或CORS问题');
+            console.error('🔌 网络连接问题，确保服务器已启动且可访问');
         }
         
-        // 如果API不可用，使用静态数据作为后备
-        return {
-            "biJi": {
-                "本地数据.html": { type: "file", icon: "fas fa-file-code" }
-            },
-            "Resources": {}
-        };
+        // 抛出错误，不使用静态数据后备，确保总是尝试获取真实的Data目录
+        throw new Error('无法获取Data目录结构，请检查服务器状态');
     }
 }
 
@@ -218,9 +215,22 @@ async function initDataFolderList() {
             }, 100);
             
         } catch (error) {
-            console.error('加载文件夹结构失败:', error);
-            folderTree.innerHTML = '<div class="error">加载失败，请刷新页面重试</div>';
+            console.error('❌ 初始化文件夹列表失败:', error.message);
+            // 显示错误消息，而不是使用静态数据
+            folderTree.innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>无法获取Data目录结构</p>
+                    <p class="error-detail">错误详情: ${error.message}</p>
+                    <p class="error-tip">请确保后端服务已启动并正常运行</p>
+                    <button onclick="initDataFolderList()" class="retry-btn">
+                        <i class="fas fa-sync-alt"></i> 重试
+                    </button>
+                </div>
+            `;
         }
+    } else {
+        console.warn('⚠️ 未找到folderTree元素');
     }
 }
 
