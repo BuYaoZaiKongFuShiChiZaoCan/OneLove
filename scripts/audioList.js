@@ -32,9 +32,6 @@ let songs = [
 	"Nathan Evans - Wellerman (Sea Shanty) ", // 无mp3文件
 	"回首掏 (伴奏)-一只小胖胖",
 	"兰花草-半吨兄弟",
-	"许巍 - 曾经的你 (Live)",
-	"许巍 - 旅行 (Live)",	
-	"许巍 - 蓝莲花",
 	/* happyEnd */
 	/* li·刘某人 黄某人 奖励哥 */
 	"Lemon Tree - Fool’s Garden",
@@ -45,10 +42,14 @@ let songs = [
 	"永久指针-海贼王片尾曲",
 	"Life Is Like A Boat（生如行舟）",
 	/* li·end */
+	"春泥",
 	"If-丁可",
 	"彩云之南-徐千雅",
 	"天真的橡皮 - 王小帅",
 	"老人与海 - 海鸣威",
+	"许巍 - 曾经的你 (Live)",
+	"许巍 - 旅行 (Live)",	
+	"许巍 - 蓝莲花",
 	/* shw */
 	"别怕我伤心-张信哲",
 	"胡彦斌-你要的全拿走",

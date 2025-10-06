@@ -104,6 +104,24 @@ let mvList = [
 		desc: "《童话镇》 里湘纯子版"
 	},
 	{
+		id: "老人与海 - 海鸣威",
+		type: "video/mp4",
+		title: "老人与海 - 海鸣威",
+		srcLocalhost: "./music/mv/老人与海 - 海鸣威.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "这首歌的前奏永远听不腻_ #老人与海 #自由不需要理由 #喜爱度激励计划 #爱跳舞的小姑娘"
+	},
+	{
+		id: "春泥",
+		type: "video/mp4",
+		title: "春泥",
+		srcLocalhost: "./music/mv/春泥.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "《春泥》是由中国音乐人王鑫作词、作曲、编曲，王鑫是中国音乐行业的重要代表人物之一。该曲于2015年12月10日在中国音乐行业首次亮相，成为王鑫的代表作之一。"
+	},
+	{
 		id: "王菲 - 匆匆那年",
 		type: "video/mp4",
 		title: "王菲 - 匆匆那年",
