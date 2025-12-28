@@ -1933,17 +1933,16 @@ footer div:nth-of-type(2) a img#gaIcon {
 }
 
 /* 弹窗的样式 */
-#tanChuang {
+#tanChuangDiaLog {
     padding: 10px;
     background: #00bfff;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    z-index: 99;
+    border: none;
     border-radius: 10px;
 }
-
 
 
 /* 头像下拉菜单样式 */
