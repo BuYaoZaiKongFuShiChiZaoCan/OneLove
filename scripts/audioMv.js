@@ -492,6 +492,11 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 	// musicInfo.poster ? video.poster = musicInfo.poster : void 0;
 	// 视频类型
 	video.type = musicInfo.type;
+	// MV 文件不存在时（本地有但未推送到线上等）自动降级：移除播放器，退回音乐播放
+	video.onerror = function () {
+		this.remove();
+		window.audioMvVideo1 = null;
+	};
 	audioMv.appendChild(video);
 	// 元素加载完成后
 	video.onload = function () {
