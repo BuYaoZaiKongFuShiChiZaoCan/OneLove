@@ -74,6 +74,13 @@
     margin: 0 20%;
 }
 
+/* 长列表渲染优化：最大化列表（dog）里同样是 8800+ 行、只显示一屏，
+   与 #musicList 一样让浏览器跳过视口外的行。--row-h 由 audio.js 实测写入。 */
+#dog>div {
+    content-visibility: auto;
+    contain-intrinsic-size: auto var(--row-h, 19px);
+}
+
 #dog>div.musliIng {
     padding: 5px;
     background: chartreuse;

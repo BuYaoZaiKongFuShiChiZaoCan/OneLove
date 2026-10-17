@@ -28,16 +28,228 @@ let mvList = [
 		// 弹幕[{time,info{text,style},{发布人,发布地点...},{弹幕点赞量、弹幕回复}}]
 	},
 	{
-		id: "Nathan Evans - Wellerman (Sea Shanty)",
+		id: "We Will Rock You",
 		type: "video/mp4",
-		title: "Nathan Evans - Wellerman (Sea Shanty)",
-		srcLocalhost: "./music/mv/Nathan Evans - Wellerman (Sea Shanty).mp4",
+		title: "We Will Rock You",
+		srcLocalhost: "./music/mv/We Will Rock You.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "We Will Rock You"
+	},
+	{
+		id: "Wellerman-NathanEvans(Sea_Shanty)",
+		type: "video/mp4",
+		title: "Wellerman-NathanEvans(Sea_Shanty)",
+		srcLocalhost: "./music/mv/Wellerman_-NathanEvans_(Sea_Shanty).mp4",
 		srcNetwork: "https://www.kuaishou.com/profile/3xv4pcbm9mvv77k",// @Mushini 
 		srcNetworkTwo: "https://www.youtube.com/watch?v=qP-7GNoDJ5c",
 		srcNetworkThree: "https://www.youtube.com/watch?v=90Oc9Xl5Aps",
 		srcNetworkFour: "https://www.youtube.com/watch?v=lLGLUSzzuWU",
 		poster: null,
 		desc: "《Wellerman》是新西兰民谣，最早由新西兰的捕鲸船员在19世纪40年代创作。歌曲讲述了捕鲸船员们在海上等待补给船“Wellerman”到来的故事。"
+	},
+	{
+		id: "留什么给你(Live)-孙楠",
+		type: "video/mp4",
+		title: "《留什么给你》",
+		srcLocalhost: "./music/mv/留什么给你-2.mp4",
+		srcNetwork: "./music/mv/留什么给你.mp4",
+		poster: null,
+		desc: "#初念 #意难平 #白月光 #意想不到的结局 留什么给你"
+	},
+	{
+		id: "《人世间》主题曲",
+		type: "video/mp4",
+		title: "【4K_60FPS】人世间MV—雷佳《人世间》主题曲(2022)(AI_高清修复).31607557583",
+		srcLocalhost: "./music/mv/【4K_60FPS】人世间MV—雷佳《人世间》主题曲(2022)(AI_高清修复).31607557583.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "《人世间》主题曲"
+	},
+	{
+		id: "花间",
+		type: "video/mp4",
+		title: "《花间》 《忘了算了》",
+		srcLocalhost: "./music/mv/花间.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "道济不负天下人，唯独负了胭脂，这就是我写《花间》和《忘了算了》的灵感。#徐嘉良 #活佛济公 #花间 #忘了算了#胭脂"
+	},
+	{
+		id: "Haha Hihi Huhu Heheh",
+		type: "video/mp4",
+		title: "Haha Hihi Huhu Heheh",
+		srcLocalhost: "./music/mv/Haha Hihi Huhu Heheh.mp4",
+		srcNetwork: "https://v.douyin.com/fYq593dt7IE/",
+		srcNetworkTwo: "https://v.douyin.com/NCoTVdjIvMw/",
+		srcNetworkThree: "https://v.douyin.com/vQWSZ0190xk/",
+		srcNetworkFour: "https://v.douyin.com/oGHPNXvoouA/",
+		srcNetworkFive: "https://v.douyin.com/p3I5EVLIWqQ/",
+		poster: null,
+		desc: "帅气逼人组合Haha Hihi Huhu Heheh"
+	},
+	{
+		id: "刘爽-漠河舞厅",
+		type: "video/mp4",
+		title: "【4K_60FPS】漠河舞厅MV—柳爽(致敬最爱的人逝去)(2020)(AI_高清修复).31936217997",
+		srcLocalhost: "./music/mv/【4K_60FPS】漠河舞厅MV—柳爽(致敬最爱的人逝去)(2020)(AI_高清修复).31936217997.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "需改MV 《漠河舞厅》MV—柳爽(致敬最爱的人逝去)(2020)(AI_高清修复).31936217997"
+	},
+	{
+		id: "李克勤、周深 - 天下有情人",
+		type: "video/mp4",
+		title: "天下有情人",
+		srcLocalhost: "https://www.douyin.com/video/7615922667203820529",
+		poster: null,
+		desc: "天下有情人"
+	},
+	{
+		id: "未知歌手 - 说谎 (DJ赵小涣)",
+		type: "video/mp4",
+		title: "【4K顶级现场】林宥嘉《说谎》神级现场",
+		srcLocalhost: "./music/mv/林宥嘉《说谎》.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "林宥嘉《说谎》神级现场!别以为你有多难忘,更何况那又不算伤!.906081558"
+	},
+	{
+		id: "童话镇-陈一发儿",
+		type: "video/mp4",
+		title: "童话镇MV—陈一发儿",
+		srcLocalhost: "./music/mv/童话镇-陈一发儿.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "童话镇MV—陈一发儿 #这么多年依然很喜欢童话镇 总有一条蜿蜒在童话镇里七彩的河 # 暗杠 # 童话镇 # 童话镇清唱 # 是臆想还是幻觉我分不清  https://v.douyin.com/LELkr1fhC_w/"
+	},
+	{
+		id: "周杰伦-蒲公英的约定",
+		type: "video/mp4",
+		title: "蒲公英哪有什么约定 风一吹就散了 -周杰伦-蒲公英的约定",
+		srcLocalhost: "./music/mv/“蒲公英哪有什么约定 风一吹就散了” 周杰伦-蒲公英的约定.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "蒲公英哪有什么约定 风一吹就散了 -周杰伦-蒲公英的约定"
+	},
+	{
+		id: "Salvatore",
+		type: "video/mp4",
+		title: "《Salvatore》#欧美音乐 #LanaDelRey 打雷姐",
+		srcLocalhost: "./music/mv/《Salvatore》打雷姐.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "《Salvatore》#欧美音乐 #LanaDelRey 打雷姐"
+	},
+	{
+		id: "欢乐地跳吧",
+		type: "video/mp4",
+		title: "《欢乐地跳吧》舞蹈完整版来啦",
+		srcLocalhost: "./music/mv/《欢乐地跳吧》舞蹈完整版来啦.mp4",
+		srcLocalhostTwo: "./music/mv/欢乐的跳吧 如何叫醒一个新疆人.mp4",
+		srcLocalhostThree: "./music/mv/维吾尔族大哥爆笑解释新疆舞动作.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "《欢乐地跳吧》舞蹈 如何叫醒一个新疆人"
+	},
+	{
+		id: "张杰-他不懂",
+		type: "video/mp4",
+		title: "[4K60FPS_Hi_Res] 张杰《他不懂》MV顶级修复",
+		srcLocalhost: "./music/mv/【4K60FPS_Hi-Res】张杰《他不懂》MV顶级修复___歌的名字是他不懂,其实是我不懂!.28781513093.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "【4K60FPS_Hi-Res】张杰《他不懂》MV顶级修复___歌的名字是他不懂,其实是我不懂"
+	},
+	{
+		id: "毛不易-借",
+		type: "video/mp4",
+		title: "[4K60FPS_Hi_Res] 毛不易《借》MV全网最高画质修复",
+		srcLocalhost: "./music/mv/【4K60FPS_Hi-Res】毛不易《借》MV全网最高音画质修复___被这风吹散的人说他爱的不深,被这雨淋湿的人说他不会冷....30090922830.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "【4K60FPS_Hi-Res】毛不易《借》MV全网最高音画质修复___被这风吹散的人说他爱的不深,被这雨淋湿的人说他不会冷"
+	},
+	{
+		id: "毛不易-消愁",
+		type: "video/mp4",
+		title: "[4K60FPS_Hi_Res] 毛不易《消愁》动态歌词MV修复",
+		srcLocalhost: "./music/mv/【4K60FPS_Hi-Res】毛不易《消愁》动态歌词MV修复___一杯敬我爹,一杯敬我娘,曾是他们的希望,如今活成这球样…….30087776649.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "【4K60FPS_Hi-Res】毛不易《消愁》动态歌词MV修复___一杯敬我爹,一杯敬我娘,曾是他们的希望,如今活成这球样……"
+	},
+	{
+		id: "苏打绿-我好想你",
+		type: "video/mp4",
+		title: "[4K60FPS_Hi_Res] 苏打绿《我好想你》顶级修复",
+		srcLocalhost: "./music/mv/【4K60FPS_Hi-Res】苏打绿《我好想你》顶级修复___明明歌词是那么的苍白无力,可伴奏又能给人无限憧憬和美好!.28293268133.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "【4K60FPS_Hi-Res】苏打绿《我好想你》顶级修复___明明歌词是那么的苍白无力,可伴奏又能给人无限憧憬和美好!"
+	},
+	{
+		id: "薛之谦-我好像在哪见过你",
+		type: "video/mp4",
+		title: "[4K60FPS_Hi_Res] 薛之谦《我好像在哪见过你》顶级修复",
+		srcLocalhost: "./music/mv/【4K60FPS_Hi-Res】薛之谦《我好像在哪见过你》___人们把难言的爱都埋进青春里!.29125510367.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "【4K60FPS_Hi-Res】薛之谦《我好像在哪见过你》___人们把难言的爱都埋进青春里!.29125510367"
+	},
+	{
+		id: "薛之谦-木偶人",
+		type: "video/mp4",
+		title: "【4K60FPS_Hi-Res】薛之谦《木偶人》顶级修复___没有人能变成木偶人,无非是在感情里逃避过程_!!!.30497506817",
+		srcLocalhost: "./music/mv/【4K60FPS_Hi-Res】薛之谦《木偶人》顶级修复___没有人能变成木偶人,无非是在感情里逃避过程_!!!.30497506817.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "【4K60FPS_Hi-Res】薛之谦《木偶人》顶级修复___没有人能变成木偶人,无非是在感情里逃避过程_!!!.30497506817"
+	},
+	{
+		id: "许飞-父亲写的散文诗",
+		type: "video/mp4",
+		title: "【4K60FPS_Hi-Res】许飞《父亲写的散文诗》___父亲是个农民,他没有散文诗,没有日记,只有一双布满老茧的手跟写满沧桑的脸庞!.32751423434",
+		srcLocalhost: "./music/mv/【4K60FPS_Hi-Res】许飞《父亲写的散文诗》___父亲是个农民,他没有散文诗,没有日记,只有一双布满老茧的手跟写满沧桑的脸庞!.32751423434.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "【4K60FPS_Hi-Res】许飞《父亲写的散文诗》___父亲是个农民,他没有散文诗,没有日记,只有一双布满老茧的手跟写满沧桑的脸庞!.32751423434"
+	},
+	{
+		id: "恋人-李荣浩",
+		type: "video/mp4",
+		title: "《恋人》MV",
+		srcLocalhost: "./music/mv/恋人-李荣浩.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "李荣浩⑧专5单《恋人》MV_现已正式上线.恋人mv正式上线.1602014297"
+	},
+	{
+		id: "Despacito",
+		type: "video/mp4",
+		title: "汽车版Despacito",
+		srcLocalhost: "./music/mv/汽车版Despacito.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "Despacito"
+	},
+	{
+		id: "开始懂了-孙燕姿",
+		type: "video/mp4",
+		title: "【4K60FPS】孫燕姿《開始懂了》顶级音画质修复___爱情只有两个结局,要么一生,要么陌生!.27241349194",
+		srcLocalhost: "./music/mv/【4K60FPS】孫燕姿《開始懂了》顶级音画质修复___爱情只有两个结局,要么一生,要么陌生!.27241349194.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "【4K60FPS】孫燕姿《開始懂了》顶级音画质修复___爱情只有两个结局,要么一生,要么陌生!.27241349194"
+	},
+	{
+		id: "远山少年",
+		type: "video/mp4",
+		title: "远山少年 已不在少 原有人陪你颠沛流离",
+		srcLocalhost: "./music/mv/远山少年，已不在年少 愿有人陪你颠沛流离.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "远山少年 已不在少 原有人陪你颠沛流离"
 	},
 	{
 		id: "小咪-我走后",
@@ -47,6 +259,10 @@ let mvList = [
 		srcNetwork: null,
 		poster: null,
 		desc: "小咪《我走后》完整版高清mv #小咪我走后 #我走后完整版 - 抖音。《我走后》是一首由小咪创作和演唱的情歌，表达了一段过客的爱情和分离的心情。歌词中反复出现“我走后”这个词，表示对对方的不舍和祝福，收录在专辑《我走后》中。"
+	},
+	{
+		id: "龙梅子、王强 - 你把爱情给了谁",
+		srcNetwork: "https://www.douyin.com/video/7612282046111673467"
 	},
 	{
 		id: "戴羽彤-来迟",
@@ -77,6 +293,22 @@ let mvList = [
 		desc: "《别怕我伤心》是由李宗盛作词并作曲，张信哲演唱的歌曲，收录于张信哲1994年6月1日发行的专辑《等待》中。"
 	},
 	{
+		id: "精卫-30年前，50年后",
+		type: "video/mp4",
+		title: "精卫",
+		srcLocalhost: "./music/mv/精卫.mp4",
+		desc: "精卫，中国古代神话中的一种鸟。上古神话传说里，女娃是炎帝最小的女儿，后溺水而亡，化作精卫鸟；另一说，女娃是上古的一个部落，由于气候变暖，海平面上升，女娃部落遭到灭顶之灾，后化作精卫。\n据《山海经》记载：精卫的外形像乌鸦，头上羽毛有花纹，白色的嘴，红色的脚。 \n明代《律学新说》记载：精卫被民间尊为“三圣公主”。"
+	},
+	{
+		id: "怎么说我不爱你-萧敬腾",
+		type: "video/mp4",
+		title: "萧敬腾《怎么说我不爱你》你怎么知道我不爱你,我就是太爱你了",
+		srcLocalhost: "./music/mv/怎么说我不爱你.mp4",
+		srcNetwork: null,
+		poster: null,
+		desc: "【4K臻藏】萧敬腾《怎么说我不爱你》_你怎么知道我不爱你,我就是太爱你了!.1524443052"
+	},
+	{
 		id: "胡彦斌-你要的全拿走",
 		type: "video/mp4",
 		title: "【胡彦斌】你要的全拿走",
@@ -92,7 +324,7 @@ let mvList = [
 		srcLocalhost: "./music/mv/4K·重制周杰伦《说了再见》MV 修复版.mp4",
 		srcNetwork: null,
 		poster: null,
-		desc: "《说了再见》是周杰伦演唱的一首流行歌曲，收录于他2010年发行的专辑《跨时代》中。 这首歌由周杰伦作曲，古小力和黄凌嘉共同作词，钟兴民负责编曲。 这首歌也是李连杰主演的电影《海洋天堂》的主题曲。 歌词描述了在雨中天亮后，主人公面对失去所爱之人的痛苦，试图放下过去，却发现再也无法与对方相见。 歌词中充满了对失去的微笑、幸福时光的怀念以及对再次拥抱和陪伴的渴望。"
+		desc: "《说了再见》是周杰伦演唱的一首流行歌曲，收录于他2010年发行的专辑《跨时代》中。 这首歌由周杰伦作曲，古小力和黄凌嘉共同作词，钟兴民负责编曲。 这首歌也是李连杰主演的电影《海洋天堂》的主题曲。 这首歌的歌词描述了在雨中天亮后，主人公面对失去所爱之人的痛苦，试图放下过去，却发现再也无法与对方相见。 歌词中充满了对失去的微笑、幸福时光的怀念以及对再次拥抱和陪伴的渴望。"
 	},
 	{
 		id: "童话镇-苗疆少女",
@@ -257,11 +489,20 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 		}
 		pauseSong();
 		// 视频最大化
-		video.webkitRequestFullScreen(); // 放在这里能有效解决播放时视频全屏无法全屏的问题
+		if (video.requestFullscreen) {
+			video.requestFullscreen();
+		} else if (video.webkitRequestFullscreen) {
+			video.webkitRequestFullscreen(); // 放在此位置能有效解决播放时视频全屏无法全屏的问题
+		} else if (video.mozRequestFullScreen) {
+			video.mozRequestFullScreen();
+		} else if (video.msRequestFullscreen) {
+			video.msRequestFullscreen();
+		}
 	};
 	video.onpause = function () {
 		// 设置音乐进度为视频进度
-		// window.localStorage.setItem("musicTime", video.currentTime); // 这里取消是因为在切换音乐的时候会影响到loaclstorage的修改，所有不得不取消在视频暂停时设置，因为切换时必须要更改，所以这里还不能在切换时设置它
+		// window.localStorage.setItem("musicTime", video.currentTime); // 这里取消是因为在切换音乐的时候会影响到loaclstorage的修改
+		document.webkitCancelFullScreen();
 	};
 	video.onended = function () {
 		lastChange === "prevSong" ? prevSong() : nextSong();
@@ -272,11 +513,56 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 	title.textContent = musicInfo.title;
 	let desc = document.createElement("p");
 	desc.classList.add("audioMvDesc");
+
+	// 直接使用传入的 musicInfo 参数，避免重复调用 findMusic 返回 undefined
+	let playSourceList = [];
+	if (musicInfo) {
+		playSourceList = [
+			{ src: musicInfo.srcLocalhost, name: "默认播放源" },
+			{ src: musicInfo.srcLocalhostTwo, name: "本地播放源 2" },
+			{ src: musicInfo.srcLocalhostThree, name: "本地播放源 3" },
+			{ src: musicInfo.srcLocalhostFour, name: "本地播放源 4" },
+			{ src: musicInfo.srcLocalhostFive, name: "本地播放源 5" },
+			{ src: musicInfo.srcLocalhostSix, name: "本地播放源 6" },
+			{ src: musicInfo.srcNetwork, name: "网络播放源" },
+			{ src: musicInfo.srcNetworkTwo, name: "网络播放源 2" },
+			{ src: musicInfo.srcNetworkThree, name: "网络播放源 3" },
+			{ src: musicInfo.srcNetworkFour, name: "网络播放源 4" },
+			{ src: musicInfo.srcNetworkFive, name: "网络播放源 5" },
+			{ src: musicInfo.srcNetworkSix, name: "网络播放源 6" },
+		];
+	}
+
+	let playSourceButtonList = [];
+	for (let index = 0; index < playSourceList.length; index++) {
+		if (!playSourceList[index].src) {
+			continue;
+		}
+		let button = document.createElement("button");
+		button.classList.add("switchSrc");
+		button.textContent = playSourceList[index].name;
+		button.onclick = function () {
+			// 直接通过 DOM 查询获取视频元素，避免作用域问题
+			const videoElement = document.querySelector("#audioMvVideo1");
+			if (videoElement) {
+				videoElement.src = playSourceList[index].src;
+			} else {
+				tanChuang("视频播放器未初始化");
+			}
+		};
+		playSourceButtonList.push(button);
+	}
 	desc.textContent = musicInfo.desc;
 	audioMv.appendChild(title);
+	// 创建按钮容器，添加边距和间距
+	let buttonContainer = document.createElement("div");
+	buttonContainer.classList.add("playSourceButtonContainer");
+	buttonContainer.style.cssText = "margin: 1rem 2rem; display: flex; flex-wrap: wrap; gap: 8px;";
+	// 将所有播放源按钮添加到容器中
+	playSourceButtonList.forEach(button => buttonContainer.appendChild(button));
+	audioMv.appendChild(buttonContainer);
 	audioMv.appendChild(desc);
 }
-
 // 更新video元素
 function updateVideo() {
 	let video = document.querySelector("#audioMvVideo1");

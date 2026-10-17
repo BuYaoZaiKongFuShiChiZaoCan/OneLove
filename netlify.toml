@@ -27,6 +27,11 @@
   force = true
 
 [[redirects]]
+  from = "/music/*"
+  to = "/404.html"
+  status = 404
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200

@@ -1558,6 +1558,16 @@ main#main-body #sidePanel #cbThree #musicList>div {
     position: relative;
 }
 
+/* 长列表渲染优化：#musicList 只有 200px 高，一屏最多看到 9 行，却装了 8800+ 行。
+   content-visibility:auto 让浏览器跳过视口外那些行的布局与绘制（节点依然在，样式和点击都不受影响）。
+   contain-intrinsic-size 负责给「被跳过的行」一个占位高度，--row-h 由 audio.js 实测写入，
+   不写会让未渲染的行按错误高度占位、滚动条长度乱跳。
+   不支持这两个属性的浏览器（Safari 18 以下）会自动忽略，退回原来的行为，不影响布局。 */
+main#main-body #sidePanel #cbThree #musicList>div {
+    content-visibility: auto;
+    contain-intrinsic-size: auto var(--row-h, 19px);
+}
+
 main#main-body #sidePanel #cbThree #musicList>div.musliIng {
     color: violet;
 }

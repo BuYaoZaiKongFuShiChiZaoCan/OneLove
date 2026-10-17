@@ -63,8 +63,8 @@ workbox.routing.registerRoute(
 
 workbox.routing.registerRoute(
   new RegExp(/\.(?:js|css)$/),
-  workbox.strategies.staleWhileRevalidate({
-    cacheName: 'ql:static',
+  workbox.strategies.networkFirst({
+    cacheName: 'ql:static-v2',
     plugins: [
       new workbox.expiration.Plugin({
         maxEntries: 20,

@@ -12,68 +12,127 @@ const musicList = document.getElementById('musicList');
 
 // 默认从第一首开始
 let songIndex = +window.localStorage.getItem('songIndex') || 0;
+// 列表条目经过增删（8865 → 8853）后，localStorage 里存的下标可能已经越界，兜一下底
+if (songIndex < 0 || songIndex >= songs.length) {
+	songIndex = 0;
+}
 
 // 向页面输出音乐数量
 document.getElementById('playlistLength').textContent = songs.length;
+/**
+ * requestIdleCallback 兜底：Safari 至今没有实现它，缺失时列表渲染会直接抛错。
+ * 降级为 setTimeout，timeRemaining 给个固定值（配合 performChunk 的单片条数上限使用）。
+ */
+if (!window.requestIdleCallback) {
+	window.requestIdleCallback = function (cb) {
+		return setTimeout(function () {
+			cb({ didTimeout: true, timeRemaining: function () { return 1; } });
+		}, 1);
+	};
+}
+if (!window.cancelIdleCallback) {
+	window.cancelIdleCallback = function (id) { clearTimeout(id); };
+}
+
+/**
+ * 把「正在播放」样式贴到当前歌曲所在的那一行。
+ * 原实现每次切歌都要遍历整个 songs（现在 8800+ 条）并为每个节点做 classList 增删，
+ * 现在只碰两个节点：清掉上一个高亮、点亮当前这个。
+ * 依旧按「下标」判断而不是按歌名（歌名可能重复，会导致两行同时高亮）。
+ * @param {HTMLElement} container 列表容器（#musicList 或 #dog）
+ * @returns {void}
+ */
+function highlightIn(container) {
+	if (!container) return;
+	// getElementsByTagName 返回的是活集合；第 0 个 div 是 h2 里的「播放列表」，歌曲从下标 1 开始
+	const rows = container.getElementsByTagName('div');
+	const cur = rows[songIndex + 1];
+	const old = container.querySelector('.musliIng');
+	if (old && old !== cur) {
+		old.classList.remove('musliIng');
+	}
+	if (cur) {
+		cur.classList.add('musliIng');
+	}
+}
+
 function listupdate() {
-	const musicDivs = window.musicList.getElementsByTagName('div');
-	songs.forEach((song, index) => {
-		if (songIndex === index) {// 不能使用songs[songIndex]了，因为有可能歌词名重复时会有两个正在播放的音乐导致显示等bug，只能用当前播放音乐下标去判断
-			// 设置正在播放的歌曲列表样式
-			musicDivs[index + 1].classList.add('musliIng');
-		} else {
-			// 恢复其它的样式
-			musicDivs[index + 1].classList.remove('musliIng');
-		}
-	});
+	highlightIn(window.musicList);
 
 	// 当dog显示时更新dog内歌词列表样式
 	if (document.querySelector('#dog #playlistPanel')) {
-		const dogMusicDivs = dog.getElementsByTagName('div');
-		songs.forEach((song, index) => {
-			if (songIndex === index) {
-				// 设置dog内正在播放的歌曲列表样式
-				dogMusicDivs[index + 1].classList.add('musliIng');
-			} else {
-				// 恢复dog其它的样式
-				dogMusicDivs[index + 1].classList.remove('musliIng');
-			}
-		});
+		highlightIn(document.querySelector('#dog'));
+	}
+}
+
+/**
+ * 实测一行歌词的高度，写进 CSS 变量 --row-h。
+ * #musicList 与 #dog 里的行用的是 content-visibility:auto，
+ * 视口外的行不参与布局，需要靠 contain-intrinsic-size 里的这个数值占位；
+ * 值不准（比如按 19px 占位而真实是 22px）会让滚动条长度一路乱跳。
+ * @returns {void}
+ */
+function measureRowHeight() {
+	const first = window.musicList.children[1];// [0] 是 h2，[1] 才是第一首歌
+	if (!first) return;
+	const h = first.getBoundingClientRect().height;
+	if (h > 0) {
+		document.documentElement.style.setProperty('--row-h', Math.round(h) + 'px');
 	}
 }
 
 // 输出列表，使用更高阶的分时函数去封装，也就是不让这个插入元素时阻塞浏览器渲染，分段去渲染，回到16.6ms渲染一次的状态
+const CHUNK_MAX = 400;// 单片条数上限：timeRemaining 偶尔会虚高，防止一口气把几千条插进 DOM
 function performChunk(datas) {
 	if (datas.length === 0) {
 		return;
 	}
 	let i = 0;
+	let measured = false;
+	let scrolled = false;// 当前播放的那一行渲染出来后先滚过去，不必等 8800+ 条全部插完
 	// 开启下一个分片的执行
 	function _run() {
 		if (i >= datas.length) {// 大于了也就是输出结束了
 			listupdate();
-			scrollToIng();
+			if (!scrolled) scrollToIng();
 			return;
 		}
 		// 一个渲染帧中，空闲时开启分片执行
+		// 加 timeout 兜底：主线程一直有活（音频解码、歌词请求）或在后台标签页时，
+		// 空闲回调可能长时间不触发，列表会永远停在渲染到一半
 		requestIdleCallback((idle) => {
 			// 得到当前这一帧剩余多少毫秒 idle.timeRemaining()
 			let fragment = document.createDocumentFragment();
-			while (idle.timeRemaining() > 0 && i < datas.length) {
+			let n = 0;
+			// 被 timeout 强制叫起来时 timeRemaining() 返回 0。这时不能继续按「剩余时间」判断，
+			// 否则每片只插 1 条，8800+ 条要拖几十分钟；改成按固定批量（CHUNK_MAX）补齐。
+			// 用 do-while 而不是 while：保证每片至少插 1 条，不会空转死循环。
+			const forced = idle.timeRemaining() <= 0;
+			do {
 				let div = document.createElement('div');
 				div.id = i;
 				let span = document.createElement('span');
 				span.classList.add('musicItem');
 				span.textContent = (i + 1) + '.';
 				div.appendChild(span);
-				div.appendChild(document.createTextNode(songs[i]));
+				div.appendChild(document.createTextNode(datas[i]));
 				fragment.appendChild(div);
 				i++;
-			}
+				n++;
+			} while (i < datas.length && n < CHUNK_MAX && (forced || idle.timeRemaining() > 0));
 			musicList.appendChild(fragment);
+			if (!measured) {// 第一批插完就能量出真实行高
+				measured = true;
+				measureRowHeight();
+			}
+			if (!scrolled && i > songIndex) {
+				scrolled = true;
+				listupdate();
+				scrollToIng();
+			}
 			// 此次分片完成
 			_run();
-		});
+		}, { timeout: 200 });
 	}
 	_run();
 }
@@ -146,6 +205,7 @@ window.playlistLength.addEventListener('click', function (event) {
 function scrollToIng() {
 	var parentElement = window.musicList;
 	var childElement = document.querySelectorAll('.musliIng')[0];
+	if (!childElement) return;// 列表还没渲染到当前播放项时不做定位，否则这里会直接报错
 
 	// 计算父元素到子元素的距离
 	var distanceToScroll = childElement.offsetTop - (parentElement.offsetTop * 1.2);// 默认是直接滚到顶部，*1.1就是多往下滚动一行，也就到了top位置，*1.2就滚动了两行，在这里也就是滚动到中间，因为css设置高度只够显示3行
@@ -218,9 +278,9 @@ const observer = new MutationObserver((mutationsList) => {
 			let musliIng = document.querySelector('.musliIng');
 			let musliIngOpt = musliIng.style.opacity;
 			if (musliIngOpt !== undefined && musliIngOpt !== '') {
-				musliIng.style.opacity = parseFloat(musliIngOpt) - 0.2;
-				if (musliIngOpt <= 0.2) {
-					musliIng.style.opacity = 0.2; // 确保透明度不小于0.2
+				musliIng.style.opacity = parseFloat(musliIngOpt) - 0.5;
+				if (musliIngOpt <= 0.5) {
+					musliIng.style.opacity = 0.3; // 确保透明度不小于0.3
 				}
 			} else {
 				musliIng.style.opacity = 0.8;

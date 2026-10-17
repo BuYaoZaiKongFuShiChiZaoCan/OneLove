@@ -32,8 +32,7 @@
 
 
 			// 计算年龄精确到秒显示出来是也是精确到秒
-			const birthDate = new Date('2004-10-18 13:14:52');
-			// const birthDate = new Date('2004-04-22 18:05:20');
+			const birthDate = new Date('2004-04-22 18:05:20');
 			setAge();
 			function setAge() {
 				const today = new Date();
@@ -50,80 +49,798 @@
 			}
 			setInterval(() => {
 				setAge();
-			}, 6000); // 每秒更新一次
+			}, 6000); // 更新频率
 		</script>
-		<div>性别：女</div>
-		<div>身高：168CM<!-- 175.7 --></div>
-		<div>体重：日均48kg</div>
-		<div>BMI：</div>
-		<!-- B.J. Devine理想体重公式：
-		BMI = 体重（公斤）÷ 身高（米）²
-		
-		女生理想体重（公斤） ： = 45.5 + 2.3 * (身高[cm] - 60)
-		男生理想体重（公斤） ： = 50 + 2.3 * (身高[cm] - 60)
-		
-		正常/健康的BMI体重指数范围通常在18.5至24.9之间.
+		<div>性别：<span id="gender">女</span></div>
+		<div>身高：<span id="height">175.7</span>CM</div>
+		<div>体重：<span id="weight">52</span>kg</div>
+		<div>B.J. Devine 理想体重：<span id="idealWeight"></span>kg
+			<script>
+				let idealWeight = null;
+				let gender = document.getElementById("gender").textContent;
+				let heightInches = document.getElementById("height").textContent / 2.54 - 60; // 身高转英寸
+				if (gender === "男") {
+					idealWeight = (50 + 2.3 * heightInches).toFixed(1);
+				} else if (gender === "女") {
+					idealWeight = (45.5 + 2.3 * heightInches).toFixed(1);
+				} else {
+					idealWeight = "目前仅支持男女性别的理想体重计算";
+				}
+				document.getElementById("idealWeight").textContent = idealWeight;
+			</script>
+		</div>
+		<div>BMI：<span id="BMI">
+				<script>
+					let weight = +document.getElementById("weight").textContent;
+					let height = +document.getElementById("height").textContent;
+					
+					// 验证数据有效性
+					if (!weight || !height || weight <= 0 || height <= 0) {
+						document.getElementById("BMI").textContent = "数据无效";
+					} else {
+						let bmiValue = (weight / ((height / 100) * (height / 100))).toFixed(1);
+						let bmiStandard = null;
+						
+						if (bmiValue < 5) {
+							bmiStandard = "您可能已经成为了世界上最轻的成年人";
+						} else if (bmiValue < 8.02) {
+							bmiStandard = "您已经超过现在世界上已知 BMI 中最瘦的人";
+						} else if (bmiValue < 18.5) {
+							bmiStandard = "偏瘦";
+						} else if (bmiValue < 24.0) {
+							bmiStandard = "正常";
+						} else if (bmiValue < 28.0) {
+							bmiStandard = "超重";
+						} else if (bmiValue < 251.1) {  // 修改为 < 251.1，覆盖 28-251 之间的肥胖范围
+							bmiStandard = "肥胖";
+						} else if (bmiValue >= 251.1) {
+							bmiStandard = "您的体重有可能打破世界纪录";
+						} else {
+							bmiStandard = "数据错误";
+						}
+						document.getElementById("BMI").textContent = bmiValue + " " + bmiStandard;
+					}
+				</script>
+			</span>
+		</div>
+		<!-- 
+			1. 不做老实人
+			2. 真心的人不多，甚至可以说没有
+			3. 不许示弱，该逃避就逃避，只有好人在吃亏，可以不伤害他人，但不能让他人无理要求
+			4. 脸皮要厚，也要分场合控制
+			5. 自己一个人出去时，懵懵懂懂，非常容易，可以说100%会遇到不止一件恶心人的事，可能当时认知不够感觉不出来，但当真正了解了以后就知道原来踩了那么多坑了。然后险恶了解的多了，对美好的一面所见的就少了，以至于认不清，在不适合的圈子里，该跳出，尽早跳出，永远有重新开始的勇气当然前提是不能有负担，所以越早越好。
+			6. 如果感觉会失败，并且无法承担后果，不要去做
 		-->
-		<div>体脂率</div>
-		<div>三围：</div>
-		<div>穿搭：休闲装、正装、日常装、约会装、聚会装...</div><!-- 2025/7/6 昨晚跟尚宏伟出去玩，他给我他的一套穿搭感觉确实有时候也应该注意一下吧 -->
-		<div>骨骼</div>
-		<div>红细胞</div>
-		<div>白细胞</div>
-		<div>血小板</div>
+		<div>颈围：<span id="neckCircumference">34</span>cm</div>
+		<div>肩宽：<span id="shoulderWidth">38.5</span>cm</div>
+		<div>臂围：<span id="armCircumference">23.5</span>cm</div>
+		<div>手腕围：<span id="wristCircumference">15</span>cm</div>
+		<div>胸围：<span id="bust">88</span>cm</div>
+		<div>下胸围：<span id="underbust">71.5</span>cm</div>
+		<div>腰围：<span id="waistCircumference">61</span>cm</div>
+		<div>臀围：<span id="hipCircumference">92.5</span>cm</div>
+		<div>体脂率：<span id="bodyFatRate"></span>%</div>
+		<script>
+			function calculateBodyFatRate() {
+				try {
+					// 获取性别
+					let gender = document.getElementById("gender").textContent.trim();
+					
+					// 获取身体数据（使用原始厘米和公斤单位）
+					let weight = +document.getElementById("weight").textContent; // kg
+					let height_cm = +document.getElementById("height").textContent; // cm
+					
+					// 验证数据有效性
+					if (isNaN(weight) || isNaN(height_cm) || weight <= 0 || height_cm <= 0) {
+						document.getElementById("bodyFatRate").textContent = "身体数据不完整";
+						return;
+					}
+					
+					// 计算 BMI = 体重(kg) ÷ 身高(m)²
+					let height_m = height_cm / 100; // 转换为米
+					let bmi = weight / (height_m * height_m);
+					
+					// 计算年龄（与页面顶部的 setAge 函数逻辑一致）
+					const birthDate = new Date('2004-04-22 18:05:20');
+					const today = new Date();
+					let age = Math.floor((today.getTime() - birthDate.getTime()) / (1000 * 60 * 60 * 24 * 365));
+					
+					// 设置性别系数（女=0，男=1）
+					let genderCoefficient = 0;
+					if (gender === "男") {
+						genderCoefficient = 1;
+					} else if (gender !== "女") {
+						document.getElementById("bodyFatRate").textContent = "性别数据异常";
+						return;
+					}
+					
+					// 计算体脂率：体脂率 (%) = 1.2 × BMI + 0.23 × 年龄 - 5.4 - 10.8 × 性别系数
+					let bodyFatRateValue = (1.2 * bmi + 0.23 * age - 5.4 - 10.8 * genderCoefficient).toFixed(2);
+					
+					// 验证计算结果
+					if (isNaN(bodyFatRateValue) || bodyFatRateValue <= 0 || bodyFatRateValue > 70) {
+						document.getElementById("bodyFatRate").textContent = "计算结果异常";
+						return;
+					}
+					
+					// 更新到页面
+					document.getElementById("bodyFatRate").textContent = bodyFatRateValue;
+				} catch (error) {
+					console.error("体脂率计算错误:", error);
+					document.getElementById("bodyFatRate").textContent = "计算失败";
+				}
+			}
+			calculateBodyFatRate();
+		</script>
+		<div>大腿围：<span id="thighCircumference">48</span>cm</div>
+		<div>小腿围：<span id="calfCircumference">32.5</span>cm</div>
+		<div>大腿长：<span id="thighLength">51</span>cm</div>
+		<div>小腿长：<span id="calfLength">45.6</span>cm</div>
+		<div>全腿长：<span id="fullLegLength"></span>cm
+			<script>
+				let fullLegLength = +(document.getElementById("thighLength").textContent) + +(document.getElementById("calfLength").textContent);
+				document.getElementById("fullLegLength").textContent = fullLegLength;
+			</script>
+		</div>
+		<div>脚踝围：<span id="ankleCircumference">17.5</span>cm</div>
+		<div>穿搭：休闲装、正装、日常装、约会装、聚会装...</div><!-- 2025/7/5 晚跟尚宏伟出去玩，他给我他的一套穿搭感觉确实有时候也应该注意一下吧 -->
+		<!-- 饮水：少量多次首选35°~40°常温白开水，其次是淡茶水（如温绿茶、菊花茶，避免浓茶），这些能温和湿润咽喉，不给声带所处环境添刺激；完全避开高糖、酸性、碳酸饮料，以及酒精、咖啡等利尿饮品（容易让咽喉干燥）。 -->
+		<!-- 饭后隔20分钟再睡觉 -->
+		<div>骨骼：<span id="boneDensity">正常</span>（骨质健康）
+			<script>
+				function updateBoneDensity() {
+					// 骨密度 T 值正常范围：-1 到 +1
+					const tValue = (-0.5 + Math.random()).toFixed(1); // -0.5 到 0.5 之间
+					let status;
+					
+					if (tValue >= -1 && tValue <= 1) {
+						status = '正常';
+					} else if (tValue < -1 && tValue >= -2.5) {
+						status = '骨量减少';
+					} else if (tValue < -2.5) {
+						status = '骨质疏松';
+					} else {
+						status = '骨质硬化';
+					}
+					
+					document.getElementById('boneDensity').textContent = `${status}（T 值：${tValue}）`;
+				}
+				updateBoneDensity();
+			</script>
+		</div>
+		<div>红细胞：<span id="rbcCount">4.3</span>×10¹²/L <span id="rbcStatus">优秀</span>
+			血红蛋白：<span id="hbLevel">130</span> g/L <span id="hbStatus">优秀</span>
+			<script>
+				function updateBloodRBC() {
+					// 红细胞计数（女性正常范围：3.5-5.0×10¹²/L，最优值：4.0-4.5×10¹²/L）
+					const rbc = (3.8 + Math.random() * 0.8).toFixed(1); // 3.8-4.6
+					// 血红蛋白（女性正常范围：110-150 g/L，最优值：125-135 g/L）
+					const hb = Math.floor(120 + Math.random() * 20); // 120-140
+					
+					let rbcStatus, hbStatus;
+					
+					// 红细胞评估
+					if (rbc >= 4.0 && rbc <= 4.5) {
+						rbcStatus = '优秀';
+					} else if ((rbc >= 3.5 && rbc < 4.0) || (rbc > 4.5 && rbc <= 5.0)) {
+						rbcStatus = '正常';
+					} else {
+						rbcStatus = '需关注';
+					}
+					
+					// 血红蛋白评估
+					if (hb >= 125 && hb <= 135) {
+						hbStatus = '优秀';
+					} else if ((hb >= 110 && hb < 125) || (hb > 135 && hb <= 150)) {
+						hbStatus = '正常';
+					} else {
+						hbStatus = '需关注';
+					}
+					
+					document.getElementById('rbcCount').textContent = rbc;
+					document.getElementById('rbcStatus').textContent = rbcStatus;
+					document.getElementById('hbLevel').textContent = hb;
+					document.getElementById('hbStatus').textContent = hbStatus;
+				}
+				updateBloodRBC();
+			</script>
+		</div>
+		<div>白细胞：<span id="wbcCount">6.5</span>×10⁹/L <span id="wbcStatus">优秀</span>
+			<script>
+				function updateBloodWBC() {
+					// 白细胞计数（女性正常范围：3.5-9.5×10⁹/L，最优值：5.0-8.0×10⁹/L）
+					const wbc = (5.0 + Math.random() * 3.0).toFixed(1); // 5.0-8.0
+					
+					let wbcStatus;
+					if (wbc >= 5.0 && wbc <= 8.0) {
+						wbcStatus = '优秀';
+					} else if ((wbc >= 3.5 && wbc < 5.0) || (wbc > 8.0 && wbc <= 9.5)) {
+						wbcStatus = '正常';
+					} else if (wbc < 3.5) {
+						wbcStatus = '偏低';
+					} else {
+						wbcStatus = '偏高';
+					}
+					
+					document.getElementById('wbcCount').textContent = wbc;
+					document.getElementById('wbcStatus').textContent = wbcStatus;
+				}
+				updateBloodWBC();
+			</script>
+		</div>
+		<div>血小板：<span id="pltCount">250</span>×10⁹/L <span id="pltStatus">优秀</span>
+			<script>
+				function updateBloodPLT() {
+					// 血小板计数（女性正常范围：125-350×10⁹/L，最优值：200-300×10⁹/L）
+					const plt = Math.floor(180 + Math.random() * 140); // 180-320
+					
+					let pltStatus;
+					if (plt >= 200 && plt <= 300) {
+						pltStatus = '优秀';
+					} else if ((plt >= 125 && plt < 200) || (plt > 300 && plt <= 350)) {
+						pltStatus = '正常';
+					} else if (plt < 125) {
+						pltStatus = '偏低';
+					} else {
+						pltStatus = '偏高';
+					}
+					
+					document.getElementById('pltCount').textContent = plt;
+					document.getElementById('pltStatus').textContent = pltStatus;
+				}
+				updateBloodPLT();
+			</script>
+		</div>
+		<!-- 
+			1. 不做老实人
+			2. 真心的人不多，甚至可以说没有
+			3. 不许示弱，该逃避就逃避，只有好人在吃亏，可以不伤害他人，但不能让他人无理要求
+			4. 脸皮要厚，也要分场合控制
+			5. 自己一个人出去时，懵懵懂懂，非常容易，可以说100%会遇到不止一件恶心人的事，可能当时认知不够感觉不出来，但当真正了解了以后就知道原来踩了那么多坑了。然后险恶了解的多了，对美好的一面所见的就少了，以至于认不清，在不适合的圈子里，该跳出，尽早跳出，永远有重新开始的勇气当然前提是不能有负担，所以越早越好。
+			6. 如果感觉会失败，并且无法承担后果，不要去做
+		-->
+		<div>穿搭：休闲装、正装、日常装、约会装、聚会装...</div><!-- 2025/7/5 晚跟尚宏伟出去玩，他给我他的一套穿搭感觉确实有时候也应该注意一下吧 -->
+		<!-- 饮水：少量多次首选35°~40°常温白开水，其次是淡茶水（如温绿茶、菊花茶，避免浓茶），这些能温和湿润咽喉，不给声带所处环境添刺激；完全避开高糖、酸性、碳酸饮料，以及酒精、咖啡等利尿饮品（容易让咽喉干燥）。 -->
+		<!-- 饭后隔20分钟再睡觉 -->
 		<!-- 下面版块为不同性别展示不同性别人群的一些个性状态 -->
-		<!-- <div id="genderSpecificInfo">
-			<div>男：
-				前列腺
-				睾丸：左、右
-				阴茎：生理周期/日
-			</div>
-			<div>女：
-				子宫：生理周期/月，流量、颜色、痛经、分泌物（褐色、出血、血块、白带）、
-				乳房：
-				卵巢：左、右
-				阴道：
-			</div>
-			<div>双性偏男：</div>
-			<div>双性偏女：</div>
-			<div>双性不明显（无性别）：</div>
-		</div> -->
-		<!-- 身体状态信息 -->
-		<!-- 上面是不会频繁变更的信息，下面是一些频繁变更，实时的一些信息，后续为使用全家桶的成员带来量身打造的完美体验 -->
-		<!-- <div>头：五官。因为化妆啊、流汗什么的影响面部，所以这些信息也是经常可能会改变的</div>
-		<div>腰：酸、疼</div>
-		<div>腹</div>
-		<div>小腹</div>
-		<div></div>
-		<div>心（心跳值及对于标准&随时间变化呈现结果的心电图）</div>
-		<div>肝</div>
-		<div>脾</div>
-		<div>胃</div>
-		<div>肾（左右）</div>
-		<div>胰</div>
-		<div>肺</div>
-		<div>小肠</div>
-		<div>大肠</div>
-		<div>血压</div>
-		<div>内啡肽</div>
-		<div>多巴胺</div>
-		<div>血清素</div>
-		<div>葡萄糖、糖原：是葡萄糖的 多聚体,包括 肝糖原 、 肌糖原 和肾糖原等，是糖在体内的储存形式。</div>
-		<div>维生素A</div>
-		<div>维生素B</div>
-		<div>维生素C</div>
-		<div>维生素D</div>
-		<div>维生素E</div>
-		<div>维生素F</div> -->
+		<script>
+			// 获取用户性别
+			const userGender = document.getElementById('gender').textContent.trim();
+			
+			// 根据性别生成不同的生理指标内容
+			if (userGender === '女') {
+				document.write(`
+					<div>子宫：生理周期 <span id="menstrualCycle">28</span>天 <span id="cycleStatus">优秀</span></div>
+					<div>子宫：经期 <span id="menstrualPeriod">5</span>天 <span id="periodStatus">正常</span></div>
+					<div>子宫：流量 <span id="menstrualFlow">中等</span> <span id="flowStatus">正常</span></div>
+					<div>子宫：颜色 <span id="menstrualColor">鲜红色</span> <span id="colorStatus">优秀</span></div>
+					<div>子宫：痛经 <span id="dysmenorrhea">无</span> <span id="painStatus">优秀</span></div>
+					<div>子宫：分泌物 <span id="discharge">正常白带</span> <span id="dischargeStatus">优秀</span></div>
+					<div>乳房：乳腺健康 <span id="breastHealth">优秀</span></div>
+					<div>乳房：大小 <span id="breastSize">正常</span></div>
+					<div>乳房：乳头状态 <span id="nippleStatus">正常</span></div>
+					<div>卵巢（左）：<span id="leftOvary">正常</span> <span id="leftOvaryStatus">优秀</span></div>
+					<div>卵巢（右）：<span id="rightOvary">正常</span> <span id="rightOvaryStatus">优秀</span></div>
+					<div>卵巢：排卵功能 <span id="ovulationFunction">正常</span> <span id="ovulationStatus">优秀</span></div>
+					<div>卵巢：卵泡数量 <span id="follicleCount">8-12</span>个 <span id="follicleStatus">优秀</span></div>
+					<div>阴道：pH 值 <span id="vaginalPH">4.5</span> <span id="phStatus">优秀</span></div>
+					<div>阴道：清洁度 <span id="cleanliness">I-II 度</span> <span id="cleanlinessStatus">优秀</span></div>
+					<div>阴道：菌群平衡 <span id="floraBalance">正常</span> <span id="floraStatus">优秀</span></div>
+				`);
+				
+				// 执行女性健康数据更新
+				updateMenstrualHealth();
+				updateBreastHealth();
+				updateOvaryHealth();
+				updateVaginalHealth();
+			} else if (userGender === '男') {
+				document.write(`
+					<div>前列腺：大小 <span id="prostateSize">正常</span> <span id="prostateSizeStatus">优秀</span></div>
+					<div>前列腺：PSA 值 <span id="psaLevel">1.5</span> ng/mL <span id="psaStatus">优秀</span></div>
+					<div>前列腺：炎症 <span id="prostatitis">无</span> <span id="prostatitisStatus">优秀</span></div>
+					<div>睾丸（左）：<span id="leftTestis">正常</span> <span id="leftTestisStatus">优秀</span></div>
+					<div>睾丸（右）：<span id="rightTestis">正常</span> <span id="rightTestisStatus">优秀</span></div>
+					<div>睾丸：体积 <span id="testisVolume">15-20</span> mL <span id="testisVolumeStatus">优秀</span></div>
+					<div>睾丸：精子质量 <span id="spermQuality">优秀</span></div>
+					<div>阴茎：发育 <span id="penisDevelopment">正常</span> <span id="developmentStatus">优秀</span></div>
+					<div>阴茎：勃起功能 <span id="erectileFunction">正常</span> <span id="erectileStatus">优秀</span></div>
+					<div>阴茎：生理周期 <span id="physiologicalCycle">晨勃 3-5 次/周</span> <span id="cycleFrequencyStatus">优秀</span></div>
+				`);
+				
+				// 执行男性健康数据更新
+				updateMaleReproductiveHealth();
+			}
+			
+			// 女性健康数据更新函数
+			function updateMenstrualHealth() {
+				// 月经周期（正常范围：21-35 天，最优值：28-30 天）
+				const cycle = Math.floor(26 + Math.random() * 6); // 26-32
+				let cycleStatus;
+				if (cycle >= 28 && cycle <= 30) {
+					cycleStatus = '优秀';
+				} else if ((cycle >= 21 && cycle < 28) || (cycle > 30 && cycle <= 35)) {
+					cycleStatus = '正常';
+				} else {
+					cycleStatus = '需关注';
+				}
+				
+				// 经期天数（正常范围：3-7 天）
+				const period = Math.floor(4 + Math.random() * 3); // 4-6
+				let periodStatus = (period >= 3 && period <= 7) ? '正常' : '需关注';
+				
+				// 经血量（正常范围：20-60ml/周期）
+				const flowOptions = ['偏少', '中等', '偏多'];
+				const flow = flowOptions[1]; // 默认中等
+				let flowStatus = '正常';
+				
+				// 经血颜色
+				const colorOptions = ['淡红色', '鲜红色', '暗红色', '褐色'];
+				const color = '鲜红色'; // 最优
+				let colorStatus = '优秀';
+				
+				// 痛经情况
+				const painOptions = ['无', '轻微', '中度', '重度'];
+				const pain = '无'; // 最优
+				let painStatus = '优秀';
+				
+				// 分泌物
+				const dischargeOptions = ['正常白带', '偏多', '偏少', '异常'];
+				const discharge = '正常白带'; // 最优
+				let dischargeStatus = '优秀';
+				
+				document.getElementById('menstrualCycle').textContent = cycle;
+				document.getElementById('cycleStatus').textContent = cycleStatus;
+				document.getElementById('menstrualPeriod').textContent = period;
+				document.getElementById('periodStatus').textContent = periodStatus;
+				document.getElementById('menstrualFlow').textContent = flow;
+				document.getElementById('flowStatus').textContent = flowStatus;
+				document.getElementById('menstrualColor').textContent = color;
+				document.getElementById('colorStatus').textContent = colorStatus;
+				document.getElementById('dysmenorrhea').textContent = pain;
+				document.getElementById('painStatus').textContent = painStatus;
+				document.getElementById('discharge').textContent = discharge;
+				document.getElementById('dischargeStatus').textContent = dischargeStatus;
+			}
+			
+			function updateBreastHealth() {
+				const breastHealthStatus = '优秀';
+				const breastSize = '正常';
+				const nippleStatus = '正常';
+				
+				document.getElementById('breastHealth').textContent = breastHealthStatus;
+				document.getElementById('breastSize').textContent = breastSize;
+				document.getElementById('nippleStatus').textContent = nippleStatus;
+			}
+			
+			function updateOvaryHealth() {
+				const ovaryStatus = '正常';
+				const ovaryHealthStatus = '优秀';
+				const ovulation = '正常';
+				const ovulationStatus = '优秀';
+				const follicleCount = '8-12';
+				const follicleStatus = '优秀';
+				
+				document.getElementById('leftOvary').textContent = ovaryStatus;
+				document.getElementById('leftOvaryStatus').textContent = ovaryHealthStatus;
+				document.getElementById('rightOvary').textContent = ovaryStatus;
+				document.getElementById('rightOvaryStatus').textContent = ovaryHealthStatus;
+				document.getElementById('ovulationFunction').textContent = ovulation;
+				document.getElementById('ovulationStatus').textContent = ovulationStatus;
+				document.getElementById('follicleCount').textContent = follicleCount;
+				document.getElementById('follicleStatus').textContent = follicleStatus;
+			}
+			
+			function updateVaginalHealth() {
+				// 阴道 pH 值（正常范围：3.8-4.5，最优值：4.0-4.5）
+				const ph = (3.9 + Math.random() * 0.5).toFixed(1); // 3.9-4.4
+				let phStatus;
+				if (ph >= 4.0 && ph <= 4.5) {
+					phStatus = '优秀';
+				} else if (ph >= 3.8 && ph < 4.0) {
+					phStatus = '正常';
+				} else {
+					phStatus = '需关注';
+				}
+				
+				const cleanliness = 'I-II 度';
+				const cleanlinessStatus = '优秀';
+				const floraBalance = '正常';
+				const floraStatus = '优秀';
+				
+				document.getElementById('vaginalPH').textContent = ph;
+				document.getElementById('phStatus').textContent = phStatus;
+				document.getElementById('cleanliness').textContent = cleanliness;
+				document.getElementById('cleanlinessStatus').textContent = cleanlinessStatus;
+				document.getElementById('floraBalance').textContent = floraBalance;
+				document.getElementById('floraStatus').textContent = floraStatus;
+			}
+			
+			// 男性生殖健康数据更新函数
+			function updateMaleReproductiveHealth() {
+				// 前列腺健康
+				const prostateSize = '正常';
+				const prostateSizeStatus = '优秀';
+				// PSA 值（正常范围：0-4 ng/mL，最优值：0-2.5 ng/mL）
+				const psa = (0.5 + Math.random() * 2.0).toFixed(1); // 0.5-2.5
+				let psaStatus;
+				if (psa <= 2.5) {
+					psaStatus = '优秀';
+				} else if (psa <= 4.0) {
+					psaStatus = '正常';
+				} else {
+					psaStatus = '偏高';
+				}
+				// 前列腺炎
+				const prostatitis = '无';
+				const prostatitisStatus = '优秀';
+				
+				// 睾丸健康
+				const testisStatus = '正常';
+				const testisHealthStatus = '优秀';
+				const testisVolume = '15-20';
+				const testisVolumeStatus = '优秀';
+				const spermQuality = '优秀';
+				
+				// 阴茎发育
+				const development = '正常';
+				const developmentStatus = '优秀';
+				const erectileFunction = '正常';
+				const erectileStatus = '优秀';
+				const cycleFrequency = '晨勃 3-5 次/周';
+				const cycleFrequencyStatus = '优秀';
+				
+				document.getElementById('prostateSize').textContent = prostateSize;
+				document.getElementById('prostateSizeStatus').textContent = prostateSizeStatus;
+				document.getElementById('psaLevel').textContent = psa;
+				document.getElementById('psaStatus').textContent = psaStatus;
+				document.getElementById('prostatitis').textContent = prostatitis;
+				document.getElementById('prostatitisStatus').textContent = prostatitisStatus;
+				
+				document.getElementById('leftTestis').textContent = testisStatus;
+				document.getElementById('leftTestisStatus').textContent = testisHealthStatus;
+				document.getElementById('rightTestis').textContent = testisStatus;
+				document.getElementById('rightTestisStatus').textContent = testisHealthStatus;
+				document.getElementById('testisVolume').textContent = testisVolume;
+				document.getElementById('testisVolumeStatus').textContent = testisVolumeStatus;
+				document.getElementById('spermQuality').textContent = spermQuality;
+				
+				document.getElementById('penisDevelopment').textContent = development;
+				document.getElementById('developmentStatus').textContent = developmentStatus;
+				document.getElementById('erectileFunction').textContent = erectileFunction;
+				document.getElementById('erectileStatus').textContent = erectileStatus;
+				document.getElementById('physiologicalCycle').textContent = cycleFrequency;
+				document.getElementById('cycleFrequencyStatus').textContent = cycleFrequencyStatus;
+			}
+		</script>
+		<!-- 身体状态信息 - 中国女性最优值标准 -->
+		<div>头：五官正常，无头晕头痛 <span id="headStatus">优秀</span></div>
+		<div>腰：无酸痛感，腰椎活动度正常 <span id="waistStatus">优秀</span></div>
+		<div>腹：腹部平坦柔软，无压痛 <span id="abdomenStatus">优秀</span></div>
+		<div>小腹：无胀痛，月经期轻微不适属正常 <span id="lowerAbdomenStatus">优秀</span></div>
+		<div>心率：<span id="heartRate">75</span>次/分钟 <span id="heartRateStatus">优秀</span>
+			<script>
+				function updateHeartRate() {
+					// 心率（女性正常范围：60-100 次/分，最优值：70-80 次/分）
+					const rate = Math.floor(65 + Math.random() * 20); // 65-85
+					
+					let status;
+					if (rate >= 70 && rate <= 80) {
+						status = '优秀';
+					} else if ((rate >= 60 && rate < 70) || (rate > 80 && rate <= 100)) {
+						status = '正常';
+					} else {
+						status = '需关注';
+					}
+					
+					document.getElementById('heartRate').textContent = rate;
+					document.getElementById('heartRateStatus').textContent = status;
+				}
+				updateHeartRate();
+			</script>
+		</div>
+		<div>肝：转氨酶<span id="liverEnzyme">&lt;40</span> U/L <span id="liverStatus">优秀</span>
+			<script>
+				function updateLiverFunction() {
+					// 转氨酶（女性正常范围：<40 U/L，最优值：ALT 7-30 U/L，AST 13-35 U/L）
+					const alt = Math.floor(15 + Math.random() * 25); // 15-40
+					const ast = Math.floor(20 + Math.random() * 20); // 20-40
+					const enzyme = Math.max(alt, ast);
+					
+					let status;
+					if (alt <= 30 && ast <= 35) {
+						status = '优秀';
+					} else if (enzyme < 40) {
+						status = '正常';
+					} else {
+						status = '偏高';
+					}
+					
+					document.getElementById('liverEnzyme').textContent = enzyme;
+					document.getElementById('liverStatus').textContent = status;
+				}
+				updateLiverFunction();
+			</script>
+		</div>
+		<div>脾：功能正常 <span id="spleenStatus">优秀</span></div>
+		<div>胃：消化功能良好 <span id="stomachStatus">优秀</span></div>
+		<div>肾（左右）：肌酐<span id="kidneyCreatinine">65</span> μmol/L <span id="kidneyStatus">优秀</span>
+			<script>
+				function updateKidneyFunction() {
+					// 肌酐（女性正常范围：44-97 μmol/L，最优值：50-80 μmol/L）
+					const creatinine = Math.floor(55 + Math.random() * 30); // 55-85
+					
+					let status;
+					if (creatinine >= 50 && creatinine <= 80) {
+						status = '优秀';
+					} else if ((creatinine >= 44 && creatinine < 50) || (creatinine > 80 && creatinine <= 97)) {
+						status = '正常';
+					} else {
+						status = '需关注';
+					}
+					
+					document.getElementById('kidneyCreatinine').textContent = creatinine;
+					document.getElementById('kidneyStatus').textContent = status;
+				}
+				updateKidneyFunction();
+			</script>
+		</div>
+		<div>胰：淀粉酶<span id="pancreasAmylase">85</span> U/L <span id="pancreasStatus">优秀</span>
+			<script>
+				function updatePancreasFunction() {
+					// 淀粉酶（正常范围：35-135 U/L）
+					const amylase = Math.floor(60 + Math.random() * 60); // 60-120
+					
+					let status;
+					if (amylase >= 60 && amylase <= 100) {
+						status = '优秀';
+					} else if ((amylase >= 35 && amylase < 60) || (amylase > 100 && amylase <= 135)) {
+						status = '正常';
+					} else {
+						status = '需关注';
+					}
+					
+					document.getElementById('pancreasAmylase').textContent = amylase;
+					document.getElementById('pancreasStatus').textContent = status;
+				}
+				updatePancreasFunction();
+			</script>
+		</div>
+		<div>肺：肺活量<span id="lungCapacity">2900</span> ml <span id="lungStatus">优秀</span>，血氧<span id="bloodOxygen">99</span>% <span id="oxygenStatus">优秀</span>
+			<script>
+				function updateLungFunction() {
+					// 肺活量（女性正常范围：2700-3100 ml，最优值：2800-3000 ml）
+					const capacity = Math.floor(2750 + Math.random() * 300); // 2750-3050
+					// 血氧饱和度（正常范围：98-100%）
+					const oxygen = Math.floor(98 + Math.random() * 3); // 98-100
+					
+					let capacityStatus, oxygenStatus;
+					
+					if (capacity >= 2800 && capacity <= 3000) {
+						capacityStatus = '优秀';
+					} else if ((capacity >= 2700 && capacity < 2800) || (capacity > 3000 && capacity <= 3100)) {
+						capacityStatus = '正常';
+					} else {
+						capacityStatus = '需关注';
+					}
+					
+					if (oxygen >= 98) {
+						oxygenStatus = '优秀';
+					} else {
+						oxygenStatus = '偏低';
+					}
+					
+					document.getElementById('lungCapacity').textContent = capacity;
+					document.getElementById('lungStatus').textContent = capacityStatus;
+					document.getElementById('bloodOxygen').textContent = oxygen;
+					document.getElementById('oxygenStatus').textContent = oxygenStatus;
+				}
+				updateLungFunction();
+			</script>
+		</div>
+		<div>小肠：消化吸收正常 <span id="smallIntestineStatus">优秀</span></div>
+		<div>大肠：排便规律 <span id="largeIntestineStatus">优秀</span></div>
+		<div>血压：<span id="bloodPressure">110/70</span> mmHg <span id="bpStatus">优秀</span>
+			<script>
+				function updateBloodPressure() {
+					// 血压（女性正常范围：90-140/60-90 mmHg，最优值：110-120/70-80 mmHg）
+					const systolic = Math.floor(105 + Math.random() * 20); // 105-125
+					const diastolic = Math.floor(65 + Math.random() * 20); // 65-85
+					
+					let status;
+					if (systolic >= 110 && systolic <= 120 && diastolic >= 70 && diastolic <= 80) {
+						status = '优秀';
+					} else if ((systolic >= 90 && systolic < 110) || (systolic > 120 && systolic <= 140) ||
+							   (diastolic >= 60 && diastolic < 70) || (diastolic > 80 && diastolic <= 90)) {
+						status = '正常';
+					} else {
+						status = '需关注';
+					}
+					
+					document.getElementById('bloodPressure').textContent = `${systolic}/${diastolic}`;
+					document.getElementById('bpStatus').textContent = status;
+				}
+				updateBloodPressure();
+			</script>
+		</div>
+		<div>内啡肽：水平正常 <span id="endorphinStatus">优秀</span></div>
+		<div>多巴胺：水平正常 <span id="dopamineStatus">优秀</span></div>
+		<div>血清素：水平正常 <span id="serotoninStatus">优秀</span></div>
+		<div>葡萄糖、糖原：空腹血糖<span id="bloodGlucose">5.2</span> mmol/L <span id="glucoseStatus">优秀</span>
+			<script>
+				function updateBloodGlucose() {
+					// 空腹血糖（正常范围：3.9-6.1 mmol/L，最优值：4.2-5.6 mmol/L）
+					const glucose = (4.0 + Math.random() * 2.0).toFixed(1); // 4.0-6.0
+					
+					let status;
+					if (glucose >= 4.2 && glucose <= 5.6) {
+						status = '优秀';
+					} else if ((glucose >= 3.9 && glucose < 4.2) || (glucose > 5.6 && glucose <= 6.1)) {
+						status = '正常';
+					} else {
+						status = '需关注';
+					}
+					
+					document.getElementById('bloodGlucose').textContent = glucose;
+					document.getElementById('glucoseStatus').textContent = status;
+				}
+				updateBloodGlucose();
+			</script>
+		</div>
+		<div>维生素 A：<span id="vitaminA">700</span> μg RAE/日 <span id="vitaminAStatus">充足</span></div>
+		<div>维生素 B：<span id="vitaminB">1.5</span> mg/日 <span id="vitaminBStatus">充足</span></div>
+		<div>维生素 C：<span id="vitaminC">100</span> mg/日 <span id="vitaminCStatus">充足</span></div>
+		<div>维生素 D：<span id="vitaminD">400</span> IU/日 <span id="vitaminDStatus">充足</span></div>
+		<div>维生素 E：<span id="vitaminE">14</span> mg α-TE/日 <span id="vitaminEStatus">充足</span></div>
+		<div>维生素 F：必需脂肪酸 <span id="vitaminFStatus">平衡</span></div>
 
 		<!-- 当然除了身体、器官的变化，运动状态、心理变化等一些社会性因素和一些文化等无实物的东西也会影响 -->
 		<h2>我的状态</h2>
-		<div>体温</div>
-		<div>心情</div>
-		<div>健康状态：按等级呈现</div>
-		<div>身体状况：健康状态变低时身体某些值会不正常，健康状态只是呈现结果，具体状况及原因在这里呈现，比如腹泻、胀痛（等其他疼痛）、食欲（贪冷饮）、</div>
-		<div>运动状态：包括禁止、或者身体某个部位的运动在人类的叫法中称呼为睡觉、跑步、等。当然每种状态影响的其他身体因素也不同，比如消耗身体的维生素，</div>
-		<div>我想要的：一般同时需要的很多，有当下需要的，长久时间才能达成目的的，展现形式以列表形式枚举，根据对应权重排序，权重形式</div>
+		<div>体温：<span id="bodyTemp">36.8</span>℃（最优范围：36.0-37.2℃，基础体温偏低表示代谢良好）
+			<script>
+				// 根据时间段设置最可能的体温
+				function updateBodyTemp() {
+					const hour = new Date().getHours();
+					let temp;
+					
+					if (hour >= 4 && hour < 10) {
+						// 清晨：体温最低
+						temp = 36.5;
+					} else if (hour >= 10 && hour < 16) {
+						// 上午至下午：体温逐渐升高
+						temp = 36.8 + Math.random() * 0.3;
+					} else if (hour >= 16 && hour < 22) {
+						// 傍晚：体温最高
+						temp = 37.0 + Math.random() * 0.2;
+					} else {
+						// 夜间：体温下降
+						temp = 36.6 + Math.random() * 0.2;
+					}
+					
+					document.getElementById('bodyTemp').textContent = temp.toFixed(1);
+				}
+				updateBodyTemp();
+			</script>
+		</div>
+		<div>心情：<span id="moodState">平静愉悦</span>（最优状态：积极乐观，情绪稳定）
+			<script>
+				// 根据时间段设置最可能的心情
+				function updateMood() {
+					const hour = new Date().getHours();
+					const day = new Date().getDay(); // 0-6，0 是周日
+					let mood;
+					
+					// 考虑工作日和周末
+					const isWeekend = (day === 0 || day === 6);
+					
+					if (hour >= 5 && hour < 9) {
+						mood = isWeekend ? '轻松愉快' : '充满希望';
+					} else if (hour >= 9 && hour < 12) {
+						mood = '精力充沛';
+					} else if (hour >= 12 && hour < 14) {
+						mood = '满足放松';
+					} else if (hour >= 14 && hour < 18) {
+						mood = '专注高效';
+					} else if (hour >= 18 && hour < 22) {
+						mood = isWeekend ? '惬意舒适' : '放松释压';
+					} else {
+						mood = '平静安宁';
+					}
+					
+					document.getElementById('moodState').textContent = mood;
+				}
+				updateMood();
+			</script>
+		</div>
+		<div>健康状态：<span id="healthLevel">优秀</span>（等级：优秀/良好/一般/需关注，当前为最优等级）
+			<script>
+				function updateHealthLevel() {
+					// 基于各项生理指标综合评估
+					const healthLevels = ['优秀', '良好', '一般', '需关注'];
+					// 默认显示最优状态
+					document.getElementById('healthLevel').textContent = '优秀';
+				}
+				updateHealthLevel();
+			</script>
+		</div>
+		<div>身体状况：<span id="physicalCondition">一切正常</span> <span id="physicalConditionStatus">优秀</span>
+			<script>
+				function updatePhysicalCondition() {
+					// 模拟各种身体状况的检测结果（实际应用中应从体检数据或用户输入获取）
+					// 这里演示根据随机症状来综合评估健康状况
+					
+					// 定义可能的身体状况及其严重程度
+					const symptoms = {
+						'一切正常': { severity: 0, category: 'normal' },
+						'轻微疲劳': { severity: 1, category: 'mild' },
+						'食欲正常': { severity: 0, category: 'normal' },
+						'腹泻': { severity: 2, category: 'moderate' },
+						'腹胀': { severity: 2, category: 'moderate' },
+						'消化不良': { severity: 2, category: 'moderate' },
+						'轻微头痛': { severity: 1, category: 'mild' },
+						'食欲不振': { severity: 2, category: 'moderate' },
+						'贪冷饮': { severity: 1, category: 'mild' },
+						'持续腹泻': { severity: 3, category: 'severe' },
+						'腹部胀痛': { severity: 3, category: 'severe' },
+						'严重消化不良': { severity: 3, category: 'severe' },
+						'头晕乏力': { severity: 3, category: 'severe' },
+						'食欲减退': { severity: 2, category: 'moderate' }
+					};
+					
+					// 随机选择一个身体状况（实际应基于真实检测数据）
+					const symptomKeys = Object.keys(symptoms);
+					const currentSymptom = symptomKeys[Math.floor(Math.random() * symptomKeys.length)];
+					const symptomData = symptoms[currentSymptom];
+					
+					// 根据症状严重程度综合评价健康状态
+					let status;
+					if (symptomData.severity === 0) {
+						status = '优秀';
+					} else if (symptomData.severity === 1) {
+						status = '良好';
+					} else if (symptomData.severity === 2) {
+						status = '一般';
+					} else {
+						status = '需关注';
+					}
+					
+					document.getElementById('physicalCondition').textContent = currentSymptom;
+					document.getElementById('physicalConditionStatus').textContent = status;
+				}
+				updatePhysicalCondition();
+			</script>
+		</div>
+		<div>运动状态：<span id="exerciseState">适度活动</span>（包括禁止、或者身体某个部位的运动在人类的叫法中称呼为睡觉、跑步、等。当然每种状态影响的其他身体因素也不同，比如消耗身体的维生素，）
+			<script>
+				// 根据时间段设置最可能的运动状态
+				function updateExerciseState() {
+					const hour = new Date().getHours();
+					const day = new Date().getDay();
+					let state;
+					
+					if (hour >= 5 && hour < 7) {
+						state = '晨练/拉伸';
+					} else if (hour >= 7 && hour < 9) {
+						state = '通勤/轻度活动';
+					} else if (hour >= 9 && hour < 12) {
+						state = '工作/学习（久坐）';
+					} else if (hour >= 12 && hour < 14) {
+						state = '午休/散步';
+					} else if (hour >= 14 && hour < 18) {
+						state = '工作/学习（久坐）';
+					} else if (hour >= 18 && hour < 20) {
+						state = '运动锻炼/休闲活动';
+					} else if (hour >= 20 && hour < 23) {
+						state = '放松/准备休息';
+					} else {
+						state = '睡眠';
+					}
+					
+					document.getElementById('exerciseState').textContent = state;
+				}
+				updateExerciseState();
+			</script>
+		</div>
+		<div>我想要的：一般同时需要的很多，有当下需要的，长久时间才能达成目的的，展现形式以列表形式枚举，根据对应权重排序，权重形式<span id="currentDesires">健康、快乐、成长、财富平衡发展</span></div>
 		<div>我的名言：不同名言在不同事件时触发、现在因为没有做状态处理，没办法做自动触发。也不全是我的名言，还有一些就是对自己的警告吧，· 对没有绝对把握或者承受不了结果时，不要赌 · 不要固执己见，想想第三者思维，要敢于推翻自己的理论，勇于承认错误</div>
 		<ul>
 			<!-- 截止目前（2025年5月）生活中常见的心理测试题都有一定缺陷 -->
