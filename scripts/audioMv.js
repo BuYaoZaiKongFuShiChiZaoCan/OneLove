@@ -98,14 +98,6 @@ let mvList = [
 		desc: "需改MV 《漠河舞厅》MV—柳爽(致敬最爱的人逝去)(2020)(AI_高清修复).31936217997"
 	},
 	{
-		id: "李克勤、周深 - 天下有情人",
-		type: "video/mp4",
-		title: "天下有情人",
-		srcLocalhost: "https://www.douyin.com/video/7615922667203820529",
-		poster: null,
-		desc: "天下有情人"
-	},
-	{
 		id: "未知歌手 - 说谎 (DJ赵小涣)",
 		type: "video/mp4",
 		title: "【4K顶级现场】林宥嘉《说谎》神级现场",
