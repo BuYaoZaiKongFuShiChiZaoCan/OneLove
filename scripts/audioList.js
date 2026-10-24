@@ -301,6 +301,12 @@ let songs = [
 	"说散就散-袁娅维TIA RAY", // 可能重复·A(高度相似) 音频换“袁娅维TIA RAY - 说散就散”这首的音频
 	"Nicky - 说散就散 (弹唱版)",
 	/* 前任3End */
+	/* K */
+	"火风 - 大花轿", // 可能重复·B(较可能同一首)
+	"花儿乐队 - 化蝶飞", // 可能重复·B(较可能同一首)
+	"虎二 - 永不失联的爱", // 可能重复·C(可能同一首)
+	"张远 - 嘉宾", // 可能重复·B(较可能同一首)
+	/* K·End */
 	"留什么给你(Live)-孙楠", // 可能重复·B(较可能同一首)
 	"Two Steps From Hell-Star Sky 活有余罪 - 可有道", // 可能重复·C(可能同一首)
 	"春风何时来", // 可能重复·A(高度相似)
@@ -497,7 +503,7 @@ let songs = [
 	"篝火旁", // 可能重复·A(高度相似)
 	"雨花石",
 	"茂茂呀 - 洪荒之力 (越南鼓)",
-	"羽·泉、黄征 - 奔跑", // 可能重复·B(较可能同一首)
+	"羽·泉、黄征 - 奔跑", // 可能重复·B(较可能同一首) 旅游[团队]
 	"金玟岐 - 岁月神偷",
 	"馒头 - 胖人愁 (变音版)", // 可能重复·B(较可能同一首)
 	"杨丞琳 - 雨爱",
@@ -549,32 +555,28 @@ let songs = [
 	"ANU - FLY", // 可能重复·C(可能同一首)
 	"ANU - FLY-飞",
 	"BGM供货商 - 通往胜利 (钢琴版)",
-	"BM奈一 - 后继者", // 可能重复·B(较可能同一首)
 	"任然 - 后继者",
 	"Cagnet - 24／7 (演奏曲)",
 	"Calypso、DJ Despacito、Échame La Culpa - Despactio",
 	"虎二 - 一百万个可能",
-	"cici_ - 盗墓笔记·十年人间 (片段)", // 可能重复·B(较可能同一首)
 	"阿禹ayy - 盗墓笔记·十年人间 (片段)",
 	"李常超（Lao乾妈） - 盗墓笔记·十年人间",
 	"Corki - 下坠Falling", // 可能重复·B(较可能同一首)
 	"Cuishan He - If You’re Happy",
+	"凤凰传奇 - 感到幸福你就拍拍手",
 	"DJ蚕豆好吃 - Lendo Calendo", // 可能重复·B(较可能同一首)
 	"Dan Balan、Tany Vander、Brasco - Lendo Calendo",
 	"dwayne ford - Perseus",
 	"ediq - 路过八零",
 	"en - 可不可以 (片段)", // 可能重复·B(较可能同一首)
-	"en - 嚣张", // 可能重复·B(较可能同一首)
-	"en (王翊恩) - 嚣张", // 无音频
-	"耳朵便利店 - 嚣张",
+	"en(王翊恩)-嚣张",
 	"Epic Score - You Must Overcome",
-	"Eric周兴哲 - 你,好不好？", // 可能重复·B(较可能同一首)
 	"艾辰 - 你,好不好",
 	"F.I.R.飞儿乐团 - 你的微笑",
 	"F.O.O.L - Criminals (罪犯)",
 	"G.E.M.邓紫棋 - 来自天堂的魔鬼",
+	"GooGoo - 不要慌太阳下山有月光",
 	"G.G - 小可爱与小领带", // 可能重复·B(较可能同一首)
-	"张思源 - 小可爱与小领带",
 	"ghfhgfyg - 王者荣耀 (口白)",
 	"GTRS - 伊格赛听-谪仙 (DJR7版)", // 可能重复·B(较可能同一首)
 	"hea2t - 恋殇", // 可能重复·B(较可能同一首)
@@ -582,7 +584,6 @@ let songs = [
 	"Klaus Badelt - He's a Pirate (他是海盗)",
 	"Lefty Hand Cream - 恋音と雨空 (恋歌与雨天)",
 	"Li-2c - 隔岸观火", // 可能重复·B(较可能同一首)
-	"Li-2c（李楚楚） - 隔岸观火",
 	"LKer林柯 - 满目星辰皆是你", // 可能重复·B(较可能同一首)
 	"林宁 - 满目星辰皆是你",
 	"MC天子、夏沫MOMO - 不爱又何必纠缠",
@@ -592,21 +593,17 @@ let songs = [
 	"Rompasso - Angetenar (安捷纳尔)(Subkills Remix)",
 	"S.H.E - 不想长大",
 	"Sami & Sasha - Love You Like A Love Song",
-	"Sand - CHINA-2 (中国-2)", // 可能重复·B(较可能同一首)
 	"Sand - CHINA-2",
 	"Sand - China-4",
 	"Steven Burke - Hero's Theme (英雄之魂)", // 可能重复·B(较可能同一首)
-	"Steven Burke - Hero's Theme (不完整)",
-	"Steven Burke - Hero's Theme",
 	"Suprafive、Kelly Clarkson - Catch My Breath (Remix)", // 可能重复·C(可能同一首)
 	"久石譲 - Mad Summer (疯狂的夏天)",
 	/* 260307 */
+	"宋拾一 - 深爱过的人怎么放手",
 	"000x - 酒喝不尽磕唠不完",
 	"1coco - 把回忆拼好给你 (0.8)",
-	"ALisa - Insomnia (钢琴治愈版)", // 可能重复·C(可能同一首)
 	"ALisa - insomnia (治愈版)",
 	"hanser - 恋爱循环",
-	"东来东往 - 别说我的眼泪你无所谓", // 可能重复·B(较可能同一首)
 	"郑源 - 别说我的眼泪你无所谓",
 	"丢火车乐队 - 火车日记 (2021枣庄热浪音乐节现场)",
 	"于毅 - 灵魂咒",
@@ -1018,7 +1015,6 @@ let songs = [
 	"胡杨林 - 香水有毒",
 	"虎二 - 跨不过的距离",
 	"虎二 - 你应该很快乐", // 可能重复·B(较可能同一首)
-	"花儿乐队 - 化蝶飞", // 可能重复·B(较可能同一首)
 	"花姐 - 狂浪",
 	"花僮 - 公子向北走",
 	"花粥 - 归去来兮", // 可能重复·B(较可能同一首)
@@ -2293,7 +2289,6 @@ songs.push(
 	"冯提莫 - 佛系少女",
 	"冯晓泉 - 冰糖葫芦", // 可能重复·B(较可能同一首)
 	"凤凰传奇 - 等爱的玫瑰",
-	"凤凰传奇 - 感到幸福你就拍拍手",
 	"凤凰传奇 - 荷塘月色", // 可能重复·B(较可能同一首)
 	"凤凰传奇 - 郎的诱惑",
 	"凤凰传奇 - 天蓝蓝", // 可能重复·B(较可能同一首)
@@ -2371,7 +2366,6 @@ songs.push(
 	"黄国俊 - 真爱你的云",
 	"黄霑、罗大佑、徐克 - 沧海一声笑", // 可能重复·B(较可能同一首)
 	"许冠杰 - 沧海一声笑",
-	"火风 - 大花轿", // 可能重复·B(较可能同一首)
 	"火箭少女101 - 卡路里",
 	"极端的杨 - 不要忘记我爱你 (0.8)",
 	"纪一馨 - Shots (0.8x)", // 可能重复·B(较可能同一首)
@@ -2884,7 +2878,6 @@ songs.push(
 	"张宇 - 雨一直下",
 	"张宇 - 月亮惹的祸", // 可能重复·B(较可能同一首)
 	"张宇 - 月亮惹的祸 (DJ版)",
-	"张远 - 嘉宾", // 可能重复·B(较可能同一首)
 	"张振宇 - 不要再来伤害我",
 	"张紫豪 - 地铁等待",
 	"章伟杰 - 我已经爱上你",
@@ -3609,7 +3602,6 @@ songs.push(
 	"冷漠 - 一路向北",
 	"良久哦 - 烟花易冷 (良久哦0.7X变速版)",
 	"蒙面哥 - 一亿个伤心",
-	"虎二 - 永不失联的爱", // 可能重复·C(可能同一首)
 	"moumoon - Sunshine Girl",
 	"周传雄 - 青花",
 	"怪阿姨 - 放纵L", // 可能重复·B(较可能同一首)
@@ -5591,7 +5583,7 @@ songs.push(
 	"深澤秀行 - Secret Laboratory Stage (Round 1) -Unknown",
 	"深澤秀行 - Pitch-black Jungle Stage -Brazil",
 	"深澤秀行 - Morning Mist Bay Stage -Vietnam",
-	"深澤秀行 - Run-down Back Alley Stage -China", // 可能重复·B(较可能同一首)·同「Sand - CHINA-2 (中国-2)」
+	"深澤秀行 - Run-down Back Alley Stage -China", // 可能重复·B(较可能同一首)·同「Sand - CHINA-2」
 	"深澤秀行 - Deserted Temple Stage -Japan",
 	"深澤秀行 - Volcanic Rim Stage -Street Fighter IV",
 	"深澤秀行 - Overpass Stage -Tokyo", // 可能重复·A(高度相似)·同「Various Artists - Funk Shui (Main Track｜Full Length)」
@@ -5602,7 +5594,7 @@ songs.push(
 	"深澤秀行 - Beautiful Bay Stage -Vietnam",
 	"深澤秀行 - Cruise Ship Stern Stage -Europe-",
 	"深澤秀行 - Snowy Rail Yard Stage -Russia",
-	"深澤秀行 - Crowded Downtown Stage -China", // 可能重复·B(较可能同一首)·同「Sand - CHINA-2 (中国-2)」
+	"深澤秀行 - Crowded Downtown Stage -China", // 可能重复·B(较可能同一首)·同「Sand - CHINA-2」
 	"深澤秀行 - Old Temple Stage -Japan",
 	"深澤秀行 - Character Select Screen -Game Arrange",
 	"深澤秀行 - AC Mode Select Screen -Game Arrange",
@@ -6476,7 +6468,6 @@ songs.push(
 	"贝乐虎儿歌 - 数鸭子",
 	"儿歌多多 - 一分钱",
 	"纯音乐哄睡 - 愤怒的小鸟",
-	"Cuishan He - If You’re Happy",
 	"宋小睿 - 我和你", // 可能重复·B(较可能同一首)·同「宋小睿 - 我和你」
 	"林妙可 - 爱我你就抱抱我",
 	"Gelato - 兔子舞",
