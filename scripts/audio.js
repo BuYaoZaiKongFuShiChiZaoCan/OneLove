@@ -163,10 +163,18 @@ let lastChange = "nextSong";
 let errorCount = 0;
 // 连续失败上限：出错一次就先自动跳下一首，连跳这么多首都失败才真停下来
 const MAX_ERR = 5;
-// 停下来时往后探测多少首去找「确定能播」的那一首
-const PROBE_LIMIT = 50;
+// 停下来时往后探测多少首去找「确定能播」的那一首（8 个并发，200 首约 2–4 秒）
+const PROBE_LIMIT = 200;
 // 探测到可播歌曲后用它切歌、但不要自动播放；用一次就消掉
 let suppressAutoplay = false;
+/**
+ * 「我们是否想要播放」——用来判断出错后该不该自动跳下一首。
+ * 不能再看播放按钮的图标状态：404 时 audio.play() 会以 NotSupportedError 被拒，
+ * playSong() 的 catch 于是把图标改回 fa-play，旧的判断据此以为「用户按了暂停」，
+ * 就停在原地只弹「已暂停自动切换」不动 —— 这就是「一出错就直接暂停」的直接原因。
+ * 只有 playSong() 置 true、pauseSong() 置 false，用户点暂停才算真的不想播。
+ */
+let playIntent = false;
 
 /**
  * 成功出声就把连败计数清零。
@@ -196,24 +204,38 @@ function probePlayable(index, callback) {
 }
 
 /**
- * 从当前歌曲往后找第一首确实能播的（最多探测 maxTries 首）。
- * 找不到（含绕回原点）回传 null。
+ * 从当前歌曲往后找第一首确实能播的（最多探测 maxTries 首），找不到（含绕回原点）回传 null。
+ * 404 密集区里连续几十首都没有文件是常态，所以每批 8 个并发探、按批顺序前进：
+ * 一批里取下标最小的可播项，既不会跳过更近的那首，也不会串行等几十个来回。
  * @param {number} maxTries 最多探测几首
  * @param {(index:number|null)=>void} callback 命中下标或 null
  */
 function findPlayableAfter(maxTries, callback) {
-	let tries = 0;
-	let idx = songIndex;
-	function step() {
-		if (tries >= maxTries) { callback(null); return; }
-		tries++;
-		idx = (idx + 1) % songs.length;
-		if (idx === songIndex) { callback(null); return; }// 绕回原点了，说明整轮都没有
-		probePlayable(idx, function (ok) {
-			ok ? callback(idx) : step();
+	const BATCH = 8;
+	let tried = 0;
+	let finished = false;
+	function nextBatch() {
+		if (finished) return;
+		const idxs = [];
+		for (let k = 0; k < BATCH && tried < maxTries; k++, tried++) {
+			const i = (songIndex + tried + 1) % songs.length;
+			if (i === songIndex || idxs.indexOf(i) >= 0) break;// 绕回原点/整轮走完了
+			idxs.push(i);
+		}
+		if (!idxs.length) { finished = true; callback(null); return; }
+		const res = new Array(idxs.length).fill(false);
+		let left = idxs.length;
+		idxs.forEach(function (idx, n) {
+			probePlayable(idx, function (ok) {
+				res[n] = ok;
+				if (--left > 0) return;
+				const hit = res.indexOf(true);
+				if (hit >= 0) { finished = true; callback(idxs[hit]); return; }
+				nextBatch();
+			});
 		});
 	}
-	step();
+	nextBatch();
 }
 
 /**
@@ -245,10 +267,10 @@ function MusicError() {
 	}
 	title.textContent = '已暂停';
 	mErrTimeout = setTimeout(() => {
-		let playIconClassList = playBtn.querySelector('i.fas').classList;
-		if (playIconClassList.contains('fa-pause')) {
+		// 只要还想播（playIntent）就往后跳；用户自己按了暂停才不动
+		if (playIntent) {
 			lastChange === "prevSong" ? prevSong() : nextSong();
-		} else if (playIconClassList.contains('fa-play')) {
+		} else {
 			tanChuang('已暂停自动切换', 3700)
 		}
 	}, 2000)
@@ -298,6 +320,7 @@ function playSong() {
 
 	// 清除错误超时
 	clearTimeout(mErrTimeout);
+	playIntent = true;
 	// 手机浏览器（尤其 iOS 低电量模式、微信内置浏览器）可能拒绝 play()，
 	// 不 catch 的话界面已经切成「暂停图标」但实际没声音，看起来就像卡住没反应
 	const playAttempt = audio.play();
@@ -326,6 +349,7 @@ function playSong() {
 
 // 停止播放
 function pauseSong() {
+	playIntent = false;
 	musicContainer.classList.remove('play');
 	playBtn.querySelector('i.fas').classList.add('fa-play');
 	playBtn.querySelector('i.fas').classList.remove('fa-pause');
