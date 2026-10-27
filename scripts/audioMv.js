@@ -508,15 +508,6 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 	// 2) 刚创建/刚换 src 就 play()，手机上会因「加载被打断」抛 AbortError，
 	//    之前据此移除视频，导致 MV 全部消失。播放交给 autoplay 属性；
 	//    若浏览器拦截了自动播放，视频保留在面板里，用户点一下控制条即可播放。
-	if (isNew && autoplay) {
-		// 兜底提示：3 秒后还没播出去（多为自动播放被浏览器拦截），提示手动点击，不移除 MV
-		setTimeout(function () {
-			const v = document.querySelector("#audioMvVideo1");
-			if (v && v.paused && !v.ended) {
-				tanChuang('MV 已就绪，自动播放被浏览器拦截，点击视频即可播放', 3000);
-			}
-		}, 3000);
-	}
 	video.onplay = function () {
 		// 设置音乐进度为视频进度
 		let savedTime = parseFloat(window.localStorage.getItem("musicTime")) || 0;
