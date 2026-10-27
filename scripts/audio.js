@@ -171,7 +171,12 @@ window.musicList.addEventListener('click', function (e) {
 	let targetIndex = +targetId;
 	if (targetId && targetId !== 'playlistPanel' && targetId !== 'musicList') {
 		if (songIndex === targetIndex) {
-			audio.paused ? playSong() : pauseSong();
+			if (audio.paused) {
+				playSong();
+			} else {
+				userPaused = true;// 用户主动暂停（点当前播放的那首）
+				pauseSong();
+			}
 		} else {
 			// 点击后设置一下当前播放音乐的index，不然songindex还是之前的，到下一首就会以之前播放的音乐为下一首跳转
 			songIndex = targetIndex;
@@ -183,6 +188,9 @@ window.musicList.addEventListener('click', function (e) {
 let mErrTimeout = null;
 let lastChange = "nextSong";
 let errorCount = 0;
+// 用户主动点了暂停按钮（区别于「MV 起播时程序自己暂停音频」），
+// 这种状态下加载出错就不再自动跳下一首，尊重用户的暂停意图
+let userPaused = false;
 // 音乐加载错误
 function MusicError() {
 	errorCount++;
@@ -195,15 +203,21 @@ function MusicError() {
 	clearTimeout(mErrTimeout);
 	title.textContent = '已暂停';
 	mErrTimeout = setTimeout(() => {
-		let playIconClassList = playBtn.querySelector('i.fas').classList;
-		if (playIconClassList.contains('fa-pause')) {
-			lastChange === "prevSong" ? prevSong() : nextSong();
-		} else if (playIconClassList.contains('fa-play')) {
-			tanChuang('已暂停自动切换', 3700)
+		// 判断依据从「播放图标是暂停态吗」换成「用户是不是主动暂停了」：
+		// 浏览器拒绝 play() 时图标会被重置成播放态，按图标判断会让自动跳歌永远不成立，
+		// 点到线上未推送的歌（目前 8685 首里有 8200 多首）就停在「已暂停」不动
+		if (userPaused) {
+			tanChuang('已暂停自动切换', 3700);
+			return;
 		}
+		lastChange === "prevSong" ? prevSong() : nextSong();
 	}, 2000)
 }
 audio.addEventListener('error', MusicError);
+// 正常出声就说明这一首没问题，错误计数归零，免得累计几个之后一遇错就停
+audio.addEventListener('playing', function () {
+	errorCount = 0;
+});
 
 // 更新歌曲细节
 function loadSong(song) {
@@ -230,13 +244,21 @@ function scrollToIng() {
 	var childElement = document.querySelectorAll('.musliIng')[0];
 	if (!childElement) return;// 列表还没渲染到当前播放项时不做定位，否则这里会直接报错
 
+	// 当前行已经完整落在可视区里就不用滚：点列表某行、点相邻的下一首时它本来就在眼前，
+	// 每次都滚一遍纯属白费；而跨越几千行的滚动会让主线程忙着布局刚进入视口的行
+	const pRect = parentElement.getBoundingClientRect();
+	const cRect = childElement.getBoundingClientRect();
+	if (cRect.top >= pRect.top && cRect.bottom <= pRect.bottom) return;
+
 	// 计算父元素到子元素的距离
 	var distanceToScroll = childElement.offsetTop - (parentElement.offsetTop * 1.2);// 默认是直接滚到顶部，*1.1就是多往下滚动一行，也就到了top位置，*1.2就滚动了两行，在这里也就是滚动到中间，因为css设置高度只够显示3行
 
-	// 设置父元素的滚动位置
+	// behavior 用 auto（瞬时）而不是 smooth：
+	// 列表滚在第 100 首时点下一首跳到第 8000 首，smooth 要一路平滑滚十几万像素，
+	// 途中每一帧都要把新进入视口的行布局一遍，主线程被占死几秒，表现就是整页点不动（只有封面动画还在转）
 	parentElement.scrollTo({
 		top: distanceToScroll,
-		behavior: 'smooth'
+		behavior: 'auto'
 	})
 }
 
@@ -245,6 +267,7 @@ function playSong() {
 	if (window.audioMvVideo1) {
 		audioMvVideo1.pause();
 	}
+	userPaused = false;// 开始播放就说明用户想听，出错后允许自动跳下一首
 
 	// 清除错误超时
 	clearTimeout(mErrTimeout);
@@ -297,6 +320,7 @@ function prevSong() {
 	loadSong(songs[songIndex]);
 
 	lastChange = "prevSong";
+	userPaused = false;// 主动切歌视为要继续播
 }
 // 下一首
 function nextSong() {
@@ -309,6 +333,7 @@ function nextSong() {
 	loadSong(songs[songIndex]);
 
 	lastChange = "nextSong";
+	userPaused = false;// 主动切歌视为要继续播
 }
 
 // 创建一个MutationObserver实例
@@ -583,7 +608,12 @@ function setProgress(e) {
 // 事件监听
 // 1.播放歌曲
 playBtn.onclick = function () {
-	musicContainer.classList.contains('play') ? pauseSong() : playSong()
+	if (musicContainer.classList.contains('play')) {
+		userPaused = true;// 用户主动暂停：之后加载出错不再自动跳下一首
+		pauseSong();
+	} else {
+		playSong();
+	}
 }
 // 2.切换歌曲
 prevBtn.onclick = prevSong
