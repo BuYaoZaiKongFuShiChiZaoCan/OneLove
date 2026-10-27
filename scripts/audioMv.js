@@ -495,11 +495,37 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 	// musicInfo.poster ? video.poster = musicInfo.poster : void 0;
 	// 视频类型（条目没写 type 时默认 mp4）
 	video.type = musicInfo.type || "video/mp4";
-	// MV 文件不存在时（本地有但未推送到线上等）自动降级：移除播放器，退回音乐播放
+	// 视频起不来时的音频兜底：只有「确实不能播放」才让音乐响。
+	// 还在加载阶段（readyState 不够）不插音频——视频在转圈、音乐先响会很怪；
+	// autoplay=false（页面初始化那次）也不插，否则一进页面就自动出声
+	let mvFallbackUsed = false;
+	function fallbackToAudio() {
+		if (mvFallbackUsed) return;
+		mvFallbackUsed = true;
+		playSong();
+	}
+	// MV 文件不存在 / 解码失败：移除播放器，让音频顶上
 	video.onerror = function () {
 		this.remove();
 		window.audioMvVideo1 = null;
+		if (autoplay) {// 页面初始化那次（autoplay=false）不自动出声
+			mvFallbackUsed = false;// 视频中途失败也算「不能播放」，允许音频顶上
+			fallbackToAudio();
+		}
 	};
+	// 有数据了却始终没开始播 = 自动播放被浏览器权限拦下（手机上切歌没有点击手势时最常见）→ 音频顶上
+	if (autoplay) {
+		video.oncanplay = function () {
+			setTimeout(function () {
+				// 用户在这 1 秒里主动按了暂停，就别再把音频放出来
+				if (typeof userPaused !== 'undefined' && userPaused) return;
+				if (!mvFallbackUsed && video.isConnected && !video.error &&
+					video.paused && !video.ended && video.readyState >= 2) {
+					fallbackToAudio();
+				}
+			}, 1000);
+		};
+	}
 	if (isNew) {
 		audioMv.appendChild(video);
 	}
@@ -509,6 +535,7 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 	//    之前据此移除视频，导致 MV 全部消失。播放交给 autoplay 属性；
 	//    若浏览器拦截了自动播放，视频保留在面板里，用户点一下控制条即可播放。
 	video.onplay = function () {
+		mvFallbackUsed = true;// 视频真的播起来了，不需要音频兜底（下面会把音频停掉）
 		// 设置音乐进度为视频进度
 		let savedTime = parseFloat(window.localStorage.getItem("musicTime")) || 0;
 		if (savedTime > 0 && savedTime < video.duration) {

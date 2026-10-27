@@ -62,14 +62,21 @@ function scrollToIng2() {
     // 获取父元素和子元素
     var parentElement = window.dog;
     var childElement = document.querySelectorAll('.musliIng')[1];
+    if (!childElement) return;// 弹窗里的列表还没渲染到当前播放项
+
+    // 当前播放行已经完整在可视区内就不用滚：点相邻的下一首时它本来就在眼前
+    var pRect = parentElement.getBoundingClientRect();
+    var cRect = childElement.getBoundingClientRect();
+    if (cRect.top >= pRect.top && cRect.bottom <= pRect.bottom) return;
 
     // 计算父元素到子元素的距离
     var distanceToScroll = childElement.offsetTop - (parentElement.clientHeight / 2);
 
-    // 设置父元素的滚动位置
+    // behavior 用 auto（瞬时）而不是 smooth：和主列表一样，
+    // 跨越几千行的平滑滚动会让主线程逐帧布局新进入视口的行，卡住整页
     parentElement.scrollTo({
         top: distanceToScroll,
-        behavior: 'smooth'
+        behavior: 'auto'
     })
 }
 
