@@ -161,16 +161,88 @@ window.musicList.addEventListener('click', function (e) {
 let mErrTimeout = null;
 let lastChange = "nextSong";
 let errorCount = 0;
+// 连续失败上限：出错一次就先自动跳下一首，连跳这么多首都失败才真停下来
+const MAX_ERR = 5;
+// 停下来时往后探测多少首去找「确定能播」的那一首
+const PROBE_LIMIT = 50;
+// 探测到可播歌曲后用它切歌、但不要自动播放；用一次就消掉
+let suppressAutoplay = false;
+
+/**
+ * 成功出声就把连败计数清零。
+ * 「连续 5 次失败」必须是连续的：原来没有清零，一天里累计 5 次失败就会被判成连败，
+ * 这也是一路播下来偶尔「出错就直接暂停」的原因之一。
+ */
+audio.addEventListener('playing', function () {
+	errorCount = 0;
+});
+
+/**
+ * 探测某一首线上是否真的有 mp3。
+ * 实测 Netlify：文件存在 → 200 + content-type: audio/mpeg；不存在 → 404 + text/html。
+ * 不带 Range 的 HEAD 就够了，不会真去下 4MB。
+ * @param {number} index songs 下标
+ * @param {(ok:boolean)=>void} callback 结果回调
+ */
+function probePlayable(index, callback) {
+	const name = songs[index];
+	if (!name) { callback(false); return; }
+	fetch(`music/${name}.mp3`, { method: 'HEAD' })
+		.then(function (res) {
+			const type = res.headers.get('content-type') || '';
+			callback(res.ok && type.indexOf('audio') === 0);
+		})
+		.catch(function () { callback(false); });
+}
+
+/**
+ * 从当前歌曲往后找第一首确实能播的（最多探测 maxTries 首）。
+ * 找不到（含绕回原点）回传 null。
+ * @param {number} maxTries 最多探测几首
+ * @param {(index:number|null)=>void} callback 命中下标或 null
+ */
+function findPlayableAfter(maxTries, callback) {
+	let tries = 0;
+	let idx = songIndex;
+	function step() {
+		if (tries >= maxTries) { callback(null); return; }
+		tries++;
+		idx = (idx + 1) % songs.length;
+		if (idx === songIndex) { callback(null); return; }// 绕回原点了，说明整轮都没有
+		probePlayable(idx, function (ok) {
+			ok ? callback(idx) : step();
+		});
+	}
+	step();
+}
+
+/**
+ * 连败到达上限：暂停，并把播放位置挪到一首「确定能播」的歌上（不自动播）。
+ * 不这么做的话，停下来的很可能又是一首 404，用户点播放立刻再错一次。
+ */
+function stopAfterErrors() {
+	errorCount = 0;
+	pauseSong();
+	title.textContent = '已暂停';
+	tanChuang(`连续 ${MAX_ERR} 首加载失败，已暂停`, 2000);
+	findPlayableAfter(PROBE_LIMIT, function (idx) {
+		if (idx === null) return;// 后面 PROBE_LIMIT 首都探测不到音频，就停在当前这首
+		songIndex = idx;
+		suppressAutoplay = true;
+		loadSong(songs[songIndex]);
+		pauseSong();
+	});
+}
+
 // 音乐加载错误
 function MusicError() {
 	errorCount++;
-	if (errorCount > 3) {
-		tanChuang('加载错误次数过多，已暂停', 2000);
-		pauseSong();
-		errorCount = 0;
+	clearTimeout(mErrTimeout);
+	// 连败到上限：停下来（不再无限往后跳）
+	if (errorCount >= MAX_ERR) {
+		stopAfterErrors();
 		return;
 	}
-	clearTimeout(mErrTimeout);
 	title.textContent = '已暂停';
 	mErrTimeout = setTimeout(() => {
 		let playIconClassList = playBtn.querySelector('i.fas').classList;
@@ -325,7 +397,10 @@ const observer = new MutationObserver((mutationsList) => {
 			updateVideo();
 
 			// 存在mv且在播放状态就暂停播放
-			if (musicinfo = findMusic(title.textContent)) {
+			if (suppressAutoplay) {
+				// stopAfterErrors() 探测到可播歌曲后的一次性压制：切过去但保持暂停
+				suppressAutoplay = false;
+			} else if (musicinfo = findMusic(title.textContent)) {
 				// Mv 有MV的歌曲会切换后会优先自动播放MV
 				audioMvmain(musicinfo);
 			} else {
@@ -523,6 +598,37 @@ function createLrcElements() {
 		dogLrc.textContent = '';
 		dogLrc.append(cloneFrag);
 	}
+}
+
+/**
+ * 点击最大化弹窗里的某一句歌词 → 从这一句的开始时间继续播放。
+ * 只作用于 #dog 里那份克隆出来的歌词（id = dogLrc）：主界面 #lyricPanel 的点击已经被
+ * maxScreen.js 占作「打开最大化」，两者不能抢同一个点击，所以主界面保持原样。
+ * 用事件委托挂在 dialog 上而不是挂在 ul 上：每次打开弹窗都会重新克隆一份歌词，
+ * 挂在 ul 上的监听会随节点一起被换掉。
+ */
+const dogDialog = document.getElementById('dog');
+if (dogDialog) {
+	dogDialog.addEventListener('click', function (e) {
+		const li = e.target.closest ? e.target.closest('li') : null;
+		if (!li || !window.dogLrc || !window.dogLrc.contains(li)) return;
+		if (!lrcData || !lrcData.length) return;
+		// 克隆出来的 li 都是新节点，只能按「在 ul 里的序号」对上 lrcData 的下标
+		const index = Array.prototype.indexOf.call(window.dogLrc.children, li);
+		if (index < 0 || !lrcData[index]) return;
+		const seekTime = lrcData[index].time;
+		if (typeof seekTime !== 'number' || isNaN(seekTime)) return;
+
+		// MV 在播时声音来自 video（此时 audio 被 pauseSong 停着），要跳 video，否则会双声
+		const mv = window.audioMvVideo1;
+		if (mv && mv.isConnected && !mv.paused) {
+			mv.currentTime = seekTime;
+			return;
+		}
+		audio.currentTime = seekTime;
+		// 暂停状态下点歌词就直接接着放；不然只跳进度，看起来像没反应
+		if (audio.paused) playSong();
+	});
 }
 
 // 进度条更新
