@@ -369,7 +369,11 @@ const observer = new MutationObserver((mutationsList) => {
 				dogLrc.style.transform = `translateY(0px)`;
 			}
 			listupdate();
-			scrollToIng();
+			// 实验（2026-10-27 19:50）：切歌后不再自动滚动列表。
+			// 用户反馈「点下一首必卡、点列表行不卡」，两条路径唯一的差别就是这里：
+			// 点列表行时目标行就在视口内（scrollToIng 会直接 return），点下一首时目标行常在视口外，会滚一次。
+			// 先停掉这一步验证卡顿是否由滚动引起，确认后再决定是永久去掉还是换更轻的方式。
+			// scrollToIng();
 
 			// 不管有没有MV都要更新一下video块区内容
 			updateVideo();
