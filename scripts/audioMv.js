@@ -478,7 +478,7 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 		// 设置音量
 		// video.volume = 0.5;
 		// 预加载
-		// video.preload = "auto";
+		video.preload = "auto";
 		// 控制条
 		video.controls = true;
 	} else {

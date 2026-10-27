@@ -73,13 +73,34 @@ function listupdate() {
  * @returns {void}
  */
 function measureRowHeight() {
-	const first = window.musicList.children[1];// [0] 是 h2，[1] 才是第一首歌
-	if (!first) return;
-	const h = first.getBoundingClientRect().height;
-	if (h > 0) {
-		document.documentElement.style.setProperty('--row-h', Math.round(h) + 'px');
+	const children = window.musicList.children;// [0] 是 h2，歌曲行从 [1] 开始
+	if (!children || children.length < 2) return;
+	// 采样已真实布局的前若干行取中位数：
+	// 只量第一行容易偏小——中文字体晚到或首行还没排完时量到的高度会低于最终值，
+	// 占位高度一旦偏小，浏览器给视口外的行留的空间就少，滚动时位置一路漂、还反复重排。
+	// 取最大值又会被换行的长歌名带偏（两行高），所以用中位数。
+	const hs = [];
+	const limit = Math.min(children.length - 1, 20);
+	for (let i = 1; i <= limit; i++) {
+		const h = children[i].getBoundingClientRect().height;
+		if (h > 0) hs.push(h);
 	}
+	if (!hs.length) return;
+	hs.sort((a, b) => a - b);
+	const h = hs[Math.floor(hs.length / 2)];
+	document.documentElement.style.setProperty('--row-h', Math.round(h) + 'px');
 }
+
+// 字体就绪后重新量一次：中文字体是异步加载的，加载完成前后行高会变
+if (document.fonts && document.fonts.ready) {
+	document.fonts.ready.then(measureRowHeight);
+}
+// 屏幕旋转 / 窗口尺寸变化会改变换行，行高跟着变，重新量
+let rowHResizeTimer = null;
+window.addEventListener('resize', function () {
+	clearTimeout(rowHResizeTimer);
+	rowHResizeTimer = setTimeout(measureRowHeight, 200);
+});
 
 // 输出列表，使用更高阶的分时函数去封装，也就是不让这个插入元素时阻塞浏览器渲染，分段去渲染，回到16.6ms渲染一次的状态
 // 手机等触屏设备单片插 400 行会让主线程长时间忙不过来，期间点播放/切歌都没反应，单片减到 80
@@ -94,6 +115,7 @@ function performChunk(datas) {
 	// 开启下一个分片的执行
 	function _run() {
 		if (i >= datas.length) {// 大于了也就是输出结束了
+			measureRowHeight();// 全部行都在了，用更多样本再校准一次占位高度
 			listupdate();
 			if (!scrolled) scrollToIng();
 			return;
@@ -237,7 +259,10 @@ function playSong() {
 			// 只有真被浏览器自动播放策略拦截才提示；
 			// AbortError 是「播放被新的加载打断」（如快速切歌），下一次播放会自动接上，静默即可
 			if (err && err.name === 'NotAllowedError') {
-				tanChuang('浏览器阻止了自动播放，请再点一次播放', 3000);
+				// 提示里带上浏览器给出的具体原因（拿不到 message 时退回错误名），
+				// 只说「被阻止」看不出为什么，等于没提示
+				const reason = (err.message || '').trim() || err.name;
+				tanChuang('播放被阻止：' + reason, 4000);
 			}
 		});
 	}
