@@ -1568,6 +1568,24 @@ main#main-body #sidePanel #cbThree #musicList>div {
     contain-intrinsic-size: auto var(--row-h, 19px);
 }
 
+/* ↑ 上面那句「只给电脑用」，手机端必须关掉，原因（2026-10-27 实测）：
+   content-visibility:auto 会对每一条歌曲行（列表共 8685 行、每页只显示 9 行）
+   反复做一次「是否进入视口」的判定；电脑 CPU 每次耗时 85–193ms，点「下一首」
+   只是稍等一下就响应，感觉不出来；手机 CPU 每次 750–1800ms，点下去主线程被
+   整段占满，按钮回调排在后面 —— 表现就是「点下一首卡住、整页没反应」，
+   而封面旋转（合成器动画）和触摸滚动（原生滚动）不走主线程，所以看着还活着。
+   宽度 390→1920px 实测开销几乎不变（不是屏幕大小的锅），所以这里不能用宽度
+   当唯一开关：触屏设备（pointer: coarse）一律关掉，另外窄窗口兜底 ≤1100px，
+   覆盖低配笔记本/平板横屏等慢机器。电脑宽屏 + 鼠标时保持开启，白拿那点渲染优化。
+   关掉后只是回到「一次把 8685 行全排一遍」的老行为，首屏进列表会慢一点，
+   但不再有持续的主线程占用。 */
+@media (pointer: coarse), (max-width: 1100px) {
+    main#main-body #sidePanel #cbThree #musicList>div {
+        content-visibility: visible;
+        contain-intrinsic-size: none;
+    }
+}
+
 main#main-body #sidePanel #cbThree #musicList>div.musliIng {
     color: violet;
 }

@@ -81,6 +81,17 @@
     contain-intrinsic-size: auto var(--row-h, 19px);
 }
 
+/* 同上（style.css 里的 #musicList 那段有完整说明）：最大化列表也装了 8685 行，
+   content-visibility:auto 在手机 CPU 上每次判定 750–1800ms，会把主线程堵死，
+   导致「点下一首卡住」。这里与 style.css 保持同一套开关：触屏 + 窄窗口关掉，
+   电脑宽屏保留。两处必须一起改，只改一边的话 #dog 这份克隆出来的列表仍会卡。 */
+@media (pointer: coarse), (max-width: 1100px) {
+    #dog>div {
+        content-visibility: visible;
+        contain-intrinsic-size: none;
+    }
+}
+
 #dog>div.musliIng {
     padding: 5px;
     background: chartreuse;
