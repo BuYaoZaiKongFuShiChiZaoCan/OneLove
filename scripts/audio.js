@@ -73,34 +73,13 @@ function listupdate() {
  * @returns {void}
  */
 function measureRowHeight() {
-	const children = window.musicList.children;// [0] 是 h2，歌曲行从 [1] 开始
-	if (!children || children.length < 2) return;
-	// 采样已真实布局的前若干行取中位数：
-	// 只量第一行容易偏小——中文字体晚到或首行还没排完时量到的高度会低于最终值，
-	// 占位高度一旦偏小，浏览器给视口外的行留的空间就少，滚动时位置一路漂、还反复重排。
-	// 取最大值又会被换行的长歌名带偏（两行高），所以用中位数。
-	const hs = [];
-	const limit = Math.min(children.length - 1, 20);
-	for (let i = 1; i <= limit; i++) {
-		const h = children[i].getBoundingClientRect().height;
-		if (h > 0) hs.push(h);
+	const first = window.musicList.children[1];// [0] 是 h2，[1] 才是第一首歌
+	if (!first) return;
+	const h = first.getBoundingClientRect().height;
+	if (h > 0) {
+		document.documentElement.style.setProperty('--row-h', Math.round(h) + 'px');
 	}
-	if (!hs.length) return;
-	hs.sort((a, b) => a - b);
-	const h = hs[Math.floor(hs.length / 2)];
-	document.documentElement.style.setProperty('--row-h', Math.round(h) + 'px');
 }
-
-// 字体就绪后重新量一次：中文字体是异步加载的，加载完成前后行高会变
-if (document.fonts && document.fonts.ready) {
-	document.fonts.ready.then(measureRowHeight);
-}
-// 屏幕旋转 / 窗口尺寸变化会改变换行，行高跟着变，重新量
-let rowHResizeTimer = null;
-window.addEventListener('resize', function () {
-	clearTimeout(rowHResizeTimer);
-	rowHResizeTimer = setTimeout(measureRowHeight, 200);
-});
 
 // 输出列表，使用更高阶的分时函数去封装，也就是不让这个插入元素时阻塞浏览器渲染，分段去渲染，回到16.6ms渲染一次的状态
 // 手机等触屏设备单片插 400 行会让主线程长时间忙不过来，期间点播放/切歌都没反应，单片减到 80
@@ -115,7 +94,6 @@ function performChunk(datas) {
 	// 开启下一个分片的执行
 	function _run() {
 		if (i >= datas.length) {// 大于了也就是输出结束了
-			measureRowHeight();// 全部行都在了，用更多样本再校准一次占位高度
 			listupdate();
 			if (!scrolled) scrollToIng();
 			return;
@@ -171,12 +149,7 @@ window.musicList.addEventListener('click', function (e) {
 	let targetIndex = +targetId;
 	if (targetId && targetId !== 'playlistPanel' && targetId !== 'musicList') {
 		if (songIndex === targetIndex) {
-			if (audio.paused) {
-				playSong();
-			} else {
-				userPaused = true;// 用户主动暂停（点当前播放的那首）
-				pauseSong();
-			}
+			audio.paused ? playSong() : pauseSong();
 		} else {
 			// 点击后设置一下当前播放音乐的index，不然songindex还是之前的，到下一首就会以之前播放的音乐为下一首跳转
 			songIndex = targetIndex;
@@ -188,9 +161,6 @@ window.musicList.addEventListener('click', function (e) {
 let mErrTimeout = null;
 let lastChange = "nextSong";
 let errorCount = 0;
-// 用户主动点了暂停按钮（区别于「MV 起播时程序自己暂停音频」），
-// 这种状态下加载出错就不再自动跳下一首，尊重用户的暂停意图
-let userPaused = false;
 // 音乐加载错误
 function MusicError() {
 	errorCount++;
@@ -203,21 +173,15 @@ function MusicError() {
 	clearTimeout(mErrTimeout);
 	title.textContent = '已暂停';
 	mErrTimeout = setTimeout(() => {
-		// 判断依据从「播放图标是暂停态吗」换成「用户是不是主动暂停了」：
-		// 浏览器拒绝 play() 时图标会被重置成播放态，按图标判断会让自动跳歌永远不成立，
-		// 点到线上未推送的歌（目前 8685 首里有 8200 多首）就停在「已暂停」不动
-		if (userPaused) {
-			tanChuang('已暂停自动切换', 3700);
-			return;
+		let playIconClassList = playBtn.querySelector('i.fas').classList;
+		if (playIconClassList.contains('fa-pause')) {
+			lastChange === "prevSong" ? prevSong() : nextSong();
+		} else if (playIconClassList.contains('fa-play')) {
+			tanChuang('已暂停自动切换', 3700)
 		}
-		lastChange === "prevSong" ? prevSong() : nextSong();
 	}, 2000)
 }
 audio.addEventListener('error', MusicError);
-// 正常出声就说明这一首没问题，错误计数归零，免得累计几个之后一遇错就停
-audio.addEventListener('playing', function () {
-	errorCount = 0;
-});
 
 // 更新歌曲细节
 function loadSong(song) {
@@ -244,21 +208,13 @@ function scrollToIng() {
 	var childElement = document.querySelectorAll('.musliIng')[0];
 	if (!childElement) return;// 列表还没渲染到当前播放项时不做定位，否则这里会直接报错
 
-	// 当前行已经完整落在可视区里就不用滚：点列表某行、点相邻的下一首时它本来就在眼前，
-	// 每次都滚一遍纯属白费；而跨越几千行的滚动会让主线程忙着布局刚进入视口的行
-	const pRect = parentElement.getBoundingClientRect();
-	const cRect = childElement.getBoundingClientRect();
-	if (cRect.top >= pRect.top && cRect.bottom <= pRect.bottom) return;
-
 	// 计算父元素到子元素的距离
 	var distanceToScroll = childElement.offsetTop - (parentElement.offsetTop * 1.2);// 默认是直接滚到顶部，*1.1就是多往下滚动一行，也就到了top位置，*1.2就滚动了两行，在这里也就是滚动到中间，因为css设置高度只够显示3行
 
-	// behavior 用 auto（瞬时）而不是 smooth：
-	// 列表滚在第 100 首时点下一首跳到第 8000 首，smooth 要一路平滑滚十几万像素，
-	// 途中每一帧都要把新进入视口的行布局一遍，主线程被占死几秒，表现就是整页点不动（只有封面动画还在转）
+	// 设置父元素的滚动位置
 	parentElement.scrollTo({
 		top: distanceToScroll,
-		behavior: 'auto'
+		behavior: 'smooth'
 	})
 }
 
@@ -267,7 +223,6 @@ function playSong() {
 	if (window.audioMvVideo1) {
 		audioMvVideo1.pause();
 	}
-	userPaused = false;// 开始播放就说明用户想听，出错后允许自动跳下一首
 
 	// 清除错误超时
 	clearTimeout(mErrTimeout);
@@ -282,10 +237,7 @@ function playSong() {
 			// 只有真被浏览器自动播放策略拦截才提示；
 			// AbortError 是「播放被新的加载打断」（如快速切歌），下一次播放会自动接上，静默即可
 			if (err && err.name === 'NotAllowedError') {
-				// 提示里带上浏览器给出的具体原因（拿不到 message 时退回错误名），
-				// 只说「被阻止」看不出为什么，等于没提示
-				const reason = (err.message || '').trim() || err.name;
-				tanChuang('播放被阻止：' + reason, 4000);
+				tanChuang('浏览器阻止了自动播放，请再点一次播放', 3000);
 			}
 		});
 	}
@@ -320,7 +272,6 @@ function prevSong() {
 	loadSong(songs[songIndex]);
 
 	lastChange = "prevSong";
-	userPaused = false;// 主动切歌视为要继续播
 }
 // 下一首
 function nextSong() {
@@ -333,7 +284,6 @@ function nextSong() {
 	loadSong(songs[songIndex]);
 
 	lastChange = "nextSong";
-	userPaused = false;// 主动切歌视为要继续播
 }
 
 // 创建一个MutationObserver实例
@@ -369,11 +319,7 @@ const observer = new MutationObserver((mutationsList) => {
 				dogLrc.style.transform = `translateY(0px)`;
 			}
 			listupdate();
-			// 实验（2026-10-27 19:50）：切歌后不再自动滚动列表。
-			// 用户反馈「点下一首必卡、点列表行不卡」，两条路径唯一的差别就是这里：
-			// 点列表行时目标行就在视口内（scrollToIng 会直接 return），点下一首时目标行常在视口外，会滚一次。
-			// 先停掉这一步验证卡顿是否由滚动引起，确认后再决定是永久去掉还是换更轻的方式。
-			// scrollToIng();
+			scrollToIng();
 
 			// 不管有没有MV都要更新一下video块区内容
 			updateVideo();
@@ -612,12 +558,7 @@ function setProgress(e) {
 // 事件监听
 // 1.播放歌曲
 playBtn.onclick = function () {
-	if (musicContainer.classList.contains('play')) {
-		userPaused = true;// 用户主动暂停：之后加载出错不再自动跳下一首
-		pauseSong();
-	} else {
-		playSong();
-	}
+	musicContainer.classList.contains('play') ? pauseSong() : playSong()
 }
 // 2.切换歌曲
 prevBtn.onclick = prevSong
