@@ -493,8 +493,8 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 		video.poster = musicInfo.poster;
 	}
 	// musicInfo.poster ? video.poster = musicInfo.poster : void 0;
-	// 视频类型
-	video.type = musicInfo.type;
+	// 视频类型（条目没写 type 时默认 mp4）
+	video.type = musicInfo.type || "video/mp4";
 	// MV 文件不存在时（本地有但未推送到线上等）自动降级：移除播放器，退回音乐播放
 	video.onerror = function () {
 		this.remove();
@@ -503,19 +503,19 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 	if (isNew) {
 		audioMv.appendChild(video);
 	}
-	// 元素加载完成后
-	// ⚠️ video 元素没有 onload 事件（那是 Image 的），这里直接尝试播放；
-	//    手机浏览器自动播放策略拒绝 play() 时必须回退到音乐播放，否则视频和音频都不响，像卡死一样
-	let playAttempt = video.play();
-	if (playAttempt && typeof playAttempt.catch === 'function') {
-		playAttempt.catch(function () {
-			video.onerror = null;
-			if (typeof video.pause === 'function') video.pause();
-			video.remove();
-			window.audioMvVideo1 = null;
-			audioMv.textContent = "";
-			playSong();// 回退：继续播放音频
-		});
+	// ⚠️ 不要在这里手动 video.play()：
+	// 1) video 元素没有 onload 事件（那是 Image 的）；
+	// 2) 刚创建/刚换 src 就 play()，手机上会因「加载被打断」抛 AbortError，
+	//    之前据此移除视频，导致 MV 全部消失。播放交给 autoplay 属性；
+	//    若浏览器拦截了自动播放，视频保留在面板里，用户点一下控制条即可播放。
+	if (isNew && autoplay) {
+		// 兜底提示：3 秒后还没播出去（多为自动播放被浏览器拦截），提示手动点击，不移除 MV
+		setTimeout(function () {
+			const v = document.querySelector("#audioMvVideo1");
+			if (v && v.paused && !v.ended) {
+				tanChuang('MV 已就绪，自动播放被浏览器拦截，点击视频即可播放', 3000);
+			}
+		}, 3000);
 	}
 	video.onplay = function () {
 		// 设置音乐进度为视频进度

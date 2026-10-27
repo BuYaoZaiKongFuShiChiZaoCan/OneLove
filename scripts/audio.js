@@ -230,11 +230,15 @@ function playSong() {
 	// 不 catch 的话界面已经切成「暂停图标」但实际没声音，看起来就像卡住没反应
 	const playAttempt = audio.play();
 	if (playAttempt && typeof playAttempt.catch === 'function') {
-		playAttempt.catch(function () {
+		playAttempt.catch(function (err) {
 			musicContainer.classList.remove('play');
 			playBtn.querySelector('i.fas').classList.remove('fa-pause');
 			playBtn.querySelector('i.fas').classList.add('fa-play');
-			tanChuang('浏览器阻止了自动播放，请再点一次播放', 3000);
+			// 只有真被浏览器自动播放策略拦截才提示；
+			// AbortError 是「播放被新的加载打断」（如快速切歌），下一次播放会自动接上，静默即可
+			if (err && err.name === 'NotAllowedError') {
+				tanChuang('浏览器阻止了自动播放，请再点一次播放', 3000);
+			}
 		});
 	}
 	// 元素添加类名
