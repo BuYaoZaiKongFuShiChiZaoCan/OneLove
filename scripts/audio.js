@@ -82,7 +82,8 @@ function measureRowHeight() {
 }
 
 // 输出列表，使用更高阶的分时函数去封装，也就是不让这个插入元素时阻塞浏览器渲染，分段去渲染，回到16.6ms渲染一次的状态
-const CHUNK_MAX = 400;// 单片条数上限：timeRemaining 偶尔会虚高，防止一口气把几千条插进 DOM
+// 手机等触屏设备单片插 400 行会让主线程长时间忙不过来，期间点播放/切歌都没反应，单片减到 80
+const CHUNK_MAX = (window.matchMedia && matchMedia('(pointer: coarse)').matches) ? 80 : 400;// 单片条数上限：timeRemaining 偶尔会虚高，防止一口气把几千条插进 DOM
 function performChunk(datas) {
 	if (datas.length === 0) {
 		return;
@@ -225,7 +226,17 @@ function playSong() {
 
 	// 清除错误超时
 	clearTimeout(mErrTimeout);
-	audio.play();
+	// 手机浏览器（尤其 iOS 低电量模式、微信内置浏览器）可能拒绝 play()，
+	// 不 catch 的话界面已经切成「暂停图标」但实际没声音，看起来就像卡住没反应
+	const playAttempt = audio.play();
+	if (playAttempt && typeof playAttempt.catch === 'function') {
+		playAttempt.catch(function () {
+			musicContainer.classList.remove('play');
+			playBtn.querySelector('i.fas').classList.remove('fa-pause');
+			playBtn.querySelector('i.fas').classList.add('fa-play');
+			tanChuang('浏览器阻止了自动播放，请再点一次播放', 3000);
+		});
+	}
 	// 元素添加类名
 	musicContainer.classList.add("play");
 	playBtn.querySelector('i.fas').classList.remove('fa-play');
@@ -275,15 +286,19 @@ function nextSong() {
 const observer = new MutationObserver((mutationsList) => {
 	for (let mutation of mutationsList) {
 		if (mutation.type === 'attributes' && mutation.attributeName === 'src') {
-			let musliIng = document.querySelector('.musliIng');
-			let musliIngOpt = musliIng.style.opacity;
-			if (musliIngOpt !== undefined && musliIngOpt !== '') {
-				musliIng.style.opacity = parseFloat(musliIngOpt) - 0.5;
-				if (musliIngOpt <= 0.5) {
-					musliIng.style.opacity = 0.3; // 确保透明度不小于0.3
+			// 列表还没分片渲染到当前行时 .musliIng 不存在，这里必须判空，
+			// 否则抛 TypeError 中断整个回调，后面的 playSong() 不会执行（表现为切歌卡住没反应）
+			const musliIng = document.querySelector('.musliIng');
+			if (musliIng) {
+				let musliIngOpt = musliIng.style.opacity;
+				if (musliIngOpt !== undefined && musliIngOpt !== '') {
+					musliIng.style.opacity = parseFloat(musliIngOpt) - 0.5;
+					if (musliIngOpt <= 0.5) {
+						musliIng.style.opacity = 0.3; // 确保透明度不小于0.3
+					}
+				} else {
+					musliIng.style.opacity = 0.8;
 				}
-			} else {
-				musliIng.style.opacity = 0.8;
 			}
 
 			// src属性发生变化时的处理逻辑 音乐改变

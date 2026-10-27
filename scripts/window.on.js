@@ -1,7 +1,11 @@
 // 页面加载时触发
 window.onload = function () {
     // 获取音乐的播放时间
-    audio.currentTime = window.localStorage.getItem('musicTime');
+    // ⚠️ localStorage 里可能是 null/空串/非数字，直接赋给 currentTime 会得到 NaN
+    let savedTime = parseFloat(window.localStorage.getItem('musicTime'));
+    if (isFinite(savedTime) && savedTime > 0) {
+        audio.currentTime = savedTime;
+    }
 }
 
 // 页面关闭时候触发

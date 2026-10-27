@@ -446,9 +446,17 @@ let mvList = [
 function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) {
 	if (!musicInfo || !musicInfo.srcLocalhost) return; // 无本地 MV 时直接跳过，避免 video.src = null
 	let audioMvVideo1Element = window.audioMvVideo1;
+	// isConnected 防御：面板被 updateVideo 清空后，window 上可能还残留已脱离文档的旧引用，
+	// 复用这种元素会改了 src 却显示不出来，必须当不存在处理、重新创建
+	if (audioMvVideo1Element && !audioMvVideo1Element.isConnected) {
+		audioMvVideo1Element = null;
+		window.audioMvVideo1 = null;
+	}
 	let video = null;
+	let isNew = false;
 	if (!audioMvVideo1Element) {
 		// 创建一个video元素
+		isNew = true;
 		video = document.createElement("video");
 		// 设置ID为audioMvVideo
 		video.id = "audioMvVideo1";
@@ -459,6 +467,10 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 		video.src = musicInfo.srcLocalhost;
 		// 设置自动播放
 		video.autoplay = autoplay;
+		// 手机端必须内联播放：iOS 不加 playsinline 会强制全屏，部分安卓浏览器会直接拒绝播放
+		video.playsInline = true;
+		video.setAttribute('playsinline', '');
+		video.setAttribute('webkit-playsinline', '');
 		// 设置循环播放
 		// video.loop = true;
 		// 设置静音播放
@@ -471,10 +483,15 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 		video.controls = true;
 	} else {
 		// 如果视频元素已经存在直接改属性就行了
+		// ⚠️ 必须把局部 video 指向已存在元素：之前这里 video 保持 null，
+		//    下面的 video.type = ... 会抛 TypeError 中断切歌流程，音乐也不播放（表现为卡住没反应）
+		video = audioMvVideo1Element;
 		audioMvVideo1Element.src = musicInfo.srcLocalhost;
 	}
 	// 视频封面
-	musicInfo.poster && (video.poster = musicInfo.poster);
+	if (isNew && musicInfo.poster) {
+		video.poster = musicInfo.poster;
+	}
 	// musicInfo.poster ? video.poster = musicInfo.poster : void 0;
 	// 视频类型
 	video.type = musicInfo.type;
@@ -483,11 +500,23 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 		this.remove();
 		window.audioMvVideo1 = null;
 	};
-	audioMv.appendChild(video);
+	if (isNew) {
+		audioMv.appendChild(video);
+	}
 	// 元素加载完成后
-	video.onload = function () {
-		video.play()
-	};
+	// ⚠️ video 元素没有 onload 事件（那是 Image 的），这里直接尝试播放；
+	//    手机浏览器自动播放策略拒绝 play() 时必须回退到音乐播放，否则视频和音频都不响，像卡死一样
+	let playAttempt = video.play();
+	if (playAttempt && typeof playAttempt.catch === 'function') {
+		playAttempt.catch(function () {
+			video.onerror = null;
+			if (typeof video.pause === 'function') video.pause();
+			video.remove();
+			window.audioMvVideo1 = null;
+			audioMv.textContent = "";
+			playSong();// 回退：继续播放音频
+		});
+	}
 	video.onplay = function () {
 		// 设置音乐进度为视频进度
 		let savedTime = parseFloat(window.localStorage.getItem("musicTime")) || 0;
@@ -509,15 +538,21 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 	video.onpause = function () {
 		// 设置音乐进度为视频进度
 		// window.localStorage.setItem("musicTime", video.currentTime); // 这里取消是因为在切换音乐的时候会影响到loaclstorage的修改
-		document.webkitCancelFullScreen();
+		// 只在真的处于全屏时才退出，部分手机浏览器非全屏状态调用会抛错
+		if (document.fullscreenElement || document.webkitFullscreenElement) {
+			document.webkitCancelFullScreen();
+		}
 	};
 	video.onended = function () {
 		lastChange === "prevSong" ? prevSong() : nextSong();
 	};
+	// 复用已存在的视频元素时，标题/描述/播放源按钮都还在面板里，直接返回，避免重复堆积
+	if (!isNew) return;
 	// 添加标题等表述元素
-	let title = document.createElement("h3");
-	title.classList.add("audioMvTitle");
-	title.textContent = musicInfo.title;
+	// ⚠️ 不要命名为 title，会遮蔽全局的 title 元素（audio.js 依赖它）
+	let mvTitle = document.createElement("h3");
+	mvTitle.classList.add("audioMvTitle");
+	mvTitle.textContent = musicInfo.title;
 	let desc = document.createElement("p");
 	desc.classList.add("audioMvDesc");
 
@@ -560,7 +595,7 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 		playSourceButtonList.push(button);
 	}
 	desc.textContent = musicInfo.desc;
-	audioMv.appendChild(title);
+	audioMv.appendChild(mvTitle);
 	// 创建按钮容器，添加边距和间距
 	let buttonContainer = document.createElement("div");
 	buttonContainer.classList.add("playSourceButtonContainer");
