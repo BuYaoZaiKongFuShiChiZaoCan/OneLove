@@ -506,6 +506,8 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 	}
 	// MV 文件不存在 / 解码失败：移除播放器，让音频顶上
 	video.onerror = function () {
+		// 已经被切歌清掉的旧 video：迟到的 error 不能去动全局引用，否则会把新 MV 的引用清空
+		if (!this.isConnected) return;
 		this.remove();
 		window.audioMvVideo1 = null;
 		if (autoplay) {// 页面初始化那次（autoplay=false）不自动出声
@@ -535,13 +537,24 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 	//    之前据此移除视频，导致 MV 全部消失。播放交给 autoplay 属性；
 	//    若浏览器拦截了自动播放，视频保留在面板里，用户点一下控制条即可播放。
 	video.onplay = function () {
+		/**
+		 * 已经被 updateVideo 清掉的旧 video，它的 play 事件可能迟到。
+		 * 不拦的话，这个迟到的 onplay 会执行下面的 pauseSong()，把刚刚切过去、已经开始播的
+		 * 新歌停掉 —— 这正是「从 MV 切到没有 MV 的歌，再点一次播放才有效」的原因。
+		 */
+		if (!video.isConnected) return;
 		mvFallbackUsed = true;// 视频真的播起来了，不需要音频兜底（下面会把音频停掉）
+		// MV 播起来同样算「播放成功」，把音频那边的连续失败计数清掉，
+		// 否则一路用 MV 听下去，计数只增不清，攒到 5 次就会莫名其妙整组停下
+		errorCount = 0;
 		// 设置音乐进度为视频进度
 		let savedTime = parseFloat(window.localStorage.getItem("musicTime")) || 0;
 		if (savedTime > 0 && savedTime < video.duration) {
 			video.currentTime = savedTime;
 		}
-		pauseSong();
+		// 这里是「声音改由视频出」的内部暂停，不是用户按了暂停：
+		// 传 false 避免把 playIntent 清成 false，否则从 MV 切回普通歌曲时会被当成用户不想听
+		pauseSong(false);
 		// 视频最大化
 		if (video.requestFullscreen) {
 			video.requestFullscreen();
@@ -626,15 +639,29 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 // 更新video元素
 function updateVideo() {
 	let video = document.querySelector("#audioMvVideo1");
-	if (video) {
-		// 判断如果video.src包含title.textContent
-		if (decodeURIComponent(video.src).includes(title.textContent)) {
-			window.localStorage.setItem("musicTime", video.currentTime);
-		} else {
-			// 移除#audioMvPanel中的所有元素
-			audioMv.textContent = "";
-		}
+	if (!video) return;
+	// 歌名里可能带 % 之类的字符，decodeURIComponent 会抛错并中断整个切歌回调
+	// （回调一断，后面的播放/暂停判断全都不执行，表现为切歌后没反应）
+	let srcDecoded = video.src;
+	try {
+		srcDecoded = decodeURIComponent(video.src);
+	} catch (e) { }
+	// 判断如果video.src包含title.textContent
+	if (srcDecoded.includes(title.textContent)) {
+		window.localStorage.setItem("musicTime", video.currentTime);
+		return;
 	}
+	// 切到别的歌了：把 MV 面板清空。
+	// 先 pause 让 onpause 把全屏退掉，再解绑所有会影响播放的回调：
+	// 这个 video 马上要被移出文档，它迟到的 play/ended 事件会去暂停、切走刚刚开始播的新歌。
+	try { video.pause(); } catch (e) { }
+	video.onplay = null;
+	video.oncanplay = null;
+	video.onerror = null;
+	video.onended = null;
+	window.audioMvVideo1 = null;
+	// 移除#audioMvPanel中的所有元素
+	audioMv.textContent = "";
 }
 
 // 查找ID与歌曲对应的元素

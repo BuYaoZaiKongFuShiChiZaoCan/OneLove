@@ -5,14 +5,26 @@ function updateLyrics() {
 
     const offset = lrc.childNodes[validIndex] ? lrc.childNodes[validIndex].offsetTop - 20 : 0;
 
-    if (Yindex !== validIndex && !lyricPanelMouse) {
+    if (Yindex !== validIndex) {
         Yindex = validIndex;
         const finalOffset = Math.max(0, offset);
 
         requestAnimationFrame(() => {
-            lyricPanel.scroll(0, finalOffset);
+            /**
+             * 主界面：鼠标停在歌词上时不抢滚动（用户可能正在看/手动滚）。
+             * 最大化弹窗（#dog）：必须始终跟随。
+             * 原来两者共用 lyricPanelMouse 这一个开关 —— 点主界面歌词打开最大化以后，
+             * 鼠标根本没离开原来那个位置，mouseleave 不会触发，开关一直是 true，
+             * 于是最大化里的歌词再也不跟着滚了（用户报的「最大化歌词不滚动」就是这个）。
+             */
+            if (!lyricPanelMouse) {
+                lyricPanel.scroll(0, finalOffset);
+            }
             if (window.dogLrc) {
-                dog.scroll(0, finalOffset - dogHeight / 2);
+                // dogHeight 只在从歌词面板打开时才有值，从播放列表面板打开时为 undefined，
+                // 这时按当前高度现场算，避免 NaN 让 scroll 整个失效
+                const half = (typeof dogHeight === 'number' && dogHeight > 0) ? dogHeight : dog.clientHeight / 2;
+                dog.scroll(0, Math.max(0, finalOffset - half));
             }
         });
     }
@@ -60,12 +72,31 @@ function updateLyricStyles(container, index) {
     }
 }
 
-// 动画循环函数
+/**
+ * 动画循环函数
+ * 加两处保护：
+ * 1) try/catch —— 原来 updateLyrics() 一抛错，后面的 requestAnimationFrame 就排不上，
+ *    整条循环永久停住，直到下次 play 事件才可能恢复（表现就是「歌词不跟着滚了」）。
+ * 2) lrcLoopRunning 标志 —— 循环因为暂停而退出时置回 false，play/playing/seeking 都能重新拉起，
+ *    不必依赖某一个事件一定要触发。
+ */
+let lrcLoopRunning = false;
 function animationLoop() {
-    if (!audio.paused && !audio.ended) {
-        updateLyrics();
-        requestAnimationFrame(animationLoop);
+    if (audio.paused || audio.ended) {
+        lrcLoopRunning = false;
+        return;
     }
+    try {
+        updateLyrics();
+    } catch (err) {
+        console.error('歌词更新出错：', err);
+    }
+    requestAnimationFrame(animationLoop);
+}
+function startLrcLoop() {
+    if (lrcLoopRunning) return;
+    lrcLoopRunning = true;
+    requestAnimationFrame(animationLoop);
 }
 
 /**
@@ -78,12 +109,22 @@ lyricPanelMouse = true;
 }
 window.lyricPanel.onmouseleave = function () {// 鼠标移出时执行
 lyricPanelMouse = false;
+    // 悬停期间 Yindex 已经一路更新到当前句，直接调 updateLyrics 不会触发滚动，
+    // 强制让 Yindex 失配一次，把主界面歌词拉回当前句
+    Yindex = -1;
     updateLyrics()
 }
 
 // 当音频开始播放时启动动画循环
-audio.addEventListener('play', () => {
-    requestAnimationFrame(animationLoop);
+audio.addEventListener('play', function () {
+    startLrcLoop();
+});
+// 播放真正出声、以及拖进度条之后，都确保循环在跑（循环万一断了也能自己接上）
+audio.addEventListener('playing', function () {
+    startLrcLoop();
+});
+audio.addEventListener('seeking', function () {
+    if (!audio.paused) startLrcLoop();
 });
 
 // 当音频暂停或结束时停止动画循环

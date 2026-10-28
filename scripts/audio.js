@@ -175,6 +175,13 @@ let suppressAutoplay = false;
  * 只有 playSong() 置 true、pauseSong() 置 false，用户点暂停才算真的不想播。
  */
 let playIntent = false;
+/**
+ * 本首歌是否已经真正出声过。
+ * 「音频加载中…」只用于「切歌后还没响」的阶段；播放中拖进度条也会派发 waiting，
+ * 若不加这道闸，拖一次进度条歌词就被换成加载提示，而且不再是第一次出声，
+ * playing 事件不一定再触发，提示会一直卡在那儿（实测复现过）。
+ */
+let songStarted = false;
 
 /**
  * 成功出声就把连败计数清零。
@@ -183,6 +190,35 @@ let playIntent = false;
  */
 audio.addEventListener('playing', function () {
 	errorCount = 0;
+	songStarted = true;
+	setPlayUI(true);
+	// 音频真的开始出声了，把「音频加载中…」换回歌词
+	restoreLrc();
+});
+
+/**
+ * 外观以真实播放状态为准（详见 setPlayUI 的注释）。
+ * play 在「开始播」时触发，playing 在「确实有数据在出声」时触发，两者都说明该显示播放中。
+ */
+audio.addEventListener('play', function () {
+	setPlayUI(true);
+});
+
+/**
+ * 真正的暂停（含播完、出错停下）→ 显示暂停图标。
+ * 切歌时改 src 派发的是 emptied 而不是 pause，所以这里不会把「马上要播的新歌」误标成暂停。
+ */
+audio.addEventListener('pause', function () {
+	if (audio.ended) return;
+	setPlayUI(false);
+});
+
+/**
+ * 缓冲中（有播放意图但还没数据）→ 歌词位置提示「音频加载中…」。
+ * 用户反馈：切歌后界面看着没问题，实际还没出声，分不清是在加载还是已经播了。
+ */
+audio.addEventListener('waiting', function () {
+	if (playIntent && audio.readyState < 3) showAudioLoading();
 });
 
 /**
@@ -245,7 +281,6 @@ function findPlayableAfter(maxTries, callback) {
 function stopAfterErrors() {
 	errorCount = 0;
 	pauseSong();
-	title.textContent = '已暂停';
 	tanChuang(`连续 ${MAX_ERR} 首加载失败，已暂停`, 2000);
 	findPlayableAfter(PROBE_LIMIT, function (idx) {
 		if (idx === null) return;// 后面 PROBE_LIMIT 首都探测不到音频，就停在当前这首
@@ -265,8 +300,8 @@ function MusicError() {
 		stopAfterErrors();
 		return;
 	}
-	title.textContent = '已暂停';
 	mErrTimeout = setTimeout(() => {
+		mErrTimeout = null;
 		// 只要还想播（playIntent）就往后跳；用户自己按了暂停才不动
 		if (playIntent) {
 			lastChange === "prevSong" ? prevSong() : nextSong();
@@ -279,6 +314,16 @@ audio.addEventListener('error', MusicError);
 
 // 更新歌曲细节
 function loadSong(song) {
+	/**
+	 * 切歌必须作废上一次「出错后自动跳下一首」的定时器。
+	 * 之前只有 playSong() 里清，切到「有 MV 的歌」走的是 audioMvmain() 分支，不会清，
+	 * 于是旧的 2 秒定时器在切歌之后又触发一次 nextSong —— 表现就是明明切到了下一首，
+	 * 却又被多跳一首（用户报的「能正常播放却被自动切走，切回上一首才听得到」）。
+	 */
+	clearTimeout(mErrTimeout);
+	mErrTimeout = null;
+	// 新的一首：还没出声，「音频加载中…」可以显示；出声后由 playing 事件关掉
+	songStarted = false;
 	title.textContent = song;
 	audio.src = `music/${song}.mp3`;
 	musicCover.src = `music/audio/${song}.png`;
@@ -312,47 +357,68 @@ function scrollToIng() {
 	})
 }
 
+/**
+ * 统一切换播放器外观（封面旋转 + 播放/暂停图标）。
+ * 关键：外观只应该反映「真实播放状态」。原来 playSong() 里先同步改成「播放中」，
+ * 一旦 audio.play() 返回的 promise 被拒（AbortError：播放请求被下一次加载打断），
+ * catch 就把图标改回「暂停」，可音频其实随后照常出声了 —— 于是「明明在播，却显示暂停」，
+ * 用户点一下按钮才「恢复」，看起来就是每次切歌都要手动点一次。
+ * 现在改为：按钮点下去先乐观设一次（保证手感），之后一律以 audio 的 play/playing/pause 事件为准。
+ * @param {boolean} on true=显示播放中，false=显示已暂停
+ */
+function setPlayUI(on) {
+	const icon = playBtn.querySelector('i.fas');
+	if (on) {
+		musicContainer.classList.add('play');
+		if (icon) { icon.classList.remove('fa-play'); icon.classList.add('fa-pause'); }
+	} else {
+		musicContainer.classList.remove('play');
+		if (icon) { icon.classList.remove('fa-pause'); icon.classList.add('fa-play'); }
+	}
+}
+
 // 播放歌曲
 function playSong() {
-	if (window.audioMvVideo1) {
-		audioMvVideo1.pause();
+	// 只暂停还挂在文档里的 video：被 updateVideo 清掉的那份已经 detached，
+	// 对它 pause() 会触发迟到的 onpause（退出全屏），没有任何意义
+	if (window.audioMvVideo1 && window.audioMvVideo1.isConnected) {
+		window.audioMvVideo1.pause();
 	}
 
 	// 清除错误超时
 	clearTimeout(mErrTimeout);
+	mErrTimeout = null;
 	playIntent = true;
+	// 先乐观设一次外观，让点击立刻有反馈；真正的状态由下面的 play/playing/pause 事件兜底
+	setPlayUI(true);
+
 	// 手机浏览器（尤其 iOS 低电量模式、微信内置浏览器）可能拒绝 play()，
 	// 不 catch 的话界面已经切成「暂停图标」但实际没声音，看起来就像卡住没反应
 	const playAttempt = audio.play();
 	if (playAttempt && typeof playAttempt.catch === 'function') {
 		playAttempt.catch(function (err) {
-			musicContainer.classList.remove('play');
-			playBtn.querySelector('i.fas').classList.remove('fa-pause');
-			playBtn.querySelector('i.fas').classList.add('fa-play');
-			// 只有真被浏览器自动播放策略拦截才提示；
-			// AbortError 是「播放被新的加载打断」（如快速切歌），下一次播放会自动接上，静默即可
+			// AbortError = 播放请求被下一次加载/播放打断。此时音频往往紧接着照常开始播，
+			// 这里一旦把外观改回「暂停」，就会出现「在播却显示暂停」——所以直接交给
+			// play/playing/pause 事件判断，不能用 promise 的结果定外观。
+			if (err && err.name === 'AbortError') return;
+			if (audio.paused) setPlayUI(false);
 			if (err && err.name === 'NotAllowedError') {
 				tanChuang('浏览器阻止了自动播放，请再点一次播放', 3000);
 			}
 		});
 	}
-	// 元素添加类名
-	musicContainer.classList.add("play");
-	playBtn.querySelector('i.fas').classList.remove('fa-play');
-	playBtn.querySelector('i.fas').classList.add('fa-pause');
-
-	// 如果因为错误暂停就自动下一首
-	if (title.textContent == '已暂停') {
-		nextSong();
-	}
 }
 
-// 停止播放
-function pauseSong() {
-	playIntent = false;
-	musicContainer.classList.remove('play');
-	playBtn.querySelector('i.fas').classList.add('fa-play');
-	playBtn.querySelector('i.fas').classList.remove('fa-pause');
+/**
+ * 停止播放
+ * @param {boolean} [userAction] 是否是用户自己按的暂停（默认是）。
+ *   MV 开始播放时（audioMv.js 的 video.onplay）会用 pauseSong(false) 把音频停掉，
+ *   这只是「声音改由视频出」，不代表用户不想听。原来不区分，MV 一播就把 playIntent 清成
+ *   false，之后从 MV 切回普通歌曲时，出错逻辑以为用户暂停了 → 不自动跳、要再点一次播放。
+ */
+function pauseSong(userAction) {
+	if (userAction !== false) playIntent = false;
+	setPlayUI(false);
 
 	audio.pause();
 }
@@ -420,14 +486,21 @@ const observer = new MutationObserver((mutationsList) => {
 			// 不管有没有MV都要更新一下video块区内容
 			updateVideo();
 
+			// 用局部变量，别再往全局隐式赋值（原来写的是 musicinfo = findMusic(...)）
+			const musicinfo = findMusic(title.textContent);
 			// 存在mv且在播放状态就暂停播放
 			if (suppressAutoplay) {
 				// stopAfterErrors() 探测到可播歌曲后的一次性压制：切过去但保持暂停
 				suppressAutoplay = false;
-			} else if (musicinfo = findMusic(title.textContent)) {
+			} else if (musicinfo) {
 				// Mv 有MV的歌曲会切换后会优先自动播放MV
+				// 有 MV 时声音不由音频出，audio 不会有 playing 事件。上一首留下的「音频加载中…」
+				// 必须在这里结束，否则歌词会永远停在提示上（getLrc 即使拉回了歌词也不会渲染）
+				audioLoading = false;
 				audioMvmain(musicinfo);
 			} else {
+				// 无 MV 的歌：音频还没到能播的程度，先在歌词位置说明「在加载」，别让人以为已经在播了
+				if (audio.readyState < 3) showAudioLoading();
 				playSong();
 			}
 		}
@@ -446,6 +519,37 @@ observer.observe(audio, observerConfig);
 let lrcContent
 // 歌词存储object
 let lrc = document.querySelector('#lrc');
+
+/**
+ * 是否正处在「音频还在加载」的状态。
+ * 用户要求：切歌后音频还没准备好时，就在歌词的位置显示「音频加载中」，
+ * 而不是把上一首的歌词留在那儿（界面看着正常，其实还没出声，分不清是在加载还是已经播了）。
+ */
+let audioLoading = false;
+
+/** 在歌词位置显示「音频加载中…」，并把当前歌词数据留着，等真正出声再渲染 */
+function showAudioLoading() {
+	// 已经出过声了：这次只是拖进度条/短暂缓冲，歌词不能被提示盖掉
+	if (songStarted) return;
+	audioLoading = true;
+	if (lrc) lrc.textContent = '音频加载中…';
+	if (window.dogLrc) window.dogLrc.textContent = '音频加载中…';
+}
+
+/**
+ * 音频真正出声（playing）后把歌词恢复出来。
+ * 加载期间 getLrc 可能已经把歌词拉回来了（lrcData 有值）只是没渲染，这里直接重建；
+ * 万一还没拉回来（网络慢），再请求一次。
+ */
+function restoreLrc() {
+	if (!audioLoading) return;
+	audioLoading = false;
+	if (lrcData && lrcData.length) {
+		createLrcElements();
+	} else {
+		getLrc(songs[songIndex]);
+	}
+}
 /**
  * 歌词获取
  * @param {string} titC 歌词名称
@@ -528,9 +632,6 @@ function parseLrc() {
 		};
 		lrcData = result;
 		createLrcElements();
-
-		// 设置li高度
-		liHeight = lrc.children[0].clientHeight;
 		return result;
 	} else {
 		// lrcContent==false
@@ -599,6 +700,8 @@ let frag = document.createDocumentFragment(); //文档片段
  * 创建歌词元素
  */
 function createLrcElements() {
+	// 音频还在加载：保留「音频加载中…」提示，等 playing 事件再渲染歌词
+	if (audioLoading) return;
 	lrc.textContent = '';
 	/* 优化后，只改一次 dom 树，当然现在这里内容很少，可以不需要做这样的优化 */
 	for (var i = 0; i < lrcData.length; i++) {
@@ -621,6 +724,13 @@ function createLrcElements() {
 	if (window.dogLrc) {
 		dogLrc.textContent = '';
 		dogLrc.append(cloneFrag);
+	}
+
+	// 记录一行歌词的真实高度，供歌词滚动/高亮使用。
+	// 原来在 parseLrc 里算，但「音频加载中」时 createLrcElements 会提前返回、DOM 里没有 li，
+	// 那里取值会抛错，所以挪到这里：只要真的渲染了歌词就一定算得到。
+	if (lrc.children[0]) {
+		liHeight = lrc.children[0].clientHeight;
 	}
 }
 
