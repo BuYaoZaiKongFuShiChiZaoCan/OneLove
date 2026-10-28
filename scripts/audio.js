@@ -168,6 +168,13 @@ const PROBE_LIMIT = 200;
 // 探测到可播歌曲后用它切歌、但不要自动播放；用一次就消掉
 let suppressAutoplay = false;
 /**
+ * 「我们主动把 MV 视频停掉」的时间窗（毫秒时间戳），不是用户按的暂停。
+ * playSong() 会 pause 还在播的 MV 视频（声音改由音频出）。video 的 pause 事件是异步派发的，
+ * 用一个立刻复位的一次性布尔标志会在事件到达前就被清掉，所以用时间窗。
+ * audioMv.js 的 video.onpause 据此区分「用户主动暂停」和「我们改播音频」。
+ */
+let suppressVideoPauseUntil = 0;
+/**
  * 「我们是否想要播放」——用来判断出错后该不该自动跳下一首。
  * 不能再看播放按钮的图标状态：404 时 audio.play() 会以 NotSupportedError 被拒，
  * playSong() 的 catch 于是把图标改回 fa-play，旧的判断据此以为「用户按了暂停」，
@@ -414,6 +421,9 @@ function playSong() {
 	// 只暂停还挂在文档里的 video：被 updateVideo 清掉的那份已经 detached，
 	// 对它 pause() 会触发迟到的 onpause（退出全屏），没有任何意义
 	if (window.audioMvVideo1 && window.audioMvVideo1.isConnected) {
+		// 这是我们为了改播音频而主动停视频，不是用户按了暂停：开一个时间窗，
+		// 让 audioMv.js 的 video.onpause 别把这次 pause 误记成「用户不想听了」
+		suppressVideoPauseUntil = Date.now() + 500;
 		window.audioMvVideo1.pause();
 	}
 

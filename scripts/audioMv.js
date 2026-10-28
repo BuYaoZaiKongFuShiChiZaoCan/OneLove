@@ -523,19 +523,18 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 			fallbackToAudio();
 		}
 	};
-	// 有数据了却始终没开始播 = 自动播放被浏览器权限拦下（手机上切歌没有点击手势时最常见）→ 音频顶上
-	if (autoplay) {
-		video.oncanplay = function () {
-			setTimeout(function () {
-				// 用户在这 1 秒里主动按了暂停，就别再把音频放出来
-				if (typeof userPaused !== 'undefined' && userPaused) return;
-				if (!mvFallbackUsed && video.isConnected && !video.error &&
-					video.paused && !video.ended && video.readyState >= 2) {
-					fallbackToAudio();
-				}
-			}, 1000);
-		};
-	}
+	/**
+	 * ⚠️ 这里原来有一段「canplay 之后等 1 秒，视频还是 paused 就判定自动播放被浏览器拦截 →
+	 * 回退音频」。实测证明这个判断是错的，而且是「视频都加载出来了，放的却是音频」的直接原因：
+	 *   线上实测 25.181s 触发 canplay（readyState=3、有 0.3s 缓冲），同一时刻 video.paused 仍为 true
+	 *   —— 因为 autoplay 属性根本没有触发播放（见下面 startMvPlayback 的说明）。
+	 *   1.2 秒后这段定时器把「有数据但没播」当成「被浏览器拦了」，调用 fallbackToAudio() →
+	 *   playSong()：音频起播的同时反过来把视频 pause 掉。视频就这么在马上要播的一刻被自己人判死。
+	 * 那段里的 `typeof userPaused !== 'undefined'` 也是个从未生效的守卫：userPaused 这个变量
+	 * 在全项目里没有定义，typeof 永远返回字符串 'undefined'，条件恒为 false。
+	 * 现在只在「真的出错」时回退音频（见上面的 video.onerror），加载慢就一直等，
+	 * 期间歌词位置显示「MV 正在加载中…」，不会静默变成音频。
+	 */
 	if (isNew) {
 		audioMv.appendChild(video);
 		/**
@@ -546,11 +545,39 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 		 */
 		window.audioMvVideo1 = video;
 	}
-	// ⚠️ 不要在这里手动 video.play()：
-	// 1) video 元素没有 onload 事件（那是 Image 的）；
-	// 2) 刚创建/刚换 src 就 play()，手机上会因「加载被打断」抛 AbortError，
-	//    之前据此移除视频，导致 MV 全部消失。播放交给 autoplay 属性；
-	//    若浏览器拦截了自动播放，视频保留在面板里，用户点一下控制条即可播放。
+	/**
+	 * 不能依赖 video.autoplay = true。上面的创建顺序是「先 src、再 autoplay、最后 appendChild」，
+	 * 元素还没插入文档时设置 autoplay，这条自动播放请求会被丢掉，之后也不会补上 ——
+	 * 线上实测 25 秒 canplay 那一刻 paused 仍是 true，就是它没生效的证明。
+	 * 元素真正插入文档之后再显式调 play()，才会触发加载并开始播放。
+	 *
+	 * 出错分三种，处理方式不同：
+	 * - AbortError：播放请求被下一次换源/加载打断。下一次播放会自动接上，静默忽略
+	 *   （之前把它当失败、移除视频，导致 MV 全部消失）。
+	 * - NotAllowedError：浏览器确实要求用户手势。退一步静音播放，再提示点一下开声音，
+	 *   这样不会停在「什么都不动」的死状态。iOS 低电量模式、微信内置浏览器常见。
+	 * - NotSupportedError 等：文件真的拿不到，交给 video.onerror 回退音频。
+	 */
+	function startMvPlayback() {
+		if (!video.isConnected) return;
+		const attempt = video.play();
+		if (!attempt || typeof attempt.then !== 'function') return;
+		attempt.catch(function (err) {
+			const name = err && err.name;
+			if (name === 'AbortError') return;
+			if (name === 'NotAllowedError' && video.isConnected) {
+				video.muted = true;
+				const retry = video.play();
+				if (retry && typeof retry.then === 'function') {
+					retry.then(function () {
+						if (video.isConnected) tanChuang('已静音播放，点击视频可开启声音', 3500);
+					}).catch(function () {
+						// 静音也被拒（极少数环境）：保留「MV 正在加载中…」，等用户点控制条
+					});
+				}
+			}
+		});
+	}
 	video.onplay = function () {
 		/**
 		 * 已经被 updateVideo 清掉的旧 video，它的 play 事件可能迟到。
@@ -596,16 +623,33 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 		if (autoplay) showLoading('mv');
 	};
 	video.onpause = function () {
+		if (!this.isConnected) return;
 		// 设置音乐进度为视频进度
 		// window.localStorage.setItem("musicTime", video.currentTime); // 这里取消是因为在切换音乐的时候会影响到loaclstorage的修改
 		// 只在真的处于全屏时才退出，部分手机浏览器非全屏状态调用会抛错
 		if (document.fullscreenElement || document.webkitFullscreenElement) {
 			document.webkitCancelFullScreen();
 		}
+		/**
+		 * 用户主动按了暂停 → 记下「不想听了」，界面同步成暂停。
+		 * 要排除两种不是用户意图的 pause：
+		 * ① 播完（ended 为 true，onended 会去切下一首，不算暂停）；
+		 * ② 我们为了改播音频而主动 pause 视频（audio.js 的 playSong 会置一个短暂时间窗）。
+		 * 原来这个位置判断的是 `typeof userPaused !== 'undefined'`，而 userPaused 在全项目里
+		 * 根本没有定义，typeof 恒返回字符串 'undefined'，那段守卫从未生效过。
+		 */
+		if (!video.ended && playIntent && Date.now() > suppressVideoPauseUntil) {
+			playIntent = false;
+			setPlayUI(false);
+			setCoverSpin(false);
+		}
 	};
 	video.onended = function () {
 		lastChange === "prevSong" ? prevSong() : nextSong();
 	};
+	// 开始播放。两个分支都要走：新建的要播，复用元素改了 src 的也要播。
+	// autoplay=false（页面初始化那次）只预加载、不出声。
+	if (autoplay) startMvPlayback();
 	// 复用已存在的视频元素时，标题/描述/播放源按钮都还在面板里，直接返回，避免重复堆积
 	if (!isNew) return;
 	// 添加标题等表述元素
