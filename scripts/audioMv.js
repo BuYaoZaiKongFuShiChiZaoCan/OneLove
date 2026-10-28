@@ -530,6 +530,13 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 	}
 	if (isNew) {
 		audioMv.appendChild(video);
+		/**
+		 * 显式记下引用（audio.js 靠它判断「MV 是否正在播」，避免音频和视频同时出声）。
+		 * 原来只靠 <video id="audioMvVideo1"> 自动挂到 window 的命名访问 —— 那种映射是
+		 * 隐式且有条件的：只要某处执行过 window.audioMvVideo1 = null，就会生成一个覆盖它的
+		 * 自有属性，之后即使再插入同 id 的元素也拿不到，引用就此永久失效。
+		 */
+		window.audioMvVideo1 = video;
 	}
 	// ⚠️ 不要在这里手动 video.play()：
 	// 1) video 元素没有 onload 事件（那是 Image 的）；
