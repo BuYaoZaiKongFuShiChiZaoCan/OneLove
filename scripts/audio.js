@@ -190,15 +190,18 @@ let songStarted = false;
  */
 audio.addEventListener('playing', function () {
 	errorCount = 0;
-	songStarted = true;
+	markSoundStarted();
 	setPlayUI(true);
-	// 音频真的开始出声了，把「音频加载中…」换回歌词
+	// 真正出声了封面才转（封面 = 有没有声音，不是「点了没点」）
+	setCoverSpin(true);
+	// 音频真的开始出声了，把加载提示换回歌词
 	restoreLrc();
 });
 
 /**
  * 外观以真实播放状态为准（详见 setPlayUI 的注释）。
  * play 在「开始播」时触发，playing 在「确实有数据在出声」时触发，两者都说明该显示播放中。
+ * 注意这里不动封面：play 只是「请求开始」，此时可能还在缓冲，出声了由 playing 打开。
  */
 audio.addEventListener('play', function () {
 	setPlayUI(true);
@@ -209,6 +212,8 @@ audio.addEventListener('play', function () {
  * 切歌时改 src 派发的是 emptied 而不是 pause，所以这里不会把「马上要播的新歌」误标成暂停。
  */
 audio.addEventListener('pause', function () {
+	// 没声音了封面就停（播完也一样，所以要放在下面的 ended 判断之前）
+	setCoverSpin(false);
 	if (audio.ended) return;
 	setPlayUI(false);
 });
@@ -322,8 +327,10 @@ function loadSong(song) {
 	 */
 	clearTimeout(mErrTimeout);
 	mErrTimeout = null;
-	// 新的一首：还没出声，「音频加载中…」可以显示；出声后由 playing 事件关掉
+	// 新的一首：还没出声，加载提示可以显示；出声后由 playing 事件关掉
 	songStarted = false;
+	// 切歌瞬间封面先停，等本首真的出声再转（上一首的旋转不能延续到这一首）
+	setCoverSpin(false);
 	title.textContent = song;
 	audio.src = `music/${song}.mp3`;
 	musicCover.src = `music/audio/${song}.png`;
@@ -377,6 +384,31 @@ function setPlayUI(on) {
 	}
 }
 
+/**
+ * 封面旋转单独一个开关（类名 audio-on，样式见 style.css）。
+ * 为什么不能复用 .play：.play 的语义是「播放器处于播放状态」，playBtn、键盘快捷键都靠它
+ * 判断「现在按一下该暂停还是该播放」，所以切歌加载中也必须是 true。但封面要表达的是
+ * 「有没有声音」——切歌后还没出声、以及 MV 接管声音（音频被暂停）这两种情况都没有声音。
+ * 两者绑在同一个类上，就会出现用户说的「封面在转，但没有任何声音，状态很奇怪」。
+ * 现在封面只跟 audio 的 playing / pause 事件走。
+ * @param {boolean} on true=封面转（音频真在出声）
+ */
+function setCoverSpin(on) {
+	if (on) {
+		musicContainer.classList.add('audio-on');
+	} else {
+		musicContainer.classList.remove('audio-on');
+	}
+}
+
+/**
+ * 标记「本首已经出过声」。音频和 MV 都算：MV 走 video 播放，音频一直是暂停的，
+ * 如果不标，视频之后每次缓冲（waiting）都会被当成「还没响过」，重新盖上加载提示。
+ */
+function markSoundStarted() {
+	songStarted = true;
+}
+
 // 播放歌曲
 function playSong() {
 	// 只暂停还挂在文档里的 video：被 updateVideo 清掉的那份已经 detached，
@@ -391,6 +423,10 @@ function playSong() {
 	playIntent = true;
 	// 先乐观设一次外观，让点击立刻有反馈；真正的状态由下面的 play/playing/pause 事件兜底
 	setPlayUI(true);
+	// 还没到能出声的程度：立刻在歌词位置说明「音乐正在加载中…」。
+	// 否则点了播放之后封面不转、歌词还是上一首的，看起来像什么都没发生。
+	// （songStarted 为 true 时 showLoading 自己会跳过，播放中拖进度条不会盖住歌词）
+	if (audio.readyState < 3) showLoading('music');
 
 	// 手机浏览器（尤其 iOS 低电量模式、微信内置浏览器）可能拒绝 play()，
 	// 不 catch 的话界面已经切成「暂停图标」但实际没声音，看起来就像卡住没反应
@@ -419,6 +455,8 @@ function playSong() {
 function pauseSong(userAction) {
 	if (userAction !== false) playIntent = false;
 	setPlayUI(false);
+	// 暂停了就没声音，封面必须停（MV 接管声音时也走这里）
+	setCoverSpin(false);
 
 	audio.pause();
 }
@@ -493,10 +531,11 @@ const observer = new MutationObserver((mutationsList) => {
 				// stopAfterErrors() 探测到可播歌曲后的一次性压制：切过去但保持暂停
 				suppressAutoplay = false;
 			} else if (musicinfo) {
-				// Mv 有MV的歌曲会切换后会优先自动播放MV
-				// 有 MV 时声音不由音频出，audio 不会有 playing 事件。上一首留下的「音频加载中…」
-				// 必须在这里结束，否则歌词会永远停在提示上（getLrc 即使拉回了歌词也不会渲染）
-				audioLoading = false;
+				// 有 MV 的歌声音由视频出，audio 不会有 playing 事件，所以歌词不会自动回来。
+				// 先把提示切成「MV 正在加载中」：线上有 80MB 以上的 MV，要十几秒才就绪，
+				// 这段时间没有任何提示的话，界面看着正常、其实既没画面也没声音。
+				// 视频真正播起来时由 video.onplay 调 restoreLrc 把歌词换回来。
+				showLoading('mv');
 				audioMvmain(musicinfo);
 			} else {
 				// 无 MV 的歌：音频还没到能播的程度，先在歌词位置说明「在加载」，别让人以为已经在播了
@@ -521,19 +560,29 @@ let lrcContent
 let lrc = document.querySelector('#lrc');
 
 /**
- * 是否正处在「音频还在加载」的状态。
- * 用户要求：切歌后音频还没准备好时，就在歌词的位置显示「音频加载中」，
- * 而不是把上一首的歌词留在那儿（界面看着正常，其实还没出声，分不清是在加载还是已经播了）。
+ * 是否正处在「还在加载、还没出声」的状态。
+ * 用户要求：只要在加载就要有提示，而且要说清在加载什么——
+ * 有 MV 的歌提示「MV 正在加载中」，普通歌提示「音乐正在加载中」；
+ * 绝对不能出现「界面什么都没说、封面在转、但没有声音」的状态。
  */
 let audioLoading = false;
 
-/** 在歌词位置显示「音频加载中…」，并把当前歌词数据留着，等真正出声再渲染 */
-function showAudioLoading() {
-	// 已经出过声了：这次只是拖进度条/短暂缓冲，歌词不能被提示盖掉
+/**
+ * 在歌词位置显示加载提示，并把当前歌词数据留着，等真正出声再渲染。
+ * @param {'music'|'mv'} kind 这次加载的是音频还是 MV
+ */
+function showLoading(kind) {
+	// 已经出过声了：这次只是拖进度条/视频短暂缓冲，歌词不能被提示盖掉
 	if (songStarted) return;
 	audioLoading = true;
-	if (lrc) lrc.textContent = '音频加载中…';
-	if (window.dogLrc) window.dogLrc.textContent = '音频加载中…';
+	const text = kind === 'mv' ? 'MV 正在加载中…' : '音乐正在加载中…';
+	if (lrc) lrc.textContent = text;
+	if (window.dogLrc) window.dogLrc.textContent = text;
+}
+
+/** 只加载音频时用的简写（waiting 事件等地方调用） */
+function showAudioLoading() {
+	showLoading('music');
 }
 
 /**

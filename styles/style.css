@@ -1370,8 +1370,10 @@ main#main-body #sidePanel #cbThree .img-container img {
     animation-play-state: paused;
 }
 
-main#main-body #sidePanel #cbThree .music-container.play .img-container img {
-    /* 播放 */
+main#main-body #sidePanel #cbThree .music-container.audio-on .img-container img {
+    /* 播放中：只有音频真的在出声时封面才转（audio-on 由 audio 的 playing/pause 事件控制）。
+       .play 表示的是「播放器处于播放意图」，切歌加载中、MV 接管声音时它也是真的，
+       但那两种情况并没有声音，封面跟着转会让人误以为在放。 */
     -webkit-animation-play-state: running;
     animation-play-state: running;
 }

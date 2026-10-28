@@ -495,6 +495,14 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 	// musicInfo.poster ? video.poster = musicInfo.poster : void 0;
 	// 视频类型（条目没写 type 时默认 mp4）
 	video.type = musicInfo.type || "video/mp4";
+	/**
+	 * MV 正在加载：在歌词位置说明「MV 正在加载中…」。
+	 * 线上有大到 80MB 以上的 MV，十几秒都起不来，这段时间既没画面也没声音；
+	 * 没有任何提示的话，界面看着正常，完全判断不出是在加载还是坏了。
+	 * autoplay=false 是页面初始化那一次，用户还没点播放，不该先摆一个加载提示。
+	 * showLoading 内部有「本首已经出过声就不提示」的闸门，视频播放中拖进度条不会盖住歌词。
+	 */
+	if (autoplay) showLoading('mv');
 	// 视频起不来时的音频兜底：只有「确实不能播放」才让音乐响。
 	// 还在加载阶段（readyState 不够）不插音频——视频在转圈、音乐先响会很怪；
 	// autoplay=false（页面初始化那次）也不插，否则一进页面就自动出声
@@ -554,6 +562,11 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 		// MV 播起来同样算「播放成功」，把音频那边的连续失败计数清掉，
 		// 否则一路用 MV 听下去，计数只增不清，攒到 5 次就会莫名其妙整组停下
 		errorCount = 0;
+		// 本首已经出过声（声音由视频出）。标上之后，视频后续的缓冲不会再盖上「MV 正在加载中」，
+		// 也不会把歌词顶掉。
+		markSoundStarted();
+		// MV 出声了：把「MV 正在加载中…」换回歌词
+		restoreLrc();
 		// 设置音乐进度为视频进度
 		let savedTime = parseFloat(window.localStorage.getItem("musicTime")) || 0;
 		if (savedTime > 0 && savedTime < video.duration) {
@@ -572,6 +585,15 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 		} else if (video.msRequestFullscreen) {
 			video.msRequestFullscreen();
 		}
+	};
+	/**
+	 * 视频缓冲（还没起播 / 加载中途）。
+	 * 首次加载时把「MV 正在加载中…」重新摆出来；已经出过声的缓冲会被 showLoading 的闸门挡掉，
+	 * 不会盖住歌词（否则播放中拖一次进度条，提示就永远挂在那儿了）。
+	 */
+	video.onwaiting = function () {
+		if (!this.isConnected) return;
+		if (autoplay) showLoading('mv');
 	};
 	video.onpause = function () {
 		// 设置音乐进度为视频进度
@@ -664,6 +686,7 @@ function updateVideo() {
 	try { video.pause(); } catch (e) { }
 	video.onplay = null;
 	video.oncanplay = null;
+	video.onwaiting = null;
 	video.onerror = null;
 	video.onended = null;
 	window.audioMvVideo1 = null;
