@@ -962,7 +962,10 @@
 		/* 如果浏览器支持加载完成后就开启PWA功能 */
 		if ("serviceWorker" in navigator) {
 			window.addEventListener("load", function () {
-				navigator.serviceWorker.register("./scripts/sw.js")
+				// 必须显式给 scope：sw.js 在 /scripts/ 下，不写 scope 的话作用域默认只有
+				// /scripts/，根路径的 /music/*.mp3 根本拦不到（这也是它以前一直"注册了却不干活"的原因之一）。
+				// scope 用根路径需要服务端发 Service-Worker-Allowed 头，见 netlify.toml。
+				navigator.serviceWorker.register("./scripts/sw.js", { scope: "./" })
 					.then(function (registration) {
 						// console.log('Service Worker 注册成功:', registration.scope);
 					})
