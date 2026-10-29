@@ -438,6 +438,12 @@ let mvList = [
 ]
 
 /**
+ * 「拉不动的 MV」看门狗计时器（模块级，切歌时由 updateVideo 清掉）。
+ * 定义在函数外是因为 updateVideo 要能取消它，否则切走之后旧计时器还会去回退音频。
+ */
+let mvZeroBufTimer = null;
+
+/**
  * 主函数
  * @param {object} musicInfo 音乐信息
  * @param {boolean} autoplay 是否自动播放
@@ -512,10 +518,54 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 		mvFallbackUsed = true;
 		playSong();
 	}
+	/**
+	 * 「拉不动」兜底：30 秒内 buffered 一直为 0（一个字节都没下到）→ 判定这个 MV 下不来，
+	 * 回退音频，免得界面永远停在「MV 正在加载中…」，既没画面也没声音。
+	 * 与「加载慢」严格区分：只要中途缓冲到过任何数据，看门狗立刻收工、之后一直等，
+	 * 再慢也不判死（慢是缓冲在涨，拉不动是纹丝不动）。
+	 * 阈值 30 秒：正常 MV 冷启动 20 秒内就开始缓冲，留一倍余量。
+	 * ⚠️ 已知局限：moov 在文件尾的 mp4（必须整份下完才能拿到元数据）在慢网络下 buffered
+	 * 会长时间为 0，这类文件可能被误判成拉不动；它们的文件本身也不适合流式播放。
+	 */
+	const ZERO_BUF_LIMIT = 30000;
+	function stopZeroBufWatch() {
+		clearTimeout(mvZeroBufTimer);
+		mvZeroBufTimer = null;
+	}
+	function startZeroBufWatch() {
+		stopZeroBufWatch();
+		const deadline = Date.now() + ZERO_BUF_LIMIT;
+		const tick = function () {
+			mvZeroBufTimer = null;
+			if (!video.isConnected) return;                     // 已经切歌 / 被移除
+			if (video.error || video.ended) return;             // 真出错（onerror 另有处理）/ 播完
+			// ⚠️ 不能用 video.paused 判断「是否已起播」：调过 play() 之后 paused 立刻变 false，
+			// 哪怕 readyState 还是 0、一个字节都没下来（实测就是这个假象让看门狗第一轮就退出了）。
+			// 用 currentTime 是否在走作为「真的播起来了」的判据。
+			if (video.currentTime > 0) return;
+			// 有任何一段缓冲 = 数据在下来，只是慢：停止看门狗，后面不再干预
+			if (video.buffered.length > 0 && video.buffered.end(video.buffered.length - 1) > 0) return;
+			if (Date.now() >= deadline) {
+				/**
+				 * ⚠️ 必须先清掉 mvFallbackUsed：play() 一被调用就会派发 play 事件，
+				 * 上面的 video.onplay 会立刻把它置成 true（它把「发了 play 事件」当成「已经播起来」）。
+				 * 不清的话这里的 fallbackToAudio() 会直接 return，兜底等于没做。
+				 * 另外注意 onplay 里不能调 stopZeroBufWatch()：没有数据的元素同样会派发 play 事件，
+				 * 一停就再也等不到 30 秒了（第一版就是这么失效的）。
+				 */
+				mvFallbackUsed = false;
+				fallbackToAudio();
+				return;
+			}
+			mvZeroBufTimer = setTimeout(tick, 2000);
+		};
+		mvZeroBufTimer = setTimeout(tick, 4000);
+	}
 	// MV 文件不存在 / 解码失败：移除播放器，让音频顶上
 	video.onerror = function () {
 		// 已经被切歌清掉的旧 video：迟到的 error 不能去动全局引用，否则会把新 MV 的引用清空
 		if (!this.isConnected) return;
+		stopZeroBufWatch();
 		this.remove();
 		window.audioMvVideo1 = null;
 		if (autoplay) {// 页面初始化那次（autoplay=false）不自动出声
@@ -650,6 +700,8 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 	// 开始播放。两个分支都要走：新建的要播，复用元素改了 src 的也要播。
 	// autoplay=false（页面初始化那次）只预加载、不出声。
 	if (autoplay) startMvPlayback();
+	// 同时开始「30 秒一个字节都没下到就回退音频」的看门狗（起播或缓冲到数据都会让它收工）
+	if (autoplay) startZeroBufWatch();
 	// 复用已存在的视频元素时，标题/描述/播放源按钮都还在面板里，直接返回，避免重复堆积
 	if (!isNew) return;
 	// 添加标题等表述元素
@@ -728,6 +780,9 @@ function updateVideo() {
 	// 先 pause 让 onpause 把全屏退掉，再解绑所有会影响播放的回调：
 	// 这个 video 马上要被移出文档，它迟到的 play/ended 事件会去暂停、切走刚刚开始播的新歌。
 	try { video.pause(); } catch (e) { }
+	// 切走了：取消「拉不动」看门狗，否则它到点还会去回退音频，把新歌停掉
+	clearTimeout(mvZeroBufTimer);
+	mvZeroBufTimer = null;
 	video.onplay = null;
 	video.oncanplay = null;
 	video.onwaiting = null;
