@@ -519,15 +519,16 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 		playSong();
 	}
 	/**
-	 * 「拉不动」兜底：30 秒内 buffered 一直为 0（一个字节都没下到）→ 判定这个 MV 下不来，
+	 * 「拉不动」兜底：60 秒内 buffered 一直为 0（一个字节都没下到）→ 判定这个 MV 下不来，
 	 * 回退音频，免得界面永远停在「MV 正在加载中…」，既没画面也没声音。
-	 * 与「加载慢」严格区分：只要中途缓冲到过任何数据，看门狗立刻收工、之后一直等，
-	 * 再慢也不判死（慢是缓冲在涨，拉不动是纹丝不动）。
-	 * 阈值 30 秒：正常 MV 冷启动 20 秒内就开始缓冲，留一倍余量。
-	 * ⚠️ 已知局限：moov 在文件尾的 mp4（必须整份下完才能拿到元数据）在慢网络下 buffered
-	 * 会长时间为 0，这类文件可能被误判成拉不动；它们的文件本身也不适合流式播放。
+	 * 与「加载慢」区分：只要中途缓冲到过任何数据，看门狗立刻收工、之后一直等，再慢也不判死。
+	 * 阈值 60 秒：线上实测冷启动差别很大——6MB 的《We Will Rock You》要 69 秒才起播，
+	 * 86.9MB 的《浮夸》CDN 回源只有 19.6KB/s（下完要 74 分钟）。30 秒会把前者一起掐掉，
+	 * 放宽到 60 秒；后者仍会被兜底（多等 30 秒，但至少能出声）。
+	 * ⚠️ 已知局限：Chrome 在拿到可解码数据前 buffered 一直是 0，哪怕 CDN 正在传字节，
+	 * 所以「buffered 为 0」不完全等于「一个字节都没下到」；moov 在文件尾的 mp4 尤其容易误判。
 	 */
-	const ZERO_BUF_LIMIT = 30000;
+	const ZERO_BUF_LIMIT = 60000;
 	function stopZeroBufWatch() {
 		clearTimeout(mvZeroBufTimer);
 		mvZeroBufTimer = null;
@@ -551,7 +552,7 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 				 * 上面的 video.onplay 会立刻把它置成 true（它把「发了 play 事件」当成「已经播起来」）。
 				 * 不清的话这里的 fallbackToAudio() 会直接 return，兜底等于没做。
 				 * 另外注意 onplay 里不能调 stopZeroBufWatch()：没有数据的元素同样会派发 play 事件，
-				 * 一停就再也等不到 30 秒了（第一版就是这么失效的）。
+				 * 一停就再也等不到 60 秒了（第一版就是这么失效的）。
 				 */
 				mvFallbackUsed = false;
 				fallbackToAudio();
@@ -700,7 +701,7 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 	// 开始播放。两个分支都要走：新建的要播，复用元素改了 src 的也要播。
 	// autoplay=false（页面初始化那次）只预加载、不出声。
 	if (autoplay) startMvPlayback();
-	// 同时开始「30 秒一个字节都没下到就回退音频」的看门狗（起播或缓冲到数据都会让它收工）
+	// 同时开始「60 秒一个字节都没下到就回退音频」的看门狗（起播或缓冲到数据都会让它收工）
 	if (autoplay) startZeroBufWatch();
 	// 复用已存在的视频元素时，标题/描述/播放源按钮都还在面板里，直接返回，避免重复堆积
 	if (!isNew) return;
