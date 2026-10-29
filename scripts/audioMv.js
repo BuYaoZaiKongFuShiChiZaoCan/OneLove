@@ -20,7 +20,7 @@ let mvList = [
 		title: "【𝟖𝐊_𝟔𝟎𝐅𝐏𝐒】《浮夸》2010DUO演唱会 现场版",
 		srcLocalhost: "./music/mv/浮夸-陈奕迅.mp4",
 		srcNetwork: null,
-		poster: "./music/audio/浮夸-陈奕迅.png",
+		poster: null,
 		desc: "【𝟖𝐊_𝟔𝟎𝐅𝐏𝐒】极限画质_史上最炸裂《浮夸》!没有之一!.浮夸.546484128 《浮夸》现场版，演唱陈奕迅，粵语经典歌曲，太好听了来源 qq.com · 时长 4 分钟35 秒 · 上传时间 2021年2月7日 · 上传人 娟子v音乐"
 		// 上传时间
 		// 上传人
@@ -360,7 +360,7 @@ let mvList = [
 		title: "李健-清华90年校庆合唱《蝴蝶花》《同桌的你》",
 		srcLocalhost: "./music/mv/李健 - 蝴蝶花 (Live).mp4",
 		srcNetwork: null,
-		poster: "./music/audio/李健 - 蝴蝶花 (Live).png",
+		poster: null,
 		desc: "清华大学 90 年校庆，李健与校友合唱《蝴蝶花》《同桌的你》"
 	},
 	{

@@ -1666,21 +1666,27 @@ main#main-body #sidePanel #cbThree .container #lrc {
 }
 
 main#main-body #sidePanel #cbThree .container #lrc li {
-    line-height: 20px;
-    font-size: 15px;
+    /* 基准 = 「放大态」：字号就是原来的 15px × 1.15。
+       以前是反过来的（15px 基准 + 当前句 scale(1.15)），transform 会把这一句的
+       视觉尺寸撑出容器 ==> sidebar 出现横向滚动条、上下句被裁，就是「边界溢出」。
+       现在 li 的 transform 永远 ≤ 1，视觉不可能大于自己的布局盒子，溢出从根上没了。 */
+    line-height: 23px;
+    font-size: 17.25px;
     list-style: none;
     transition: 1.2s;
     height: 100%;
     min-height: 19.6px;
+    transform: scale(0.86957); /* = 1 / 1.15：没唱到的句子缩回原来的 15px 观感 */
+    transform-origin: center;
 }
 
 main#main-body #sidePanel #cbThree .container #lrc li.visited {
-    transform: scale(1);
+    transform: scale(0.86957);
     color: #aaa;
 }
 
 main#main-body #sidePanel #cbThree .container #lrc li.active {
-    transform: scale(1.15);
+    transform: scale(1);
     color: pink;
 }
 
