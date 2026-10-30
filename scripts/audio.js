@@ -340,7 +340,63 @@ function loadSong(song) {
 	setCoverSpin(false);
 	title.textContent = song;
 	audio.src = `music/${song}.mp3`;
-	musicCover.src = `music/audio/${song}.png`;
+	applyCover(song);
+}
+
+/**
+ * 封面加载：优先用 mp3 内嵌的封面（scripts/id3.js 从 ID3v2 的 APIC 帧读），
+ * 没有封面 / 读失败 / 3 秒没读出来 → 回退到原来的 music/audio/<歌名>.png。
+ * 两条路都保留，所以旧的封面文件还在就能照常显示。
+ */
+function applyCover(song) {
+	// 兜底：万一解析卡住，3 秒后先按老逻辑显示 png，不至于一直没有封面
+	const pngTimer = setTimeout(function () {
+		if (songs[songIndex] === song) musicCover.src = `music/audio/${song}.png`;
+	}, 3000);
+	if (!window.Id3) {
+		clearTimeout(pngTimer);
+		musicCover.src = `music/audio/${song}.png`;
+		return;
+	}
+	Id3.read(song).then(function (r) {
+		clearTimeout(pngTimer);
+		if (songs[songIndex] !== song) return; // 已经切到别的歌，丢弃
+		musicCover.src = (r && r.cover) ? r.cover : `music/audio/${song}.png`;
+	}).catch(function () {
+		clearTimeout(pngTimer);
+		if (songs[songIndex] === song) musicCover.src = `music/audio/${song}.png`;
+	});
+}
+
+/**
+ * 歌词加载：优先用 mp3 内嵌的 USLT 帧（内容就是带时间戳的 LRC 原文），
+ * 没有 / 读失败 / 3 秒没读出来 → 回退到原来的 music/lrc/<歌名>.lrc。
+ */
+function applyLyrics(song) {
+	lrc.textContent = '加载中...';
+	if (window.dogLrc) dogLrc.textContent = '加载中...';
+	let settled = false;
+	function fallback() {
+		if (settled || songs[songIndex] !== song) return;
+		settled = true;
+		getLrc(song);
+	}
+	if (!window.Id3) { fallback(); return; }
+	const lrcTimer = setTimeout(fallback, 3000);
+	Id3.read(song).then(function (r) {
+		clearTimeout(lrcTimer);
+		if (songs[songIndex] !== song) return;
+		if (r && r.lyrics) {
+			settled = true;
+			lrcContent = r.lyrics;
+			parseLrc();
+		} else {
+			fallback();
+		}
+	}).catch(function () {
+		clearTimeout(lrcTimer);
+		fallback();
+	});
 }
 loadSong(songs[songIndex]);
 
@@ -516,7 +572,7 @@ const observer = new MutationObserver((mutationsList) => {
 			}
 
 			// src属性发生变化时的处理逻辑 音乐改变
-			getLrc(songs[songIndex]);
+			applyLyrics(songs[songIndex]);
 
 			// 存储正在播放的音乐下标到应用程序
 			window.localStorage.setItem('songIndex', songIndex);

@@ -147,8 +147,27 @@ let songs = [
 	"Oliver Tree-Life Goes On",
 	"借月",
 	"黄安 - 东南西北风", // 可能重复·B(较可能同一首)·同「我创建·Yy」
-	"你郝兄 - 往后余生（不见）", // 可能重复·A(高度相似) // 已换成你郝兄本尊 11s 试听（酷我）；原版 180s 全平台付费/已下架，此前 204s 那条是何小渝同一录音（波形相关1.0000）
+	"你郝兄 - 往后余生（不见）", // 可能重复·A(高度相似) // 2026-10-30 已换成本尊完整版 180s/320k（夸克下载）；此前 11s 是酷我试听，204s 那条是何小渝同一录音（波形相关1.0000）
 	"马良、孙茜茹 - 往后余生",
+	/* happy·爱人先爱己 所有人都没有我的快乐重要 */
+	"林志炫 - 你的样子",
+	"纤夫的爱-尹相杰&于文华", // 可能重复·C(可能同一首)
+	"We Will Rock You", // 可能重复·A(高度相似)
+	"Estudio Miami Ritmo - We Will Rock You", // 同「我创建·默认收藏」
+	"李克勤-护花使者",
+	"Wellerman-NathanEvans(Sea_Shanty)",
+	"回首掏 (伴奏)-一只小胖胖",
+	"兰花草-半吨兄弟",
+	"天真的橡皮 (DJ版)-白水寒", // 可能重复·C(可能同一首)
+	"Haha Hihi Huhu Heheh", // ha hi hu he ho 日语五十音，ha行 // 可能重复·A(高度相似)
+	"Maman Vibez - Haha Hihi Huhu Heheh",
+	"星光下的梦想", // 可能重复·A(高度相似)
+	"吉米，来吧",
+	"洛天依 - 我在东北玩泥巴",
+	"燃烧的爱火",
+	"恭喜发财-刘德华", // 可能重复·A(高度相似)
+	"恭喜恭喜-卓依婷",
+	/* happyEnd */
 
 	/* KTV ·start */
 	// —— 华语经典 · K歌常点 ——
@@ -221,27 +240,8 @@ let songs = [
 	// —— 2026-10-26 追加 ——
 	"鱼蛋 - 夜色",
 	"余书瑶 - 芊芊", // 余书瑶翻唱版（回音哥原版/来一碗老于版抓不到）
-	/* happy·爱人先爱己 所有人都没有我的快乐重要 */
-	"林志炫 - 你的样子",
-	"纤夫的爱-尹相杰&于文华", // 可能重复·C(可能同一首)
-	"We Will Rock You", // 可能重复·A(高度相似)
-	"Estudio Miami Ritmo - We Will Rock You", // 同「我创建·默认收藏」
-	"李克勤-护花使者",
-	"Wellerman-NathanEvans(Sea_Shanty)",
-	"回首掏 (伴奏)-一只小胖胖",
-	"兰花草-半吨兄弟",
-	"天真的橡皮 (DJ版)-白水寒", // 可能重复·C(可能同一首)
-	"Haha Hihi Huhu Heheh", // ha hi hu he ho 日语五十音，ha行 // 可能重复·A(高度相似)
-	"Maman Vibez - Haha Hihi Huhu Heheh",
-	"星光下的梦想", // 可能重复·A(高度相似)
-	"吉米，来吧",
-	"洛天依 - 我在东北玩泥巴",
-	"燃烧的爱火",
-	"恭喜发财-刘德华", // 可能重复·A(高度相似)
-	"恭喜恭喜-卓依婷", // 可能重复·C(可能同一首)
-	/* happyEnd */
 	"焚情-黄凯芹", // 可能重复·A(高度相似)
-	"孤单心事", // 可能重复·A(高度相似) // 女声
+	"孤单心事", // 可能重复·A(高度相似) // 删除
 	"蓝又时 - 孤单心事", // 男声
 	"春涧",
 	"李袁杰 - 大天蓬", // 翻唱版（原唱需付费） // 可能重复·B(较可能同一首)
@@ -719,11 +719,9 @@ let songs = [
 	"SWIN-S - 只因你太美",
 	"华语群星 - Super Star (2023青岛大学毕业典礼现场)",
 	"杨仁清 - 是我一人放不下", // 可能重复·B(较可能同一首)
-	"杨仁清、苏小纯 - 是我一人放不下",
 	"李荣浩、王俊凯 - 李白 (Live)", // 可能重复·C(可能同一首)
 	"李荣浩 - 李白",
 	// ===End
-	"Anna Yvette、Rootkit - Against The Sun", // 可能重复·B(较可能同一首)
 	"Rootkit、Anna Yvette - Against The Sun", // 同「我创建·two」
 	"Anuo. - 喜欢你 (x0.8)",
 	"Armağan Oruç - Gun Double",
@@ -739,11 +737,8 @@ let songs = [
 	"Christina Aguilera、A Great Big World、Sebastien - Say Something (Sebastien Remix)",
 	"CNBALLER、DP龙猪、CLOUDWANG 王云 - 全部都是你", // 可能重复·B(较可能同一首)
 	"周翊涛、李宏镇、郑人予、许文哲 - 全部都是你 (Live)",
-	"CNBALLER、DP龙猪、王云 Cloud Wang - 全部都是你",
 	"CO1 - 给陌生的你听 (0.8x)",
-	"Cypis - Gdzie jest biały węgorz", // 可能重复·B(较可能同一首)
 	"Cypis - Gdzie jest biały węgorz？(Zejśćie) (“白鳗鱼”在哪里)(Explicit)",
-	"Cypis - Gdzie jest biały węgorz？(Zejśćie) (Explicit)",
 	"D1ofAquavibe - The Happy Troll",
 	"Damon Empero - I Promise (我承诺)", // 可能重复·B(较可能同一首)
 	"Damon Empero - I Promise",
@@ -827,7 +822,6 @@ let songs = [
 	"Nana、Booya Family - Lonely (2021 Remastered Version)",
 	"Nanne Grönvall - Håll om mig",
 	"Nino学长 - 若之前",
-	"Phao、CM1X - Hai Phút Hơn (两分多钟)(Remix)", // 可能重复·B(较可能同一首)
 	"Pháo、CM1X - Hai Phút Hơn (两分多钟)(Remix)",
 	"Philter - Adventure Time (冒险时刻)", // 可能重复·B(较可能同一首)
 	"Philter - Adventure Time",
@@ -861,14 +855,12 @@ let songs = [
 	"Toby Fox - His Theme (他的主题)", // 可能重复·B(较可能同一首)
 	"Toby Fox - His Theme",
 	"Toby Fox - Megalovania (狂妄之人)",
-	"Tule、Chris Linton - Fearless Pt. II", // 可能重复·B(较可能同一首)
 	"Lost Sky、Chris Linton - Fearless Pt. II",
 	"Turtles - 빙고 (答对了)", // 可能重复·B(较可能同一首)
 	"乌龟组合 - 빙고 (答对了)", // 同「我创建·two」
 	"Two Steps From Hell - Archangel",
 	"Two Steps From Hell - Atlantis",
 	"Two Steps From Hell - Disappear", // 可能重复·B(较可能同一首)
-	"Two Steps From Hell、Thomas Bergersen - Disappear",
 	"Two Steps From Hell - Dragon Rider (龙骑士)", // 可能重复·B(较可能同一首)
 	"Two Steps From Hell - Dragon Rider",
 	"Two Steps From Hell - Protectors of The Earth",
@@ -948,7 +940,6 @@ let songs = [
 	"郭峰 - 中国",
 	"承利 - 一个人的北京",
 	"承利、苏小纯 - 是我放不下",
-	"川 - 落空 (0.8X)",
 	"纯音乐 - FAKE LOVE", // 可能重复·B(较可能同一首)
 	"辛永吉 - FakeLove",
 	"崔伟立 - 对面的小姐姐 (DJ何鹏版)",
@@ -964,7 +955,6 @@ let songs = [
 	"罗大佑 - 光阴的故事",
 	"邓丽君 - 路边的野花不要采", // 同「我创建·Yy」
 	"邓壬鑫 - 告白之夜 (治愈版)", // 可能重复·B(较可能同一首)
-	"Leon不太冷的邓壬鑫 - 告白之夜 (治愈版)",
 	"翟迎新 - 鬼子进村", // 可能重复·B(较可能同一首)·同「我创建·电视剧、改编/鬼畜/片段/DJ」
 	"第五个季节 - @第五个季节创作的原声一第五个季节",
 	"丁译林 - 我们", // 可能重复·B(较可能同一首)
@@ -1000,7 +990,6 @@ let songs = [
 	"OCTOBER - Tears",
 	"葛顺 - 一个人的浪漫",
 	"跟风超人 - 你打不过我吧", // 同「我创建·改编/鬼畜/片段/DJ」
-	"顾峰、斯琴高丽 - 猜",
 	"顾嘉辉 - Mark's Theme", // 可能重复·B(较可能同一首)
 	"顾嘉煇 - Mark's Theme",
 	"顾小柒 - 怕的不是等 是等不到", // 同「我创建·改编/鬼畜/片段/DJ」
@@ -1027,7 +1016,6 @@ let songs = [
 	"好妹妹 - 不说再见", // 可能重复·B(较可能同一首)
 	"好妹妹乐队 - 不说再见",
 	"好想谈恋爱啊 - 喜欢你 (0.8x版)",
-	"何炅、王诗龄 - 栀子花开", // 可能重复·B(较可能同一首)
 	"何炅 - 栀子花开",
 	"黑龙 - 我爱你你却爱着他",
 	"黑猫 - 九张机", // 可能重复·B(较可能同一首)
@@ -1164,7 +1152,6 @@ let songs = [
 	"罗高丞 - 森林时光 (TV Version)",
 	"罗震环 - 我们能不能",
 	"吕飞、陈星 - 离家的孩子", // 可能重复·B(较可能同一首)
-	"陈星、吕飞 - 离家的孩子",
 	"吕继宏、宋祖英 - 九九艳阳天", // 同「我创建·Yy」
 	"麻雀音乐人 - 此地无银二百两",
 	"马可 - 两生缘", // 可能重复·B(较可能同一首)·同「我创建·花千骨」
@@ -1283,7 +1270,6 @@ let songs = [
 	"邵雨涵 - 拉拉爱", // 可能重复·B(较可能同一首)·同「我创建·Yy、动画片」
 	"深七 - 我们不是情侣",
 	"沈春阳、小沈阳 - 都要好好的", // 可能重复·B(较可能同一首)
-	"小沈阳、沈春阳 - 都要好好的",
 	"沈熙 - 凤舞九天", // 可能重复·B(较可能同一首)·同「我创建·改编/鬼畜/片段/DJ」
 	"沈绪 - 哪里都是你 (0.8x)",
 	"十二大美女 - 免失志 (MV版)",
@@ -1308,15 +1294,12 @@ let songs = [
 	"桃子啊 - 听闻爱情十有九悲 (片段)",
 	"藤竹京 - 孤独 (片段)", // 可能重复·C(可能同一首)
 	"王佳杨 - 孤独",
-	"天龙八部之宿敌--许嵩", // 可能重复·A(高度相似)
 	"许嵩 - 天龙八部之宿敌",
-	"天才 - 天龙八部之宿敌 (片段)", // 同「我创建·改编/鬼畜/片段/DJ」
 	"田馥甄 - 魔鬼中的天使", // 可能重复·B(较可能同一首)
 	"庄心妍 - 魔鬼中的天使",
 	"田一名 - 给我一首歌的时间", // 可能重复·C(可能同一首)
 	"田震 - 好大一棵树",
 	"屠洪刚 - 藏龙卧虎",
-	"晚安、误 - 落空 (cover：印子月) (Live)",
 	"万茜、音频怪物 - 为你成全", // 同「我创建·默认收藏」
 	"汪峰 - 我爱你中国", // 可能重复·B(较可能同一首)
 	"汪峰 - 像梦一样自由",
@@ -1457,8 +1440,6 @@ let songs = [
 	"陈奕迅 - 十年",
 	"郑源 - 不要在我寂寞的时候说爱我",
 	"栀hen - may i see u again (我们还能再见吗)", // 可能重复·B(较可能同一首)
-	"栀hen - may i see u again",
-	"栀hen - May i see u again (Inst.)",
 	"中央乐团交响乐队 - 春节序曲", // 可能重复·B(较可能同一首)·同「我创建·gg」
 	"中国国家交响乐团 - 春节序曲",
 	"周华健 - 朋友",
@@ -1531,7 +1512,6 @@ let songs = [
 	"司令 - Shots (DJ版)",
 	"猴七七 - Om Mig (DJ版)",
 	"Feint、Laura Brehm - Solace",
-	"英雄联盟、Against The Current - Legends Never Die (传奇永不熄)",
 	"张杰、张碧晨 - 只要平凡", // 可能重复·B(较可能同一首)
 	"Calvin Harris、Ellie Goulding - Outside", // 可能重复·C(可能同一首)
 	"Alan Walker、K-391、Tungevaag、Mangoo - Play",
@@ -1833,7 +1813,6 @@ let songs = [
 	"馒头 - 期末之歌 (Single Version)", // 同「我创建·改编/鬼畜/片段/DJ」
 	"Hoaprox - Ngẫu Hứng (DJ虎太郎版)", // 可能重复·B(较可能同一首)
 	"LeeAlive - Water (Original Mix)",
-	"李俊佑、小潘潘（潘柚彤） - 宠坏 (可不可以你把我宠坏)",
 	"Krutikov Music - Enemy (Arcane League of Legends) (Epic Version)",
 	"康硕Kenny - 喜剧之王 Silent Open (电影喜剧之王原声)", // 同「我创建·电视剧」
 	"侃侃 - 滴嗒",
@@ -1850,7 +1829,6 @@ let songs = [
 	"孙露 - 光辉岁月", // 可能重复·B(较可能同一首)
 	"BEYOND - 光辉岁月",
 	"Roger Subirana - Between Worlds (世界之间)",
-	"Rezz、Isabelle Rezazadeh - Edge",
 	"曲婉婷 - 我的歌声里",
 	"OCTOBER - Time To Love (相爱时间)",
 	"欧阳朵、小小浩 - 落单恋人", // 可能重复·B(较可能同一首)
@@ -6175,7 +6153,7 @@ songs.push(
 	"纵贯线 - 爱的初体验 (Live)", // 可能重复·B(较可能同一首)·同「纵贯线 - 爱的初体验 (Live)」
 	"Kaiz、Phúc Du、King Kudo - AKLGD (remix：KAIZ)", // 可能重复·C(可能同一首)·同「Kaiz、Phúc Du、King Kudo - AKLGD (KAIZ Remix)」
 	"Chris Rock、Danny Jacobs - Afro Circus ／ I Like To Move It",
-	"Rootkit、Anna Yvette - Against The Sun", // 可能重复·B(较可能同一首)·同「Anna Yvette、Rootkit - Against The Sun」
+	"Rootkit、Anna Yvette - Against The Sun", // 可能重复·B(较可能同一首)
 	"Alan Walker、Noah Cyrus、Digital Farm Animals、Juliander - All Falls Down", // 可能重复·B(较可能同一首)·同「Alan Walker、Noah Cyrus、Digital Farm Animals、Juliander - All Falls Down」
 	"Achim Reichel - Aloha Heja He",
 	"Rompasso - Angetenar (remix：Subkills)",
@@ -6772,7 +6750,7 @@ songs.push(
 	"就是南方凯 - 信仰 (30秒片段)",
 	"是二智呀 - 修炼爱情 (20秒片段)",
 	"秦晓疯 - 喜欢你", // 可能重复·A(高度相似)·同「軍 - 喜欢你」
-	"天才 - 天龙八部之宿敌 (片段)", // 可能重复·A(高度相似)·同「天龙八部之宿敌--许嵩」
+	"天才 - 天龙八部之宿敌 (片段)", // 可能重复·A(高度相似)·同「许嵩 - 天龙八部之宿敌」
 	"网络歌手 - 淘汰 (20秒片段)",
 	"白雲兮、DJ家兴、寐加岛 - 我还能把你抢回来", // 可能重复·A(高度相似)·同「我还能把你抢回来」
 	"大D(DLyn)、驴 - 小毛驴之歌",
@@ -7082,7 +7060,7 @@ songs.push(
 
 // 我的2023年度歌单（10首）
 songs.push(
-	"许嵩 - 天龙八部之宿敌", // 可能重复·A(高度相似)·同「天龙八部之宿敌--许嵩」
+	"许嵩 - 天龙八部之宿敌", // 可能重复·A(高度相似)
 	"七元 - IF", // 可能重复·A(高度相似)·同「丁可 - If」
 	"朱添泽 - 等", // 可能重复·B(较可能同一首)·同「朱添泽 - 等」
 	"烟(许佳豪) - 再见我的女孩",
@@ -7168,7 +7146,7 @@ songs.push(
 	"张泽熙 - 那个女孩", // 可能重复·B(较可能同一首)·同「张泽熙 - 那个女孩」
 	"G.E.M.邓紫棋 - 泡沫", // 可能重复·A(高度相似)·同「泡沫」
 	"威仔、格子兮 - 我知道你不爱我",
-	"许嵩 - 天龙八部之宿敌", // 可能重复·A(高度相似)·同「天龙八部之宿敌--许嵩」
+	"许嵩 - 天龙八部之宿敌", // 可能重复·A(高度相似)
 	"吸猫大师 - 《zhurek 中文翻唱》：有点好听~很难不喜欢",
 	"松紧先生 李宗锦 - 你走",
 	"潘成（皮卡潘） - 白鸽乌鸦相爱的戏码", // 可能重复·B(较可能同一首)·同「潘成（皮卡潘） - 白鸽乌鸦相爱的戏码」
