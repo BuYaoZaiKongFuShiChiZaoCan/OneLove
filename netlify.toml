@@ -20,11 +20,35 @@
   CORS_ORIGIN = "https://uplove.netlify.app"
   APP_VERSION = "1.0.0"
 
+# MV 浏览器长缓存：30 天（2592000 秒）。
+# 默认头是 public,max-age=0,must-revalidate —— 每次播放都要回源验证，MV 又是 30-100MB，
+# 关掉页面再打开等于重下。加长缓存后第二次打开是 0 请求。
+# 只给 /music/mv/* 加，不给 /music/* —— 那里还有 lrc（歌词改得很勤）和 audio（封面），
+# 一旦长缓存，歌词更新了用户也永远拿旧的。
+# 注意：MV 文件名不变的话，换了内容最多 30 天后才自然生效；想立刻生效只能改名（或让用户 Ctrl+F5）。
+[[headers]]
+  for = "/music/mv/*"
+  [headers.values]
+    Cache-Control = "public, max-age=2592000"
+
+# Service Worker 必须能控制根路径，否则 /music/*.mp3 拦不到。
+# sw.js 放在 /scripts/ 下，用 scope:"/" 注册就要求服务端发这个头。
+[[headers]]
+  for = "/scripts/sw.js"
+  [headers.values]
+    Service-Worker-Allowed = "/"
+    Cache-Control = "public, max-age=0, must-revalidate"
+
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/api/api/:splat"
   status = 200
   force = true
+
+[[redirects]]
+  from = "/music/*"
+  to = "/404.html"
+  status = 404
 
 [[redirects]]
   from = "/*"

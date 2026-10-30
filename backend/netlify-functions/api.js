@@ -5,8 +5,6 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const fs = require('fs');                  // 文件系统模块
-const { promisify } = require('util');     // 将回调函数转换为Promise
 
 const app = express();
 
@@ -128,8 +126,11 @@ const phoneSchema = new mongoose.Schema({
 
 const Password = mongoose.models.Password || mongoose.model('Password', passwordSchema);
 const Phone = mongoose.models.Phone || mongoose.model('Phone', phoneSchema);
+
 const fs = require('fs');
 const path = require('path');
+const util = require('util');
+const promisify = util.promisify;
 
 // 连接数据库
 const connectDB = async () => {
@@ -216,8 +217,7 @@ app.get('/api/info', (req, res) => {
 			'/api/auth/password': '修改密码',
 			'/api/auth/logout': '用户登出',
 			'/api/health': '健康检查',
-			'/api/changelog': '版本信息',
-			'/api/data/structure': '获取Data目录结构'
+			'/api/changelog': '版本信息'
 		}
 	});
 });
@@ -230,44 +230,6 @@ app.get('/api/data', (req, res) => {
 		random: Math.random()
 	};
 	res.json({ success: true, data });
-});
-
-// 获取Data目录结构API
-app.get('/api/data/structure', async (req, res) => {
-  try {
-	// Data目录的绝对路径
-	const dataDir = path.join(__dirname, '..', 'Data');
-	
-	// 检查Data目录是否存在
-	try {
-	  await promisify(fs.access)(dataDir);
-	} catch (error) {
-	  return res.status(404).json({
-		success: false,
-		message: 'Data目录不存在'
-	  });
-	}
-	
-	// 扫描Data目录结构
-	console.log('🔍 开始扫描Data目录:', dataDir);
-	const structure = await scanDirectory(dataDir);
-	console.log('📊 扫描结果:', JSON.stringify(structure, null, 2));
-	
-	res.json({
-	  success: true,
-	  data: structure,
-	  timestamp: new Date().toISOString(),
-	  excludedFiles: excludedFiles // 返回排除配置信息
-	});
-	
-  } catch (error) {
-	console.error('获取Data目录结构失败:', error);
-	res.status(500).json({
-	  success: false,
-	  message: '获取目录结构失败',
-	  error: error.message
-	});
-  }
 });
 
 // 用户角色检查

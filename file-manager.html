@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <title>D盘文件管理器</title>
+    <style>
+        .container {
+            display: flex;
+            gap: 10px;
+            height: 90vh;
+            padding: 10px;
+        }
+
+        .file-tree {
+            width: 280px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            overflow: auto;
+        }
+
+        .editor-box {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        textarea {
+            flex: 1;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        .btns button {
+            margin-right: 6px;
+            padding: 4px 12px;
+        }
+
+        .file-item {
+            cursor: pointer;
+            padding: 3px 4px;
+            margin: 2px 0;
+        }
+
+        .file-item:hover {
+            background: #eee;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 文件目录列表 -->
+        <div class="file-tree" id="tree"></div>
+
+        <!-- 编辑区域 -->
+        <div class="editor-box">
+            <div class="btns">
+                <span>当前文件：<span id="curPath">未选择</span></span>
+                <br><br>
+                <button onclick="saveFile()">保存修改</button>
+                <button onclick="createFolder()">新建文件夹</button>
+                <button onclick="deleteItem()">删除当前文件/文件夹</button>
+            </div>
+            <textarea id="editor" placeholder="选左侧文件进行编辑"></textarea>
+        </div>
+    </div>
+
+    <script>
+        // 接口封装，直接对接后端新增的文件API
+        const FileApi = {
+            async list(path = "") {
+                // 空路径直接不带path参数，避免 ?path= 解析问题
+                if (path === "") {
+                    const res = await fetch(`/api/file/list`);
+                    return res.json()
+                }
+                const res = await fetch(`/api/file/list?path=${encodeURIComponent(path)}`)
+                return res.json()
+            },
+            async read(path) {
+                const res = await fetch(`/api/file/read?path=${encodeURIComponent(path)}`)
+                return res.text()
+            },
+            async save(path, content) {
+                await fetch(`/api/file/save?path=${encodeURIComponent(path)}`, {
+                    method: "POST",
+                    body: content
+                })
+            },
+            async mkdir(path) {
+                await fetch(`/api/file/mkdir?path=${encodeURIComponent(path)}`, {
+                    method: "POST"
+                })
+            },
+            async del(path) {
+                await fetch(`/api/file/del?path=${encodeURIComponent(path)}`, {
+                    method: "DELETE"
+                })
+            }
+        }
+
+        // 全局变量
+        let currentDir = "";
+        let currentFile = "";
+        const treeDom = document.getElementById("tree");
+        const editorDom = document.getElementById("editor");
+        const curPathDom = document.getElementById("curPath");
+
+        // 渲染目录列表
+        async function renderTree(dirPath) {
+            currentDir = dirPath;
+            treeDom.innerHTML = "";
+            const res = await FileApi.list(dirPath);
+            if (res.code !== 0) {
+                treeDom.innerHTML = `<p style="color:red">加载失败：${res.msg}</p>`;
+                return;
+            }
+            // 返回上一级按钮
+            if (dirPath) {
+                const backBtn = document.createElement("div");
+                backBtn.className = "file-item";
+                backBtn.innerText = "← 返回上一级";
+                backBtn.onclick = () => {
+                    const arr = dirPath.split("/");
+                    arr.pop();
+                    renderTree(arr.join("/"));
+                }
+                treeDom.appendChild(backBtn);
+            }
+            // 遍历文件/文件夹
+            res.data.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "file-item";
+                div.innerText = (item.isFolder ? "📁 " : "📄 ") + item.name;
+                div.onclick = async () => {
+                    const fullPath = dirPath ? `${dirPath}/${item.name}` : item.name;
+                    if (item.isFolder) {
+                        renderTree(fullPath);
+                    } else {
+                        // 文件：读取内容到编辑器
+                        currentFile = fullPath;
+                        curPathDom.innerText = fullPath;
+                        editorDom.value = await FileApi.read(fullPath);
+                    }
+                }
+                treeDom.appendChild(div);
+            })
+        }
+
+        // 保存文件
+        async function saveFile() {
+            if (!currentFile) return alert("请先选择一个文件");
+            await FileApi.save(currentFile, editorDom.value);
+            alert("保存成功！");
+        }
+
+        // 新建文件夹
+        async function createFolder() {
+            const name = prompt("输入新文件夹名称：");
+            if (!name) return;
+            const newPath = currentDir ? `${currentDir}/${name}` : name;
+            await FileApi.mkdir(newPath);
+            renderTree(currentDir);
+        }
+
+        // 删除当前选中项
+        async function deleteItem() {
+            const target = currentFile || currentDir;
+            if (!target) return alert("未选中任何文件/文件夹");
+            if (!confirm(`确定删除：${target}？`)) return;
+            await FileApi.del(target);
+            editorDom.value = "";
+            curPathDom.innerText = "未选择";
+            currentFile = "";
+            renderTree(currentDir);
+        }
+
+        // 页面加载完成默认打开D盘根目录
+        renderTree("");
+    </script>
+</body>
+
+</html>

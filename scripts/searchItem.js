@@ -85,21 +85,37 @@ document.onkeydown = function (e) {
  * @returns {null} 无返回值
  */
 function tanChuang(content, time = 3000) {
-	let tc = document.getElementById('tanChuang');
-	let tctime = setTimeout(() => {
-		let tc = document.getElementById('tanChuang');
-		tc.remove();
-	}, time);
+	let tc = document.getElementById('tanChuangDiaLog');
+	let tctime;
+	
 	// 如果已存在更改之前的元素内容，
 	if (tc) {
 		tc.textContent = content;
-		clearTimeout(tctime);
+		// 如果弹窗已经隐藏，重新显示
+		if (tc.open === false) {
+			tc.show();
+		}
+		// 清除之前的超时定时器
+		if (tc.timeoutId) {
+			clearTimeout(tc.timeoutId);
+		}
 	} else {
-		let div = document.createElement("div");
-		div.id = "tanChuang";
+		let div = document.createElement("dialog");
+		div.id = "tanChuangDiaLog";
 		div.textContent = content;
-		// div.style.cssText = "position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:200px;height:50px;line-height:50px;text-align:center;border-radius:5px;background-color:rgba(0,0,0,.5);color:#fff;z-index:9999;";
 		// 添加到页面
 		document.body.appendChild(div);
+		div.show();
+		tc = div;
 	}
+	
+	// 设置新的超时关闭
+	tctime = setTimeout(() => {
+		if (tc && tc.open) {
+			tc.close();
+		}
+	}, time);
+	
+	// 保存超时ID到元素上，以便后续更新时清除
+	tc.timeoutId = tctime;
 }
