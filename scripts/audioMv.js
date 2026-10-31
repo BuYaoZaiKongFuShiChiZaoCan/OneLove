@@ -738,6 +738,10 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 	};
 	// 视频播放中每 5 秒存一次进度（被系统杀进程时 beforeunload 不触发，靠它兜底）
 	video.addEventListener('timeupdate', mvProgressTick);
+	// 锁屏/通知栏的进度条也要跟着视频走（updatePositionState 内部每秒最多写一次）
+	video.addEventListener('timeupdate', function () {
+		if (typeof updatePositionState === "function") updatePositionState();
+	});
 	video.onplay = function () {
 		/**
 		 * 已经被 updateVideo 清掉的旧 video，它的 play 事件可能迟到。

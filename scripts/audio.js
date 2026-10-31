@@ -707,7 +707,9 @@ const observer = new MutationObserver((mutationsList) => {
 			scrollToIng();
 
 			// 不管有没有MV都要更新一下video块区内容
-			updateVideo();
+			// 加 typeof 守卫：MutationObserver 可能在 audioMv.js 执行前就触发了，
+			// 那时函数还没定义，直接调用会抛 ReferenceError 中断后面的逻辑
+			if (typeof updateVideo === "function") updateVideo();
 
 			// 用局部变量，别再往全局隐式赋值（原来写的是 musicinfo = findMusic(...)）
 			const musicinfo = findMusic(title.textContent);
@@ -1134,9 +1136,10 @@ function syncMediaSessionState() {
 var lastPosState = 0;
 function updatePositionState(force) {
 	if (!("mediaSession" in navigator) || typeof navigator.mediaSession.setPositionState !== "function") return;
-	// MV 出声时进度归视频管，音频停在旧位置，拿它去改控件进度条会跳回错误的时间
-	if (typeof mvIsPlaying === "function" && mvIsPlaying()) return;
-	var d = audio.duration;
+	// 进度以「谁真的在出声」为准：MV 出声时音频是被内部暂停的，停在旧位置（常是 0），
+	// 拿它去写锁屏进度条会显示成「刚开始」甚至跳回错误时间。MV 在播就改用视频的时间轴。
+	var media = mediaSeekTarget();
+	var d = media.duration;
 	if (!isFinite(d) || d <= 0) return;
 	var now = Date.now();
 	if (!force && now - lastPosState < 1000) return;
@@ -1144,10 +1147,37 @@ function updatePositionState(force) {
 	try {
 		navigator.mediaSession.setPositionState({
 			duration: d,
-			playbackRate: audio.playbackRate || 1,
-			position: Math.min(Math.max(audio.currentTime, 0), d)
+			playbackRate: media.playbackRate || 1,
+			position: Math.min(Math.max(media.currentTime, 0), d)
 		});
 	} catch (e) { }
+}
+
+/**
+ * 当前实际出声的那个媒体元素：MV 在播就是 video，否则是 audio。
+ * 锁屏的进度条与快进/快退都得以它为准 —— MV 在播时音频是暂停的，
+ * 动 audio.currentTime 画面不会有任何反应。
+ */
+function mediaSeekTarget() {
+	if (typeof mvIsPlaying === "function" && mvIsPlaying()) {
+		var video = window.audioMvVideo1;
+		if (video && video.isConnected) return video;
+	}
+	return audio;
+}
+
+/**
+ * 锁屏 / 通知栏的快进、快退。
+ * @param {number} delta 秒数，正数快进、负数快退
+ */
+function mediaSeek(delta) {
+	var target = mediaSeekTarget();
+	var d = target.duration;
+	if (!isFinite(d) || d <= 0) return;
+	target.currentTime = Math.min(Math.max(target.currentTime + delta, 0), d);
+	// 顺手记一次：不然拖完进度马上关页面，下次恢复的还是拖之前的旧位置
+	if (typeof writeSavedProgress === "function") writeSavedProgress(target.currentTime);
+	updatePositionState(true);
 }
 
 // Chrome for Android 和 Safari for iOS 提供了 navigator.mediaSession API，可以用来监听耳机按钮事件。
@@ -1183,12 +1213,12 @@ if ("mediaSession" in navigator) {
 	// 这个示例使用了适当的监听器来允许在不同的方向搜寻正在播放的媒体。
 	navigator.mediaSession.setActionHandler("seekbackward", (evt) => {
 		// 用户点击了“向后搜寻”的媒体按钮
-		audio.currentTime = Math.max(audio.currentTime - skipTime, 0);
+		mediaSeek(-skipTime);
 	});
 
 	navigator.mediaSession.setActionHandler("seekforward", (evt) => {
 		// 用户点击了“向前搜寻”的媒体按钮
-		audio.currentTime = Math.min(audio.currentTime + skipTime, audio.duration);
+		mediaSeek(skipTime);
 	});
 
 
