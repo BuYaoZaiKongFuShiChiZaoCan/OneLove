@@ -222,6 +222,16 @@ audio.addEventListener('pause', function () {
 	// 没声音了封面就停（播完也一样，所以要放在下面的 ended 判断之前）
 	setCoverSpin(false);
 	if (audio.ended) return;
+	/**
+	 * 有 MV 的歌：音频被暂停是「声音改由视频出」，不是用户按了暂停。
+	 * MV 正在出声时，播放器整体仍然是播放中，按钮必须保持暂停图标。
+	 * （audio.pause() 的 pause 事件是异步派发的，可能在 video.onplay 里补的 setPlayUI(true)
+	 *   之后才到达，所以这里也要拦一次，否则会被它改回播放图标。）
+	 */
+	if (typeof mvIsPlaying === 'function' && mvIsPlaying()) {
+		setPlayUI(true);
+		return;
+	}
 	setPlayUI(false);
 });
 
@@ -336,6 +346,9 @@ function loadSong(song) {
 	mErrTimeout = null;
 	// 新的一首：还没出声，加载提示可以显示；出声后由 playing 事件关掉
 	songStarted = false;
+	// 页面初始化之后的 loadSong 都算换歌：上一次的续播点作废，
+	// 否则新歌的 loadedmetadata 一到就会被拉到旧歌的时间点
+	if (pageInitDone) resumePending = false;
 	// 切歌瞬间封面先停，等本首真的出声再转（上一首的旋转不能延续到这一首）
 	setCoverSpin(false);
 	title.textContent = song;
@@ -399,6 +412,92 @@ function applyLyrics(song) {
 	});
 }
 loadSong(songs[songIndex]);
+
+/**
+ * ===== 播放进度：保存 / 恢复 / 归零 =====
+ * 会用到「上次听到哪儿」的地方有三处：
+ *   ① 关页面 / 切后台 → 保存（window.on.js 的 beforeunload、pagehide、visibilitychange）
+ *   ② 播放中 → 每 5 秒存一次（手机被系统杀进程时 beforeunload 根本不会触发）
+ *   ③ 打开页面 → 恢复；换歌 → 归零（见下面 observer 里的 writeSavedProgress(0)）
+ *
+ * ⚠️ 恢复**不能**挂在 window.onload 上（原来就是这么写的）：
+ *    <audio> 和 MV 的 <video> 都是 preload="auto"，load 事件要等它们全部预加载完才触发。
+ *    实测（本地，Chrome 无头）：无 MV 的歌要 10.8 秒；有 MV 的歌（浮夸 86MB）16 秒了
+ *    还没触发。这段时间里用户点播放，就是从 0 开始 —— 看着完全像「进度没记住」。
+ *    现在改成挂在 audio 的 loadedmetadata：音频一拿到时长就恢复，通常 1 秒内到位。
+ */
+const PROGRESS_KEY = 'musicTime';
+const PROGRESS_SONG_KEY = 'musicTimeSong';   // 这条进度是哪一首的，防止把别的歌拉到这个时间点
+
+/** 读上次存的进度；没有 / 是 0 / 是 NaN 一律返回 null */
+function readSavedProgress() {
+	const t = parseFloat(window.localStorage.getItem(PROGRESS_KEY));
+	if (!isFinite(t) || t <= 0) return null;
+	const s = window.localStorage.getItem(PROGRESS_SONG_KEY);
+	return { t: t, song: (s === null || s === '') ? null : +s };
+}
+
+/** 写进度：第 t 秒，idx 不传就是当前歌 */
+function writeSavedProgress(t, idx) {
+	if (!isFinite(t) || t < 0) t = 0;
+	window.localStorage.setItem(PROGRESS_KEY, +t);
+	window.localStorage.setItem(PROGRESS_SONG_KEY, (idx === undefined ? songIndex : idx));
+}
+
+/**
+ * 把「现在的进度」存起来。MV 在播时声音来自 video（audio 被 pauseSong 停着），要以视频为准。
+ * 两边都停着（用户按了暂停后关页面）时取较大的那个有效值，别存成 0。
+ */
+function saveMusicProgress() {
+	const video = window.audioMvVideo1;
+	const videoPlaying = !!video && video.isConnected && !video.paused
+		&& video.readyState > 0 && video.currentTime > 0;
+	let t;
+	if (videoPlaying) {
+		t = video.currentTime;
+	} else if (!audio.paused && audio.currentTime > 0) {
+		t = audio.currentTime;
+	} else {
+		const vt = (video && video.currentTime > 0) ? video.currentTime : 0;
+		const at = audio.currentTime > 0 ? audio.currentTime : 0;
+		t = Math.max(vt, at);
+	}
+	writeSavedProgress(t);
+}
+
+// ② 播放中每 5 秒存一次
+let lastProgressSave = 0;
+audio.addEventListener('timeupdate', function () {
+	if (audio.currentTime <= 0) return;
+	const now = Date.now();
+	if (now - lastProgressSave < 5000) return;
+	lastProgressSave = now;
+	writeSavedProgress(audio.currentTime);
+});
+
+/**
+ * ③ 页面初始化那一首的续播点。
+ * 只有「保存的进度就是这首」才恢复；用户还没等 metadata 到就切了歌 → 作废，
+ * 不能把新歌拉到旧歌的时间点（原来 window.onload 不校验这个是会跳错的）。
+ * ⚠️ 这两个变量故意用 var：loadSong() 在下面第 401 行就被调用了，那时它们还是 undefined，
+ *    用 let 会踩暂时性死区直接抛 ReferenceError。
+ */
+var savedProgress = readSavedProgress();
+var resumePending = !!savedProgress && (savedProgress.song === null || savedProgress.song === songIndex);
+var pageInitDone = false;   // 初始化那次 loadSong 跑完置 true，之后的 loadSong 都算「换歌」
+
+function resumeAudioPosition() {
+	if (!resumePending) return;
+	resumePending = false;
+	if (!isFinite(audio.duration) || audio.duration <= 0) return;
+	// 上次听到结尾了（差不到 1 秒）就从头开始，别卡在最后
+	if (savedProgress.t >= audio.duration - 1) return;
+	audio.currentTime = savedProgress.t;
+}
+audio.addEventListener('loadedmetadata', resumeAudioPosition);
+// 兜底：万一来不及绑监听（缓存命中，metadata 已经就绪）
+if (audio.readyState >= 1) resumeAudioPosition();
+pageInitDone = true;
 
 // 图片加载错误设置
 function musicimgerr() {
@@ -473,7 +572,24 @@ function markSoundStarted() {
 }
 
 // 播放歌曲
-function playSong() {
+/**
+ * @param {boolean} [forceAudio] 强制走音频，不把这次播放交给 MV。
+ *   用在「MV 还在加载时用户点了播放按钮」——用户要的是马上听到声音，
+ *   而不是继续等 MV（见 playBtn.onclick）。
+ */
+function playSong(forceAudio) {
+	/**
+	 * 当前这首有 MV、视频还在、也没被判「播不了」→ 让 MV 接着放（从上次的位置，见 audioMv.js
+	 * 的 resumeMvIfNeeded / resumeMvPosition）。以前这里一律走音频，于是重开页面点播放，
+	 * MV 那首放的是音频，视频永远停在 0。
+	 * forceAudio=true 时跳过这一步（视频还没就绪，用户点播放就是要听音乐）。
+	 */
+	if (!forceAudio && typeof resumeMvIfNeeded === 'function' && resumeMvIfNeeded()) {
+		playIntent = true;
+		setPlayUI(true);
+		return;
+	}
+
 	// 只暂停还挂在文档里的 video：被 updateVideo 清掉的那份已经 detached，
 	// 对它 pause() 会触发迟到的 onpause（退出全屏），没有任何意义
 	if (window.audioMvVideo1 && window.audioMvVideo1.isConnected) {
@@ -576,8 +692,9 @@ const observer = new MutationObserver((mutationsList) => {
 
 			// 存储正在播放的音乐下标到应用程序
 			window.localStorage.setItem('songIndex', songIndex);
-			// 设置播放进度
-			window.localStorage.setItem('musicTime', 0);
+			// 换歌了：进度归零（同时记下这条 0 属于这首），别把上一首的进度套到这首上
+			writeSavedProgress(0);
+			resumePending = false;
 
 			// 对歌词位置做初始化
 			lrc.style.transform = `translateY(0px)`;
@@ -641,7 +758,7 @@ function showLoading(kind) {
 	// 已经出过声了：这次只是拖进度条/视频短暂缓冲，歌词不能被提示盖掉
 	if (songStarted) return;
 	audioLoading = true;
-	const text = kind === 'mv' ? 'MV 正在加载中…' : '音乐正在加载中…';
+	const text = kind === 'mv' ? 'MV 正在加载中…（点击播放按钮直接播放音频）' : '音乐正在加载中…';
 	if (lrc) lrc.textContent = text;
 	if (window.dogLrc) window.dogLrc.textContent = text;
 }
@@ -913,7 +1030,30 @@ function setProgress(e) {
 // 事件监听
 // 1.播放歌曲
 playBtn.onclick = function () {
-	musicContainer.classList.contains('play') ? pauseSong() : playSong()
+	if (!musicContainer.classList.contains('play')) {
+		playSong();
+		return;
+	}
+	/**
+	 * 此时按钮显示「暂停」（播放中外观），但音频并没有在响。分两种：
+	 * ① MV 还在加载（还没出声）→ 点一次就直接播音频，不要先按一次暂停、再点一次才播放；
+	 * ② MV 已经在放 → 这一下就是「暂停」，真的把视频停掉（原来只暂停了本来就没在响的音频，
+	 *    按钮变了、画面还在动）。
+	 */
+	if (audio.paused && typeof mvIsLoading === 'function') {
+		if (mvIsLoading()) {
+			playSong(true);
+			return;
+		}
+		if (typeof mvIsPlaying === 'function' && mvIsPlaying()) {
+			// 先停画面，再统一播放器状态（音频本来就没在响，pauseSong 只负责外观和播放意图）。
+			// 只调 pauseSong 的话画面照动，只 pause 视频的话按钮不会变回「播放」。
+			window.audioMvVideo1.pause();
+			pauseSong();
+			return;
+		}
+	}
+	pauseSong();
 }
 // 2.切换歌曲
 prevBtn.onclick = prevSong

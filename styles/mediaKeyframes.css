@@ -49,8 +49,9 @@ main#main-body #sidePanel #cbThree #tipBox {
         transform: translateX(0px);
     }
 
+    /* 窄屏原来把弹窗缩到 80%（留边），改成一并铺满，否则手机上四周仍有缝。 */
     #dog {
-        width: 80%;
+        width: 100%;
     }
 }
 

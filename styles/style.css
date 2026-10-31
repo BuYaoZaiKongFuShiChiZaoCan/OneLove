@@ -1671,7 +1671,7 @@ main#main-body #sidePanel #cbThree .container #lrc li {
        视觉尺寸撑出容器 ==> sidebar 出现横向滚动条、上下句被裁，就是「边界溢出」。
        现在 li 的 transform 永远 ≤ 1，视觉不可能大于自己的布局盒子，溢出从根上没了。 */
     line-height: 23px;
-    font-size: 17.25px;
+    font-size: 18px;
     list-style: none;
     transition: 1.2s;
     height: 100%;

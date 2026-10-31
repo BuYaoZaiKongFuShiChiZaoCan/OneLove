@@ -21,10 +21,21 @@ function updateLyrics() {
                 lyricPanel.scroll(0, finalOffset);
             }
             if (window.dogLrc) {
-                // dogHeight 只在从歌词面板打开时才有值，从播放列表面板打开时为 undefined，
-                // 这时按当前高度现场算，避免 NaN 让 scroll 整个失效
-                const half = (typeof dogHeight === 'number' && dogHeight > 0) ? dogHeight : dog.clientHeight / 2;
-                dog.scroll(0, Math.max(0, finalOffset - half));
+                /**
+                 * 最大化窗口里的歌词行高与主界面不一样（28.6px vs 23px），
+                 * 拿主界面那句算出来的 offsetTop 去滚 dog，行高差会随句数累积，
+                 * 表现就是「越到后面当前句越靠下」。这里直接用当前句相对窗口的实时位置
+                 * 反推目标滚动量（每一句都重新对齐，误差不会往下传）。
+                 * 底部留白由 max.css 的 #dog>#dogLrc padding-bottom 提供，
+                 * 否则最后几句物理上滚不到中线。
+                 */
+                const li = window.dogLrc.children[validIndex];
+                if (li) {
+                    const liRect = li.getBoundingClientRect();
+                    const dogRect = dog.getBoundingClientRect();
+                    const abs = dog.scrollTop + (liRect.top + liRect.height / 2) - (dogRect.top + dog.clientHeight / 2);
+                    dog.scroll(0, Math.max(0, abs));
+                }
             }
         });
     }

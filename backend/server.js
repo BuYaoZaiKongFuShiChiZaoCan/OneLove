@@ -77,6 +77,10 @@ require('dotenv').config({ path: './config.env' });
 // ========================================
 const connectDB = async () => {
 	try {
+		if (process.env.DB_DISABLED === '1') {
+			console.log('⚠️ 已按配置禁用数据库连接（config.env 中 DB_DISABLED=1），使用内存数据运行');
+			return false;
+		}
 		const mongoURI = process.env.MONGODB_URI || 'mongodb+srv://OneLoveAdminQi:LG.2457_AtlasQiAdminOneLove@onelove.bepz2u0.mongodb.net/?retryWrites=true&w=majority&appName=OneLove';
 
 		console.log('🔗 正在连接数据库...');

@@ -1,27 +1,40 @@
 /* 模板样式 */
+/* 铺满视口：原来是 50%×90% 居中的卡片，四周露出后面的页面（左右各 25%），
+   后面那层一直被绘制 + 被 backdrop-filter 模糊，很费性能。
+   改成整屏后后面完全不参与合成。
+   box-sizing 用 border-box，否则 100% + 10px 内边距会溢出出滚动条。 */
 #dog {
-    width: 50%;
-    height: 90%;
-    margin: auto;
+    width: 100%;
+    height: 100%;
+    /* 浏览器默认给 dialog 加了 max-width/max-height: calc(100% - 6px - 2em)，
+       等于四周各留 19px（实测 1424×805 的视口只铺到 1386×767）。
+       不覆盖的话四个边仍是看的见缝。 */
+    max-width: 100%;
+    max-height: 100%;
+    margin: 0;
     padding: 10px;
+    box-sizing: border-box;
     position: fixed;
-    border-radius: 10px;
+    border-radius: 0;
 }
 
 #dog:focus-visible {
     outline: none;
 }
 
+/* 背后的遮罩：原来 75% 透明 + blur(1px)，后面的页面既透出来又一直要参与模糊计算。
+   现在 #dog 已经铺满整屏、这层其实看不见，改成纯黑不透明并去掉 blur ——
+   blur 是这里最贵的一项（每帧都要重算整块画面）。 */
 #dog::-webkit-backdrop {
-    background: rgba(0, 0, 0, .75);
-    -webkit-backdrop-filter: blur(1px);
-    backdrop-filter: blur(1px);
+    background: #000;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
 }
 
 #dog::backdrop {
-    background: rgba(0, 0, 0, .75);
-    -webkit-backdrop-filter: blur(1px);
-    backdrop-filter: blur(1px);
+    background: #000;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
 }
 
 #dog>span {
@@ -72,6 +85,15 @@
     padding-left: 0;
     position: relative;
     margin: 0 20%;
+}
+
+/* 铺满整屏后（≥1101px 时 #dog 宽度从 50% 变成 100%），内容区按比例补回原来的宽度，
+   否则播放列表会从约 430px 一下翻到约 840px，与改动前的观感差太多。
+   1100px 以下不改：那边 #dog 原本就是 80% 宽，20% 的边距保持不变。 */
+@media screen and (min-width: 1101px) {
+    #dog>div {
+        margin: 0 35%;
+    }
 }
 
 /* 长列表渲染优化：最大化列表（dog）里同样是 8800+ 行、只显示一屏，
@@ -129,6 +151,10 @@
     transition: all 0.6s;
     -webkit-padding-start: 0;
     padding-inline-start: 0;
+    /* 底部留白：不留的话最后几句滚不到窗口中线，越到结尾当前句越低。
+       取窗口高的一半（#dog 铺满后就是 50vh），正好让最后一句也能到中线。
+       audioLrcSetOffset.js 会按 clientHeight/2 动态覆盖这个值，这里只是首帧兜底。 */
+    padding-bottom: 50vh;
 }
 
 #dog>#dogLrc li {

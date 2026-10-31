@@ -444,6 +444,93 @@ let mvList = [
 let mvZeroBufTimer = null;
 
 /**
+ * 本首 MV 是否已经被判定「播不了」（出错 / 60 秒拉不动）。
+ * 置 true 之后 playSong() 不会再被抢回视频，否则 resumeMvIfNeeded 会和
+ * fallbackToAudio 互相调用，转成死循环。
+ */
+let mvAbandoned = false;
+
+/**
+ * 有 MV 的歌：点播放时优先让 MV 接着放（而不是切回音频）。
+ * 返回 true 表示「这次播放已经交给视频了」，playSong() 不用再动音频。
+ * 视频不存在 / 已经脱离文档 / 出过错 / 被判拉不动 → 返回 false，照旧走音频。
+ */
+function resumeMvIfNeeded() {
+	if (mvAbandoned) return false;
+	const video = window.audioMvVideo1;
+	if (!video || !video.isConnected || video.error || !video.src) return false;
+	// 必须确认当前这首就是这段 MV，避免残留的旧引用把别的歌抢走
+	if (!findMusic(title.textContent)) return false;
+	if (!video.paused) return false;   // 已经在放，别重复 play
+	// 视频还没到「数据够播」的程度：不接管。用户此时点播放是要马上听到声音，
+	// 不能把他继续拖在「MV 正在加载中…」上（readyState: 0 无数据 / 1 元数据 / 2 有当前帧）
+	if (video.readyState < 3) return false;
+	const attempt = video.play();
+	if (attempt && typeof attempt.catch === 'function') {
+		attempt.catch(function () {
+			// 视频起不来（编码不支持 / 被策略拦）→ 标死，退回音频
+			mvAbandoned = true;
+			playSong();
+		});
+	}
+	return true;
+}
+
+/**
+ * 当前这首的 MV 是否还在「加载中」（还没真正播出声）。
+ * 只有视频存在、就是当前这首、而且时间轴还没走起来时才算。
+ * audio.js 的播放按钮用它区分「MV 在播 / MV 在加载」：
+ * 加载中按一次按钮就直接播音频，不必先暂停再点一次。
+ */
+function mvIsLoading() {
+	const video = window.audioMvVideo1;
+	if (!video || !video.isConnected || !video.src) return false;
+	if (!findMusic(title.textContent)) return false;
+	// currentTime 还在 0 附近 = 一帧都没播过（调过 play() 后 paused 会立刻变 false，不能拿它判断）
+	return !(video.currentTime > 0.2);
+}
+
+/**
+ * 当前这首的 MV 是否真的在出声（时间轴在走）。
+ * 与 mvIsLoading 互斥：一个管「还没播起来」，一个管「已经在播」。
+ */
+function mvIsPlaying() {
+	const video = window.audioMvVideo1;
+	if (!video || !video.isConnected || !video.src) return false;
+	if (!findMusic(title.textContent)) return false;
+	return !video.paused && video.currentTime > 0.2;
+}
+
+/**
+ * 把视频跳到上次听到的位置。
+ * 挂在 video 的 loadedmetadata 上（原来挂在 video.onplay 里）：页面初始化那次
+ * 视频是 autoplay=false，永远不会 play，进度就永远恢复不到视频上。
+ */
+function resumeMvPosition(video) {
+	const saved = readSavedProgress();
+	if (!saved) return;
+	if (saved.song !== null && saved.song !== songIndex) return;   // 不是这首的进度
+	if (!isFinite(video.duration) || video.duration <= 0) return;
+	if (saved.t >= video.duration - 1) return;                     // 上次听到结尾了，从头开始
+	try {
+		video.currentTime = saved.t;
+	} catch (e) { }
+}
+
+/**
+ * 视频播放中每 5 秒存一次进度（和 audio 的 timeupdate 一个思路）。
+ * 用具名函数 + addEventListener：复用的 video 元素只会挂一次，不会重复叠加。
+ */
+let mvLastProgressSave = 0;
+function mvProgressTick() {
+	if (!this || !(this.currentTime > 0)) return;
+	const now = Date.now();
+	if (now - mvLastProgressSave < 5000) return;
+	mvLastProgressSave = now;
+	writeSavedProgress(this.currentTime);
+}
+
+/**
  * 主函数
  * @param {object} musicInfo 音乐信息
  * @param {boolean} autoplay 是否自动播放
@@ -451,6 +538,8 @@ let mvZeroBufTimer = null;
  */
 function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) {
 	if (!musicInfo || !musicInfo.srcLocalhost) return; // 无本地 MV 时直接跳过，避免 video.src = null
+	// 新的 MV 开始：清掉上一首「播不了」的标记，否则这首点播放会一直被挡回音频
+	mvAbandoned = false;
 	let audioMvVideo1Element = window.audioMvVideo1;
 	// isConnected 防御：面板被 updateVideo 清空后，window 上可能还残留已脱离文档的旧引用，
 	// 复用这种元素会改了 src 却显示不出来，必须当不存在处理、重新创建
@@ -508,7 +597,15 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 	 * autoplay=false 是页面初始化那一次，用户还没点播放，不该先摆一个加载提示。
 	 * showLoading 内部有「本首已经出过声就不提示」的闸门，视频播放中拖进度条不会盖住歌词。
 	 */
-	if (autoplay) showLoading('mv');
+	if (autoplay) {
+		showLoading('mv');
+		/**
+		 * 加载过程中按钮显示「暂停」（播放中外观）：用户按一次就直接播音频
+		 * （audio.js 的 playBtn.onclick 会走 playSong(true)），
+		 * 不会出现「先按一次暂停、再点一次才出声」。
+		 */
+		if (typeof setPlayUI === 'function') setPlayUI(true);
+	}
 	// 视频起不来时的音频兜底：只有「确实不能播放」才让音乐响。
 	// 还在加载阶段（readyState 不够）不插音频——视频在转圈、音乐先响会很怪；
 	// autoplay=false（页面初始化那次）也不插，否则一进页面就自动出声
@@ -516,6 +613,9 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 	function fallbackToAudio() {
 		if (mvFallbackUsed) return;
 		mvFallbackUsed = true;
+		// 标死「这首的 MV 播不了」：不然 playSong 里的 resumeMvIfNeeded 又去 play 视频，
+		// 和这里互相调用，来回不止
+		mvAbandoned = true;
 		playSong();
 	}
 	/**
@@ -567,6 +667,7 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 		// 已经被切歌清掉的旧 video：迟到的 error 不能去动全局引用，否则会把新 MV 的引用清空
 		if (!this.isConnected) return;
 		stopZeroBufWatch();
+		mvAbandoned = true;   // 这首的 MV 坏了，playSong 别再抢回来
 		this.remove();
 		window.audioMvVideo1 = null;
 		if (autoplay) {// 页面初始化那次（autoplay=false）不自动出声
@@ -629,6 +730,14 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 			}
 		});
 	}
+	video.onloadedmetadata = function () {
+		if (!this.isConnected) return;
+		// 恢复上次听到的位置。放在这里而不是 onplay：页面初始化那次视频是 autoplay=false，
+		// 永远不会派发 play，进度就永远恢复不到视频上（重开后 MV 一直停在 0）。
+		resumeMvPosition(this);
+	};
+	// 视频播放中每 5 秒存一次进度（被系统杀进程时 beforeunload 不触发，靠它兜底）
+	video.addEventListener('timeupdate', mvProgressTick);
 	video.onplay = function () {
 		/**
 		 * 已经被 updateVideo 清掉的旧 video，它的 play 事件可能迟到。
@@ -640,19 +749,22 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 		// MV 播起来同样算「播放成功」，把音频那边的连续失败计数清掉，
 		// 否则一路用 MV 听下去，计数只增不清，攒到 5 次就会莫名其妙整组停下
 		errorCount = 0;
-		// 本首已经出过声（声音由视频出）。标上之后，视频后续的缓冲不会再盖上「MV 正在加载中」，
-		// 也不会把歌词顶掉。
-		markSoundStarted();
-		// MV 出声了：把「MV 正在加载中…」换回歌词
-		restoreLrc();
-		// 设置音乐进度为视频进度
-		let savedTime = parseFloat(window.localStorage.getItem("musicTime")) || 0;
-		if (savedTime > 0 && savedTime < video.duration) {
-			video.currentTime = savedTime;
-		}
+		/**
+		 * ⚠️ 「已经出过声」和「把提示换回歌词」不能放在这里。
+		 * play 事件是在调 play() 请求播放的那一刻就派发的，此时数据可能一个字节都没到；
+		 * 放这里的话「MV 正在加载中…」刚显示就被歌词顶掉，用户根本看不到加载提示。
+		 * 现在改挂 video.onplaying（真的开始出声，见下面）。
+		 */
+		// ⚠️ 这里原来还会把 video.currentTime 设成 localStorage.musicTime。
+		// 已经移到 loadedmetadata（见上面的 resumeMvPosition）：onplay 里做的话，
+		// 用户手动拖过进度再暂停/播放，会被拽回旧位置。
 		// 这里是「声音改由视频出」的内部暂停，不是用户按了暂停：
 		// 传 false 避免把 playIntent 清成 false，否则从 MV 切回普通歌曲时会被当成用户不想听
 		pauseSong(false);
+		// 声音虽然改由视频出，播放器本身仍是「播放中」：按钮要显示暂停图标。
+		// 不补这一句的话，MV 一 play（哪怕还在一帧没播的加载阶段）按钮就变回播放图标，
+		// 用户以为没在播、地点一次，又被拽回视频 —— 必须再点一次才出音频。
+		setPlayUI(true);
 		// 视频最大化
 		if (video.requestFullscreen) {
 			video.requestFullscreen();
@@ -663,6 +775,16 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 		} else if (video.msRequestFullscreen) {
 			video.msRequestFullscreen();
 		}
+	};
+	/**
+	 * 视频真的开始出声（有数据在播）。
+	 * 只有到这一刻才算「本首已经出过声」：onplay 只是「请求播放」，
+	 * 那时数据可能一个字节都没到，加载提示不能被顶掉。
+	 */
+	video.onplaying = function () {
+		if (!this.isConnected) return;
+		markSoundStarted();   // 之后视频再缓冲也不会重新盖上加载提示
+		restoreLrc();         // 把「MV 正在加载中…」换回歌词
 	};
 	/**
 	 * 视频缓冲（还没起播 / 加载中途）。
@@ -774,7 +896,12 @@ function updateVideo() {
 	} catch (e) { }
 	// 判断如果video.src包含title.textContent
 	if (srcDecoded.includes(title.textContent)) {
-		window.localStorage.setItem("musicTime", video.currentTime);
+		/**
+		 * ⚠️ 这里原来是 window.localStorage.setItem("musicTime", video.currentTime)。
+		 * 视频还没起播时 currentTime 是 0，这行会把已经存好的进度直接刷成 0
+		 * （重开页面后一换歌就丢进度的元凶之一）。现在什么都不写：
+		 * 进度由「视频 timeupdate 每 5 秒」和「关页面 / 切后台」这两个时机负责。
+		 */
 		return;
 	}
 	// 切到别的歌了：把 MV 面板清空。
@@ -789,6 +916,7 @@ function updateVideo() {
 	video.onwaiting = null;
 	video.onerror = null;
 	video.onended = null;
+	video.onloadedmetadata = null;
 	window.audioMvVideo1 = null;
 	// 移除#audioMvPanel中的所有元素
 	audioMv.textContent = "";
