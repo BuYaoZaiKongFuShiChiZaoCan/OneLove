@@ -785,6 +785,8 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 		if (!this.isConnected) return;
 		markSoundStarted();   // 之后视频再缓冲也不会重新盖上加载提示
 		restoreLrc();         // 把「MV 正在加载中…」换回歌词
+		// 声音改由视频出，系统控件（通知栏/锁屏）也要显示成播放中
+		if (typeof syncMediaSessionState === "function") syncMediaSessionState();
 	};
 	/**
 	 * 视频缓冲（还没起播 / 加载中途）。
@@ -816,6 +818,8 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 			setPlayUI(false);
 			setCoverSpin(false);
 		}
+		// 视频停了：接回音频时 audio 的 play 事件会再刷一次，这里先让控件别停在播放态
+		if (typeof syncMediaSessionState === "function") syncMediaSessionState();
 	};
 	video.onended = function () {
 		lastChange === "prevSong" ? prevSong() : nextSong();

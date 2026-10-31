@@ -354,6 +354,8 @@ function loadSong(song) {
 	title.textContent = song;
 	audio.src = `music/${song}.mp3`;
 	applyCover(song);
+	// 系统媒体控件（安卓通知栏/锁屏）的标题与封面跟着这首走
+	updateMediaSession(song);
 }
 
 /**
@@ -1081,25 +1083,80 @@ for (let i = 0; i < links.length; i++) {
 	});
 }
 
+/**
+ * 系统媒体控件（安卓通知栏 / 锁屏 / 蓝牙耳机）上显示的曲目信息。
+ * 原来这段只在脚本加载时跑一次，用的是初始化那一刻的 songs[songIndex] ——
+ * 所以切歌之后控件里的标题和封面永远停在第一首，能控制但信息不跟着走。
+ * 现在由 loadSong() 每次切歌调用一次。
+ */
+function updateMediaSession(song) {
+	if (!("mediaSession" in navigator) || typeof MediaMetadata !== "function") return;
+	if (!song) return;
+	// 列表条目绝大多数是「歌手 - 歌名」，拆开显示；173 条没有分隔符，就整行当标题
+	var sep = song.indexOf(' - ');
+	var artist = sep > 0 ? song.slice(0, sep) : '';
+	var name = sep > 0 ? song.slice(sep + 3) : song;
+	try {
+		navigator.mediaSession.metadata = new MediaMetadata({
+			title: name,
+			artist: artist,
+			album: 'OneLove',
+			/**
+			 * artwork 不写 sizes / type：封面实际是 PNG 480×480（少量 300×300、个别 JPEG），
+			 * 原来写死 '96x96' + 'image/jpeg' 等于给系统一个错误的声明，安卓那边取图会失败。
+			 * 歌名里有 # & % 的（5 条含 #、133 条含 &），不编码会把 URL 截断，所以整体编码。
+			 */
+			artwork: [{ src: 'music/audio/' + encodeURIComponent(song) + '.png' }]
+		});
+	} catch (e) {
+		// 元数据构造失败不影响播放，跳过即可
+	}
+}
+
+/**
+ * 把「播放/暂停状态」同步给系统控件。
+ * 状态以「谁真的在出声」为准：MV 播起来时 audio 是被内部暂停的，
+ * 只看 audio.paused 会把锁屏按钮显示成暂停态。
+ */
+function syncMediaSessionState() {
+	if (!("mediaSession" in navigator)) return;
+	var mvPlaying = typeof mvIsPlaying === "function" && mvIsPlaying();
+	try {
+		navigator.mediaSession.playbackState = (mvPlaying || !audio.paused) ? 'playing' : 'paused';
+	} catch (e) { }
+	updatePositionState();
+}
+
+/**
+ * 把进度同步给系统控件（锁屏/通知里的时间轴）。
+ * 每秒最多一次：timeupdate 一秒能触发好几次，调太勤在安卓上会拖慢。
+ */
+var lastPosState = 0;
+function updatePositionState(force) {
+	if (!("mediaSession" in navigator) || typeof navigator.mediaSession.setPositionState !== "function") return;
+	// MV 出声时进度归视频管，音频停在旧位置，拿它去改控件进度条会跳回错误的时间
+	if (typeof mvIsPlaying === "function" && mvIsPlaying()) return;
+	var d = audio.duration;
+	if (!isFinite(d) || d <= 0) return;
+	var now = Date.now();
+	if (!force && now - lastPosState < 1000) return;
+	lastPosState = now;
+	try {
+		navigator.mediaSession.setPositionState({
+			duration: d,
+			playbackRate: audio.playbackRate || 1,
+			position: Math.min(Math.max(audio.currentTime, 0), d)
+		});
+	} catch (e) { }
+}
+
 // Chrome for Android 和 Safari for iOS 提供了 navigator.mediaSession API，可以用来监听耳机按钮事件。
 // 如果浏览器支持navigator.mediaSession API就可以运行这个东西
 let skipTime = 5; // 要跳过的秒数
 if ("mediaSession" in navigator) {
 	// 下面的示例创建一个新的 media session 并且为它添加监听器
-	// 设置媒体会话信息
-	navigator.mediaSession.metadata = new MediaMetadata({
-		title: songs[songIndex],
-		artist: '歌手',// 一些元数据
-		album: '专辑名称',
-		artwork: [
-			{ src: `./music/audio/${songs[songIndex]}.png`, sizes: '96x96', type: 'image/jpeg' } // ,
-			// { src: 'albumart.jpg', sizes: '128x128', type: 'image/jpeg' },
-			// { src: 'albumart.jpg', sizes: '192x192', type: 'image/jpeg' },
-			// { src: 'albumart.jpg', sizes: '256x256', type: 'image/jpeg' },
-			// { src: 'albumart.jpg', sizes: '384x384', type: 'image/jpeg' },
-			// { src: 'albumart.jpg', sizes: '512x512', type: 'image/jpeg' },
-		]
-	});
+	// 设置媒体会话信息（切歌时由 loadSong → updateMediaSession 刷新，这里只填初始化那一首）
+	updateMediaSession(songs[songIndex]);
 	// 监听媒体按钮事件
 	navigator.mediaSession.setActionHandler("play", function () {
 		// 处理播放按钮事件
@@ -1140,3 +1197,17 @@ if ("mediaSession" in navigator) {
 } else {
 	console.log('浏览器不支持navigator.mediaSession API');
 }
+
+/**
+ * 状态与进度同步。
+ * 挂元素事件而不是写在 handler 里：拔耳机、来电、播放结束这些「不是用户点按钮」的变化
+ * 也能反映到系统控件上，否则控件会一直显示成播放中。
+ */
+audio.addEventListener('play', syncMediaSessionState);
+audio.addEventListener('playing', syncMediaSessionState);
+audio.addEventListener('pause', syncMediaSessionState);
+audio.addEventListener('ended', syncMediaSessionState);
+audio.addEventListener('timeupdate', function () { updatePositionState(); });
+// duration 这时候才有效，必须强制刷一次，否则锁屏进度条没有总时长
+audio.addEventListener('loadedmetadata', function () { updatePositionState(true); });
+audio.addEventListener('seeked', function () { updatePositionState(true); });
