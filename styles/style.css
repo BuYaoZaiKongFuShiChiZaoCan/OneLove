@@ -1428,6 +1428,13 @@ main#main-body #sidePanel #cbThree .action-btn.action-btn-big {
     font-size: 30px;
 }
 
+/* 悬浮歌词按钮（第四个）：默认 flex-shrink:1 会让它在 270px 的容器里被挤成 10px 宽，
+   加上 flex:0 0 auto 保持正常尺寸；右侧边距收窄，整行才不会比容器宽 */
+main#main-body #sidePanel #cbThree .action-btn#floatLyricBtn {
+    flex: 0 0 auto;
+    margin: 0 4px 0 10px;
+}
+
 main#main-body #sidePanel #cbThree .music-info {
     position: absolute;
     top: 0;
