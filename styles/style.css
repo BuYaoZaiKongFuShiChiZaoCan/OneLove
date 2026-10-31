@@ -1332,7 +1332,8 @@ main#main-body #sidePanel #cbThree .music-container {
     border-radius: 15px;
     box-shadow: 0 20px 20px 0 rgba(8, 182, 212, 0.4);
     display: flex;
-    padding: 20px 30px !important;
+    /* 底部 24px：给三键下方那颗悬浮歌词按钮留出位置（见 #floatLyricBtn） */
+    padding: 20px 30px 24px !important;
     position: relative;
     margin: 60px 0 40px 0;
     transform: translateY(20px) scale(0.9);
@@ -1403,6 +1404,7 @@ main#main-body #sidePanel #cbThree .navigation {
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
     z-index: 1;
     transform: translateX(40px);
 }
@@ -1428,11 +1430,19 @@ main#main-body #sidePanel #cbThree .action-btn.action-btn-big {
     font-size: 30px;
 }
 
-/* 悬浮歌词按钮（第四个）：默认 flex-shrink:1 会让它在 270px 的容器里被挤成 10px 宽，
-   加上 flex:0 0 auto 保持正常尺寸；右侧边距收窄，整行才不会比容器宽 */
+/* 悬浮歌词按钮（第四个）：脱离横排，绝对定位到三键正下方居中——
+   用 flex-basis:100% 换行会反过来压缩导航宽度、把卡片撑高一大截，
+   所以这里让它 absolute 出流，只借导航的 padding box 做居中参考 */
 main#main-body #sidePanel #cbThree .action-btn#floatLyricBtn {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin: 2px 0 0 0;
+    padding: 0;
+    line-height: 1;
     flex: 0 0 auto;
-    margin: 0 4px 0 10px;
+    transform: translateX(-50%);
+    color: #0decfc;
 }
 
 main#main-body #sidePanel #cbThree .music-info {
