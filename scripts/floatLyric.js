@@ -1,9 +1,10 @@
 /**
  * 桌面悬浮歌词
  *
- * 电脑（Chrome / Edge 116+）：用 Document Picture-in-Picture 开一个独立窗口，
+ * 只做电脑端：用 Document Picture-in-Picture 开一个独立窗口，
  *   始终置顶、可以拖到屏幕任意位置、可以缩放，盖在其他应用之上。
- * 手机 / 不支持该 API 的浏览器：退化成页面内可拖动的悬浮层（切走标签页就看不到）。
+ * 手机 / 不支持该 API 的浏览器：这个功能无从实现，直接隐藏入口按钮与侧边菜单设置块，
+ *   不保留任何降级形态（页面内悬浮层已移除）。
  *
  * 内容直接读主界面 #lrc 里被标记 active 的那一行，不另建一套歌词解析，
  * 保证两边永远同步。显示模式（三行 / 单行 / 歌名封面）存在 localStorage，
@@ -13,7 +14,6 @@
 	'use strict';
 
 	var MODE_KEY = 'floatLyricMode';
-	var POS_KEY = 'floatLyricPos';
 	var MODES = [
 		{ key: 'three', label: '三行' },
 		{ key: 'one', label: '单行' },
@@ -60,16 +60,7 @@
 		'#flRoot .fl-close svg{width:13px;height:13px}'
 	].join('');
 
-	// 只在「页面内悬浮层」生效
-	var STYLE_INLINE = [
-		'#flRoot{position:fixed;width:300px;height:auto;padding:14px 16px;',
-		'background:rgba(16,16,18,.9);border-radius:12px;border:1px solid rgba(255,255,255,.12);',
-		'box-shadow:0 10px 28px rgba(0,0,0,.4);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);',
-		'z-index:99999;cursor:move;touch-action:none}'
-	].join('');
-
 	var pipWindow = null;      // Document PiP 窗口
-	var inlineRoot = null;     // 页面内降级层
 	var tickTimer = null;
 	var lastSig = '';
 
@@ -116,13 +107,9 @@
 	}
 
 	function applyMode() {
-		var m = getMode();
-		var roots = [];
-		if (pipWindow && pipWindow.document.getElementById('flRoot')) {
-			roots.push(pipWindow.document.getElementById('flRoot'));
-		}
-		if (inlineRoot) roots.push(inlineRoot);
-		for (var i = 0; i < roots.length; i++) roots[i].setAttribute('data-mode', m);
+		if (!pipWindow) return;
+		var root = pipWindow.document.getElementById('flRoot');
+		if (root) root.setAttribute('data-mode', getMode());
 	}
 
 	/* ---------------- 取歌词 ---------------- */
@@ -205,16 +192,13 @@
 	}
 
 	function syncPlayIcon() {
-		var roots = [];
-		if (pipWindow) roots.push(pipWindow.document);
-		if (inlineRoot) roots.push(document);
+		if (!pipWindow) return;
+		var root = pipWindow.document.getElementById('flRoot');
+		if (!root) return;
+		var pb = root.querySelector('.fl-play-btn');
+		if (!pb) return;
 		var playing = !audio.paused || (typeof mvIsPlaying === 'function' && mvIsPlaying());
-		for (var i = 0; i < roots.length; i++) {
-			var btn = roots[i].getElementById('flRoot');
-			if (!btn) continue;
-			var pb = btn.querySelector('.fl-play-btn');
-			if (pb) pb.innerHTML = playing ? ICONS.pause : ICONS.play;
-		}
+		pb.innerHTML = playing ? ICONS.pause : ICONS.play;
 	}
 
 	/* ---------------- 内容同步 ---------------- */
@@ -222,8 +206,8 @@
 	function tick() {
 		// 用户把 PiP 窗口关掉后，定时器该自己收工，不用等他再点按钮
 		if (pipWindow && pipWindow.closed) { syncPipState(); return; }
-		var doc = pipWindow ? pipWindow.document : (inlineRoot ? document : null);
-		if (!doc) return;
+		if (!pipWindow) return;
+		var doc = pipWindow.document;
 		var root = doc.getElementById('flRoot');
 		if (!root) return;
 
@@ -300,13 +284,14 @@
 
 	function openFloatLyric() {
 		syncPipState();
-		if (pipWindow || inlineRoot) { closeFloatLyric(); return; }
+		if (pipWindow) { closeFloatLyric(); return; }
 
-		if (pipSupported()) {
-			openViaPip();
-		} else {
-			openInline();
+		if (!pipSupported()) {
+			// 手机端等不支持 PiP 的环境：这个功能无法实现，入口直接隐藏，不做降级
+			hideEntry();
+			return;
 		}
+		openViaPip();
 	}
 
 	function openViaPip() {
@@ -331,28 +316,10 @@
 				startTicking();
 			})
 			.catch(function (err) {
-				// 浏览器拒了（非安全上下文 / 策略限制）→ 退回页面内悬浮层
-				console.warn('Document PiP 打开失败，改用页面内悬浮层：', err);
-				openInline();
+				// 浏览器拒了（非安全上下文 / 策略限制）：做不到就不留一个点了没反应的按钮
+				console.warn('Document PiP 打开失败，隐藏悬浮歌词入口：', err);
+				hideEntry();
 			});
-	}
-
-	function openInline() {
-		if (!document.getElementById('flFloatStyle')) {
-			var style = document.createElement('style');
-			style.id = 'flFloatStyle';
-			style.textContent = STYLE_COMMON + STYLE_INLINE;
-			document.head.appendChild(style);
-		}
-		document.body.classList.add('fl-inline');
-		var root = buildRoot(document);
-		document.body.appendChild(root);
-		inlineRoot = root;
-		applyMode();
-		restoreInlinePos(root);
-		enableInlineDrag(root);
-		lastSig = '';
-		startTicking();
 	}
 
 	function closeFloatLyric() {
@@ -360,73 +327,8 @@
 			try { pipWindow.close(); } catch (e) { }
 			pipWindow = null;
 		}
-		if (inlineRoot) {
-			if (inlineRoot.parentNode) inlineRoot.parentNode.removeChild(inlineRoot);
-			inlineRoot = null;
-			document.body.classList.remove('fl-inline');
-		}
 		stopTicking();
 		lastSig = '';
-	}
-
-	/* ---------------- 页面内悬浮层的拖动 ---------------- */
-
-	function restoreInlinePos(root) {
-		var pos = null;
-		try { pos = JSON.parse(localStorage.getItem(POS_KEY) || 'null'); } catch (e) { }
-		var w = root.offsetWidth || 300;
-		var h = root.offsetHeight || 120;
-		var left, top;
-		if (pos && typeof pos.left === 'number' && typeof pos.top === 'number') {
-			left = pos.left;
-			top = pos.top;
-		} else {
-			left = Math.max(8, window.innerWidth - w - 16);
-			top = Math.max(8, window.innerHeight - h - 90);
-		}
-		left = Math.min(Math.max(left, 4), Math.max(4, window.innerWidth - w - 4));
-		top = Math.min(Math.max(top, 4), Math.max(4, window.innerHeight - h - 4));
-		root.style.left = left + 'px';
-		root.style.top = top + 'px';
-	}
-
-	function enableInlineDrag(root) {
-		var dragging = false, offX = 0, offY = 0;
-		root.addEventListener('pointerdown', function (e) {
-			// 点在按钮上就交给按钮
-			if (e.target.closest('button')) return;
-			dragging = true;
-			var rect = root.getBoundingClientRect();
-			offX = e.clientX - rect.left;
-			offY = e.clientY - rect.top;
-			try { root.setPointerCapture(e.pointerId); } catch (err) { }
-		});
-		root.addEventListener('pointermove', function (e) {
-			if (!dragging) return;
-			var w = root.offsetWidth, h = root.offsetHeight;
-			var left = Math.min(Math.max(e.clientX - offX, 4), Math.max(4, window.innerWidth - w - 4));
-			var top = Math.min(Math.max(e.clientY - offY, 4), Math.max(4, window.innerHeight - h - 4));
-			root.style.left = left + 'px';
-			root.style.top = top + 'px';
-		});
-		root.addEventListener('pointerup', function (e) {
-			if (!dragging) return;
-			dragging = false;
-			try { root.releasePointerCapture(e.pointerId); } catch (err) { }
-			saveInlinePos(root);
-		});
-		root.addEventListener('pointercancel', function () {
-			dragging = false;
-		});
-	}
-
-	function saveInlinePos(root) {
-		try {
-			localStorage.setItem(POS_KEY, JSON.stringify({
-				left: parseInt(root.style.left, 10) || 0,
-				top: parseInt(root.style.top, 10) || 0
-			}));
-		} catch (e) { }
 	}
 
 	/* ---------------- 对外暴露 ---------------- */
@@ -434,7 +336,21 @@
 	window.openFloatLyric = openFloatLyric;
 	window.closeFloatLyric = closeFloatLyric;
 	window.cycleFloatLyricMode = cycleMode;
-	window.isFloatLyricOpen = function () { syncPipState(); return !!(pipWindow || inlineRoot); };
+	window.isFloatLyricOpen = function () { syncPipState(); return !!pipWindow; };
+
+	/** 手机等不支持 PiP 的环境：把入口按钮和侧边菜单设置块一起藏掉，功能整体不提供 */
+	function hideEntry() {
+		var ids = ['floatLyricBtn', 'sideMenuFloatLyric'];
+		for (var i = 0; i < ids.length; i++) {
+			var el = document.getElementById(ids[i]);
+			if (el) el.style.display = 'none';
+		}
+	}
+
+	if (!pipSupported()) {
+		hideEntry();
+		return;
+	}
 
 	// 侧边菜单在页面里是静态 HTML，脚本执行时它已经存在
 	var modeBtn = document.getElementById('floatLyricModeBtn');

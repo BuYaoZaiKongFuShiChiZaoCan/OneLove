@@ -16,6 +16,9 @@
     box-sizing: border-box;
     position: fixed;
     border-radius: 0;
+    /* dialog 的 UA 默认样式是 `border: solid`（无宽度 = medium = 3px，颜色取 currentColor），
+       铺满整屏后就是一圈包边的黑框，看着像输入框聚焦。项目 CSS 里没写过 border，必须显式清零。 */
+    border: 0;
 }
 
 #dog:focus-visible {
@@ -37,10 +40,29 @@
     backdrop-filter: none;
 }
 
+/* 关闭按钮：原来只写了 position: fixed 没给偏移，实际仍落在左上角贴边、字很小。
+   铺满整屏后放到右上角，并给一点按钮质感（不改配色）。 */
 #dog>span {
     z-index: 99;
     position: fixed;
+    top: 14px;
+    right: 18px;
     display: inline-block;
+    padding: 7px 16px;
+    font-size: 14px;
+    line-height: 1;
+    color: #666;
+    background: #f4f4f4;
+    border-radius: 999px;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    transition: background .2s, color .2s;
+}
+
+#dog>span:hover {
+    color: #222;
+    background: #e8e8e8;
 }
 
 
@@ -158,15 +180,16 @@
 }
 
 #dog>#dogLrc li {
-    /* 与 style.css 里的 #lrc 同一套改法：基准即放大态（17px × 1.3），
-       未唱到的句子 scale(1/1.3) 缩回 17px 观感，当前句 scale(1)。
+    /* 与 style.css 里的 #lrc 同一套改法：基准即放大态（19px × 1.3），
+       未唱到的句子 scale(1/1.3) 缩回 19px 观感，当前句 scale(1)。
        这样放大的那一句也不会撑出 dialog 的内容盒（原来的 scale(1.3) 会溢出）。 */
-    line-height: 28.6px;
-    font-size: 22.1px;
+    line-height: 33px;
+    font-size: 24.7px;
+    letter-spacing: 0.3px;
     list-style: none;
     transition: .8s;
     height: 100%;
-    min-height: 19.6px;
+    min-height: 21.2px;
     transform: scale(0.76923); /* = 1 / 1.3 */
     transform-origin: center;
 }
