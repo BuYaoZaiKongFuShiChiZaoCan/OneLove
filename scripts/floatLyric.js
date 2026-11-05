@@ -20,6 +20,10 @@
 		{ key: 'meta', label: '歌名封面' }
 	];
 
+	// 每行固定高度：滚动动画靠整条轨道位移一行来实现，行高不固定就会错位
+	var ROW_H = 22;
+	var SCROLL_MS = 320;
+
 	// 图标用内联 SVG：PiP 窗口是独立 document，拿不到主页面的 font-awesome 样式
 	var ICONS = {
 		prev: '<svg viewBox="0 0 24 24"><path d="M7 5h2v14H7zm12 0L9 12l10 7V5z"/></svg>',
@@ -41,16 +45,25 @@
 		'#flRoot{position:relative;height:100%;box-sizing:border-box;padding:10px 14px;',
 		'display:flex;flex-direction:column;justify-content:center;gap:6px;',
 		'color:#eee;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Microsoft YaHei",sans-serif;',
-		'-webkit-user-select:none;user-select:none}',
+		'-webkit-user-select:none;user-select:none;animation:flRootIn .42s ease both}',
+		// 窗口一打开，整块轻轻淡入 + 上移 6px 归位
+		'@keyframes flRootIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}',
 		'#flRoot .fl-meta{display:none;align-items:center;gap:8px;min-width:0;padding-right:14px}',
 		'#flRoot[data-mode="meta"] .fl-meta{display:flex}',
 		'#flRoot .fl-cover{width:30px;height:30px;border-radius:6px;object-fit:cover;background:#222;flex:0 0 auto}',
 		'#flRoot .fl-title{font-size:12px;color:#b9b9b9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-		'#flRoot .fl-lines{display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center;min-width:0}',
-		'#flRoot .fl-prev,#flRoot .fl-next{font-size:13px;color:#8d8d8d;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-		'#flRoot .fl-now{font-size:18px;font-weight:600;color:pink;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-		'#flRoot[data-mode="one"] .fl-prev,#flRoot[data-mode="one"] .fl-next,',
-		'#flRoot[data-mode="meta"] .fl-prev,#flRoot[data-mode="meta"] .fl-next{display:none}',
+		// 歌词视口：只露 3 行（三行模式）或 1 行（单行/歌名封面），多出来的行靠 overflow 裁掉
+		'#flRoot .fl-viewport{width:100%;overflow:hidden}',
+		'#flRoot[data-mode="three"] .fl-viewport{height:' + (ROW_H * 3) + 'px}',
+		'#flRoot[data-mode="one"] .fl-viewport,',
+		'#flRoot[data-mode="meta"] .fl-viewport{height:' + ROW_H + 'px}',
+		// 轨道：4 行排成一条竖条，换句时整条向上位移一行，动画结束后重排再归位
+		'#flRoot .fl-track{transition:transform ' + SCROLL_MS + 'ms cubic-bezier(.4,0,.2,1)}',
+		'#flRoot .fl-line{height:' + ROW_H + 'px;line-height:' + ROW_H + 'px;font-size:13px;color:#8d8d8d;',
+		'text-align:center;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;',
+		// 滚动结束重排时，同一行会从「当前句 18px 粉」变成「上一句 13px 灰」，小小过渡一下不显得啪地一跳
+		'transition:font-size .18s ease,color .18s ease}',
+		'#flRoot .fl-line.now{font-size:18px;font-weight:600;color:pink}',
 		'#flRoot .fl-bar{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:2px}',
 		'#flRoot .fl-btn{border:0;background:transparent;color:#cfcfcf;cursor:pointer;padding:3px;line-height:0;border-radius:6px}',
 		'#flRoot .fl-btn svg{width:15px;height:15px;fill:currentColor}',
@@ -62,7 +75,11 @@
 
 	var pipWindow = null;      // Document PiP 窗口
 	var tickTimer = null;
-	var lastSig = '';
+	var viewportEl = null;     // 歌词视口（淡入淡出挂在它上面）
+	var trackEl = null;        // 4 行轨道
+	var lineEls = [];          // 始终按 DOM 顺序排列的 4 个行元素
+	var animating = false;     // 滚动动画进行中，这段时间不重排
+	var shown = { song: '', idx: -1 };
 
 	/* ---------------- 配置 ---------------- */
 
@@ -101,7 +118,6 @@
 		var next = MODES[(idx + 1) % MODES.length].key;
 		try { localStorage.setItem(MODE_KEY, next); } catch (e) { }
 		renderModeBtn();
-		lastSig = '';
 		applyMode();
 		tick();
 	}
@@ -110,6 +126,24 @@
 		if (!pipWindow) return;
 		var root = pipWindow.document.getElementById('flRoot');
 		if (root) root.setAttribute('data-mode', getMode());
+		// 三行模式显示第 1~3 行，单行模式只露中间那行 —— 轨道基准位移跟着模式走
+		setTrack(baseOffset(), false);
+	}
+
+	/** 视口只露 1 行时，把轨道往上推一行，让 now（第 2 行）露在视口里 */
+	function baseOffset() {
+		return getMode() === 'three' ? 0 : -ROW_H;
+	}
+
+	function setTrack(y, animate) {
+		if (!trackEl) return;
+		// 归位时必须先关掉过渡，否则「重排」这一步会连带一个反向回弹动画
+		trackEl.style.transition = animate ? '' : 'none';
+		trackEl.style.transform = 'translateY(' + y + 'px)';
+		if (!animate) {
+			void trackEl.offsetHeight;
+			trackEl.style.transition = '';
+		}
 	}
 
 	/* ---------------- 取歌词 ---------------- */
@@ -150,17 +184,23 @@
 		root.setAttribute('data-mode', getMode());
 		root.innerHTML =
 			'<div class="fl-meta"><img class="fl-cover" alt="" /><div class="fl-title"></div></div>' +
-			'<div class="fl-lines">' +
-			'<div class="fl-prev"></div>' +
-			'<div class="fl-now">♪</div>' +
-			'<div class="fl-next"></div>' +
-			'</div>' +
+			'<div class="fl-viewport"><div class="fl-track">' +
+			'<div class="fl-line prev"></div>' +
+			'<div class="fl-line now">♪</div>' +
+			'<div class="fl-line next"></div>' +
+			'<div class="fl-line next"></div>' +   // 第 4 行：滚动时从下方进入的那一行，平时藏在视口外
+			'</div></div>' +
 			'<div class="fl-bar">' +
 			'<button class="fl-btn fl-prev-btn" title="上一首">' + ICONS.prev + '</button>' +
 			'<button class="fl-btn fl-play-btn" title="播放 / 暂停">' + ICONS.play + '</button>' +
 			'<button class="fl-btn fl-next-btn" title="下一首">' + ICONS.next + '</button>' +
 			'</div>' +
 			'<button class="fl-btn fl-close" title="关闭悬浮歌词">' + ICONS.close + '</button>';
+
+		viewportEl = root.querySelector('.fl-viewport');
+		trackEl = root.querySelector('.fl-track');
+		lineEls = Array.prototype.slice.call(trackEl.children);
+		animating = false;
 
 		root.querySelector('.fl-prev-btn').addEventListener('click', function () {
 			if (typeof prevSong === 'function') prevSong();
@@ -201,7 +241,80 @@
 		pb.innerHTML = playing ? ICONS.pause : ICONS.play;
 	}
 
+	/** 关窗/重开时把「已显示的句子」状态作废，下次 tick 直接整块重绘 */
+	function resetShown() {
+		shown.song = '';
+		shown.idx = -1;
+		animating = false;
+	}
+
 	/* ---------------- 内容同步 ---------------- */
+
+	/** 按 DOM 顺序写 4 行文本：0=上一句 1=当前句 2=下一句 3=缓冲（视口外） */
+	function paintLines(prev, now, next, buffer) {
+		if (lineEls.length < 4) return;
+		lineEls[0].textContent = prev;
+		lineEls[1].textContent = now;
+		lineEls[2].textContent = next;
+		lineEls[3].textContent = buffer;
+	}
+
+	/**
+	 * 顺序前进一句：整体向上滚一行。
+	 * 先把「再下一句」写进第 4 行（藏在视口下面），再让轨道上移一行，
+	 * 动画结束把滚出视口的第一行挪到末尾当缓冲，轨道瞬间归位（视觉上是连续的）。
+	 */
+	function rollUp(list, idx) {
+		if (lineEls.length < 4 || !trackEl) return false;
+		lineEls[3].textContent = lineText(list, idx + 2);
+
+		var finished = false;
+		var finish = function () {
+			if (finished) return;
+			finished = true;
+			trackEl.removeEventListener('transitionend', finish);
+			var top = lineEls.shift();
+			trackEl.appendChild(top);
+			lineEls.push(top);
+			for (var i = 0; i < lineEls.length; i++) {
+				lineEls[i].className = 'fl-line ' + (i === 0 ? 'prev' : i === 1 ? 'now' : 'next');
+			}
+			setTrack(baseOffset(), false);
+			animating = false;
+			tick();   // 动画期间 tick 是跳过的，这里补一次，防止滚动过程中又换了句
+		};
+
+		animating = true;
+		setTrack(baseOffset() - ROW_H, true);
+		trackEl.addEventListener('transitionend', finish);
+		// 窗口被遮挡时 transitionend 可能不派发，必须有兜底
+		setTimeout(finish, SCROLL_MS + 140);
+		return true;
+	}
+
+	/** 整块淡入：切歌、跳句、后退时用（跨多句时滚动会滑很远，不如直接淡入） */
+	function fadeViewport() {
+		if (!viewportEl) return;
+		viewportEl.style.opacity = '0';
+		void viewportEl.offsetHeight;
+		viewportEl.style.transition = 'opacity .3s ease';
+		viewportEl.style.opacity = '1';
+		setTimeout(function () {
+			if (viewportEl) viewportEl.style.transition = '';
+		}, 420);
+	}
+
+	/** 直接渲染某一句的上下三行（不滚动），可选淡入 */
+	function renderStatic(list, idx, fade) {
+		var prev = idx > 0 ? lineText(list, idx - 1) : '';
+		var now = idx >= 0 ? lineText(list, idx) : '';
+		var next = (list && idx >= 0) ? lineText(list, idx + 1) : '';
+		var song = currentSong();
+		if (!now) now = song ? '♪ ' + song : '♪';
+		paintLines(prev, now, next, '');
+		setTrack(baseOffset(), false);
+		if (fade) fadeViewport();
+	}
 
 	function tick() {
 		// 用户把 PiP 窗口关掉后，定时器该自己收工，不用等他再点按钮
@@ -213,23 +326,9 @@
 
 		var list = document.getElementById('lrc');
 		var idx = currentIndex();
-		var prev = idx > 0 ? lineText(list, idx - 1) : '';
-		var now = idx >= 0 ? lineText(list, idx) : '';
-		var next = (list && idx >= 0) ? lineText(list, idx + 1) : '';
 		var song = currentSong();
-		if (!now) now = song ? '♪ ' + song : '♪';
 
-		var sig = getMode() + '|' + song + '|' + prev + '|' + now + '|' + next;
-		if (sig === lastSig) return;
-		lastSig = sig;
-
-		var elNow = root.querySelector('.fl-now');
-		var elPrev = root.querySelector('.fl-prev');
-		var elNext = root.querySelector('.fl-next');
-		if (elNow) elNow.textContent = now;
-		if (elPrev) elPrev.textContent = prev;
-		if (elNext) elNext.textContent = next;
-
+		// 封面 / 歌名 / 播放图标随时跟上，跟歌词滚动互不影响
 		var elTitle = root.querySelector('.fl-title');
 		if (elTitle) elTitle.textContent = song;
 		var elCover = root.querySelector('.fl-cover');
@@ -242,6 +341,20 @@
 			}
 		}
 		syncPlayIcon();
+
+		// 滚动动画进行中不碰歌词，否则轨道会错位；动画结束会自己补一次 tick
+		if (animating) return;
+
+		var prevIdx = shown.idx;
+		var songChanged = song !== shown.song;
+		var idxChanged = idx !== prevIdx;
+		if (!songChanged && !idxChanged) return;
+		shown.song = song;
+		shown.idx = idx;
+
+		// 同一首歌里往前挪一句才滚；切歌、跳句、后退一律淡入替换
+		if (!songChanged && idx === prevIdx + 1 && rollUp(list, idx)) return;
+		renderStatic(list, idx, true);
 	}
 
 	function startTicking() {
@@ -279,7 +392,7 @@
 		if (!pipWindow.closed) return;
 		pipWindow = null;
 		stopTicking();
-		lastSig = '';
+		resetShown();
 	}
 
 	function openFloatLyric() {
@@ -309,10 +422,10 @@
 					// 用户点了窗口的关闭按钮
 					pipWindow = null;
 					stopTicking();
-					lastSig = '';
+					resetShown();
 				});
 				applyMode();
-				lastSig = '';
+				resetShown();
 				startTicking();
 			})
 			.catch(function (err) {
@@ -328,7 +441,7 @@
 			pipWindow = null;
 		}
 		stopTicking();
-		lastSig = '';
+		resetShown();
 	}
 
 	/* ---------------- 对外暴露 ---------------- */
