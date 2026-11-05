@@ -266,7 +266,8 @@
 	 */
 	function rollUp(list, idx) {
 		if (lineEls.length < 4 || !trackEl) return false;
-		lineEls[3].textContent = lineText(list, idx + 2);
+		// 滚到 -ROW_H 后视口会露出第 2~4 行，第 4 行必须是「新当前句的下一句」= idx+1
+		lineEls[3].textContent = lineText(list, idx + 1);
 
 		var finished = false;
 		var finish = function () {
