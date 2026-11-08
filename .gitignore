@@ -115,5 +115,10 @@ Thumbs.db
 # 本地 Netlify 文件夹
 .netlify
 
+# Cloudflare Pages 部署产物（由 deploy-cf.mjs 生成，硬链接，不入库）
+.cf-dist/
+.cf-dist-skipped.txt
+.wrangler/
+
 # 本地Data文件夹
 Data/Resources
