@@ -52,7 +52,10 @@ const SKIP_ROOT_FILES = new Set([
 	'deploy-cf.mjs',
 	'.gitignore',
 	'.gitattributes',
-	'Start.cmd'
+	'Start.cmd',
+	// 上一轮生成的超限清单。它写在项目根目录，第二遍 walk 时会被当成普通文件带进产物，
+	// 结果 https://<站点>/.cf-dist-skipped.txt 可公开访问 —— 内部清单不该上线。
+	OUT_NAME + '-skipped.txt'
 ]);
 
 const args = new Set(process.argv.slice(2));
