@@ -1836,6 +1836,730 @@ let songs = [
 	"AViVA - GRRRLS",
 	/* 酷狗音乐歌单结束 */
 	"陪我过个冬",
+	/* 我喜欢歌单·酷狗（共 2353 首：与上方列表重复 877 首已跳过、下载成功并入 498 首、以下 731 首暂无法下载） */
+	"邓寓君(等什么君) - 叹郁孤",
+	"晓龙、苏妤 - 七滴相思泪",
+	"Thomas Greenberg - The Right Path", // 可能重复·B(较可能同一首)
+	"凯大大 - The Right Path",
+	"陆树铭 - 一壶老酒", // 可能重复·B(较可能同一首)
+	"誓言 - 求佛", // 可能重复·B(较可能同一首)
+	"誓言 - 求佛 (DJ默涵版)",
+	"汪峰 - 勇敢的心",
+	"曾春年 - 最幸福的人",
+	"S.H.E - 中国话",
+	"张含韵 - 想唱就唱",
+	"孙子涵、李潇潇 - 全世界宣布爱你",
+	"兰雨 - 最后一次的温柔", // 可能重复·B(较可能同一首)
+	"甜瓜儿不是呆瓜 - 最后一次的温柔",
+	"花僮 - 笑纳",
+	"徐泽（要不要买菜） - 下山",
+	"程响 - 世界这么大还是遇见你",
+	"杨胖雨 - 情深深雨濛濛",
+	"庄心妍 - 再见只是陌生人", // 可能重复·C(可能同一首)
+	"邓寓君(等什么君) - 笑看",
+	"林俊杰 - 醉赤壁", // 可能重复·B(较可能同一首)
+	"en (王翊恩) - 云水谣",
+	"王媛渊 - 三妻四妾", // 可能重复·B(较可能同一首)
+	"贺一航 - 我又想你了",
+	"Acreix - Visions",
+	"王雨笙 - Here we are again",
+	"Peter Roe - One Love",
+	"吴埈成 - Sad Run",
+	"Era - The Mass (Surround Sound)", // 可能重复·B(较可能同一首)
+	"Else - Paris (巴黎)", // 同「我创建·。」
+	"悠悠琴韵 - Theme Of Exodus (出埃及记)(钢琴版)",
+	"华莎 - 마리아 (María) (玛利亚)", // 同「我创建·two」
+	"李荣浩 - 年少有为", // 可能重复·B(较可能同一首)
+	"张靓颖 - 我的梦",
+	"深海鱼子酱 - 千千万万",
+	"凤飞飞 - 追梦人", // 可能重复·B(较可能同一首)
+	"Martin Garrix、Troye Sivan - There For You", // 同「我创建·和平精英音乐合集」
+	"尚士达 - 生而为人", // 可能重复·B(较可能同一首)
+	"小星星Aurora - 坠落星空",
+	"杨栋梁、夏婉安 - 我的心在海对面",
+	"Superluckyqi - 直觉",
+	"王贰浪 - 人间城",
+	"王铮亮 - 时间都去哪儿了", // 同「我创建·默认收藏」
+	"井迪 - 失控",
+	"徐梓淳 - 嫌晚",
+	"薛之谦 - 天外来物", // 可能重复·B(较可能同一首)
+	"yihuik苡慧 - 银河与星斗",
+	"不是花火呀 - 陨落", // 可能重复·C(可能同一首)
+	"杨博然 - 所有",
+	"陈子晴 - 陪你看星星",
+	"姚六一 - 雾里", // 可能重复·C(可能同一首)
+	"不是花火呀 - Ring Ring Ring",
+	"Lost Frequencies、Janieck - Reality",
+	"秋裤大叔 - 一晃就老了", // 可能重复·B(较可能同一首)
+	"Cadmium、Harley Bird、Rival - Seasons",
+	"国风新语、浮生梦、汐音社 - 探窗",
+	"Burak Yeter、Danelle Sandoval - Tuesday (Original Mix)",
+	"久石让 - The Rain",
+	"井胧、井迪 - 骁",
+	"程响 - 时光洪流",
+	"羽肿 - Windy Hill (风之谷)",
+	"阿南亮子 - Refrain",
+	"Reynard Silva - The Way I Still Love You",
+	"刀郎 - 花儿为什么这样红 (2016音乐大师课第二季第6期现场)",
+	"Dropgun、Kaleena Zanders - Nothing New (feat. Kaleena Zanders)(Explicit)",
+	"JVLA - Such a Whore",
+	"INNDRIVE - Oriente",
+	"凯撒 - Sugar Crash (DJ Kaisa)", // 可能重复·C(可能同一首)
+	"DJ凯撒 - Lone Ranger (DJ Kaisa)", // 同「我创建·two」
+	"Sia - Unstoppable", // 可能重复·B(较可能同一首)
+	"The Score - Unstoppable",
+	"Mr FijiWiji、Laura Brehm、AgNo3 - Pure Sunlight", // 同「我创建·和平精英音乐合集」
+	"Feint、Laura Brehm - We Won't Be Alone",
+	"EXO - 지나갈 테니 (Been Through)",
+	"DAISHI DANCE、Cécile Corbel - Take Me Hand", // 可能重复·B(较可能同一首)
+	"DJ Project、Giulia - Nu (Original Mix)",
+	"Bobby Capri - Rather Be (Pri Mix)",
+	"Regard - Ride It",
+	"蓝心羽 - 星辰不坠落",
+	"丢火车乐队 - 晚安", // 可能重复·B(较可能同一首)
+	"买辣椒也用券 - 起风了", // 可能重复·B(较可能同一首)
+	"程响 - 千里共婵娟",
+	"邰正宵 - 千纸鹤",
+	"薛之谦 - 我害怕",
+	"凤凰传奇 - 心驰神往",
+	"白小白 - 最后我们没在一起 (DJ伟伟Mix)(DJ阳山伟伟版)",
+	"鹿晗 - 致爱 Your Song",
+	"王琪 - 站着等你三千年",
+	"尚文婷 - 做你的猫",
+	"鹿晗 - 时间停了 (The Moment)(Live)",
+	"程响 - 新娘不是我",
+	"王靖雯 - 爱，存在",
+	"零一九零贰 - 忘川彼岸", // 可能重复·B(较可能同一首)
+	"韩可可 - 迷失在梦中",
+	"王雨桐 - 太阳", // 可能重复·B(较可能同一首)
+	"TheMix多语种乐团 - Lemon (九种语言版)",
+	"邓寓君(等什么君) - 同舟",
+	"Hayley Westenra - Scarborough Fair",
+	"乔艳艳 - 谁",
+	"大张伟 - 我在诗里看到了你",
+	"Germán Gastón Álvarez y La Chueca - We Will Rock You (EnVivo(Explicit))",
+	"张杰 - 仰望星空",
+	"GALA - 追梦赤子心",
+	"July - Somewhere", // 同「我创建·。」
+	"Hans Zimmer、Lisa Gerrard - Now We Are Free (Maximus Mix)",
+	"李玉刚 - 万疆",
+	"胡期皓 - 小时光",
+	"杨千嬅 - 野孩子",
+	"杨胖雨 - 这就是爱吗",
+	"Cascada - Miracle (DJ BOSS HAN版)",
+	"Escala - Requiem For A Tower",
+	"凤凰传奇 - 奢香夫人", // 可能重复·B(较可能同一首)
+	"阿语 - 奢香夫人 (DJ版)",
+	"凤凰传奇 - 奢香夫人 (DJ版)",
+	"葛顺 - 夜的钢琴曲五",
+	"王富贵 - 情字最大 (DJheap九天版)",
+	"宋孟君 - 失眠的夜 (DJ版)", // 可能重复·C(可能同一首)
+	"宋孟君 - 失眠的夜",
+	"王搏 - 穷叉叉",
+	"鹏鹏音乐、付豪 - 夜夜夜漫长",
+	"傅梦彤 - 星陨",
+	"程响 - 四季予你",
+	"海来阿木 - 烟雨人间", // 可能重复·B(较可能同一首)
+	"海来阿木 - 烟雨人间 (DJ沈念版)",
+	"高胜美 - 一帘幽梦",
+	"庾澄庆 - 情非得已", // 可能重复·B(较可能同一首)
+	"小蓝背心 - 我怕来者不是你",
+	"张学友 - 吻别",
+	"七叔（叶泽浩） - 燕无歇", // 可能重复·B(较可能同一首)
+	"回小仙 - 醒不来的梦",
+	"邓丽君 - 小城故事",
+	"赵海洋 - 夜空的寂静 (钢琴曲)",
+	"刘思涵 - 走在冷风中", // 可能重复·B(较可能同一首)
+	"庄学忠 - 中华功夫", // 可能重复·B(较可能同一首)·同「我创建·two」
+	"张韶涵 - 破茧", // 可能重复·B(较可能同一首)
+	"庄心妍 - 为情所伤", // 可能重复·B(较可能同一首)
+	"半吨兄弟 - 为情所伤",
+	"半吨兄弟 - 为情所伤 (DJ沈念版)",
+	"贺一航 - 请先说你好",
+	"李玖哲 - 想太多",
+	"七叔（叶泽浩） - 踏山河", // 可能重复·B(较可能同一首)
+	"半阳 - 一曲相思",
+	"李袁杰、李俊佑 - 醉千年",
+	"逃跑计划 - 夜空中最亮的星",
+	"邱永传 - 十二年",
+	"邱永传 - 十一年",
+	"Ice Paper - 心如止水",
+	"姜鹏 - 赢在江湖", // 可能重复·C(可能同一首)
+	"齐晨 - 咱们结婚吧",
+	"陈慧娴 - 千千阕歌",
+	"潘安邦 - 外婆的澎湖湾", // 可能重复·B(较可能同一首)
+	"卓依婷 - 外婆的澎湖湾",
+	"小志 - 当世界美好与你环环相扣",
+	"周杰伦 - 夜曲",
+	"阿米 - 一个深爱的女孩",
+	"张靓颖 - 如果这就是爱情",
+	"夹子道 - 死心塌地",
+	"李晓杰 - 朋友的酒",
+	"温岚 - 夏天的风", // 可能重复·B(较可能同一首)
+	"Uu (刘梦妤) - 夏天的风",
+	"Die - 月亮不睡你不睡", // 可能重复·C(可能同一首)
+	"朴树 - 平凡之路",
+	"半阳 - 我的将军啊", // 可能重复·B(较可能同一首)
+	"岑宁儿 - 追光者", // 可能重复·C(可能同一首)
+	"汪苏泷 - 追光者 (Live)",
+	"周笔畅 - 最美的期待",
+	"小阿枫 - 醉倾城", // 可能重复·B(较可能同一首)·同「我创建·two」
+	"小阿枫 - 醉倾城 (DJ名龙版)",
+	"阿YueYue - 云与海",
+	"王忻辰、苏星婕 - 去年花开",
+	"郑源 - 为爱停留",
+	"张靓颖 - 天下无双",
+	"许佳慧 - 预谋",
+	"海来阿木 - 五十年以后", // 可能重复·B(较可能同一首)
+	"海来阿木 - 五十年以后 (DJ沈念版)",
+	"蒋雪儿Snow.J - 谁在意我流下的泪",
+	"郑亦辰 - 相思成灾",
+	"庄心妍 - 以后的以后", // 可能重复·B(较可能同一首)
+	"黄龄、Tăng Duy Tân - 叹",
+	"残雪 - 弃佛入魔", // 可能重复·B(较可能同一首)
+	"闻人听書_ - 虞兮叹", // 可能重复·B(较可能同一首)
+	"张小九 - 余香", // 可能重复·B(较可能同一首)
+	"李哈哈 - 再也不会遇见第二个她",
+	"Deep East Music - Sunny Jim",
+	"李春波 - 小芳",
+	"姜玉阳 - 痛彻心扉", // 可能重复·B(较可能同一首)
+	"汪苏泷 - 一笑倾城",
+	"李克勤 - 月半小夜曲", // 可能重复·B(较可能同一首)
+	"王晴 - 月半小夜曲",
+	"六哲、贺敬轩 - 让全世界知道我爱你",
+	"黑Girl - 123木头人",
+	"2Someone - Star Unkind (Lanfranchi & Farina Radio)(Radio Edit)",
+	"房东的猫 - New Boy",
+	"刘钧 - 听闻远方有你", // 可能重复·B(较可能同一首)
+	"朴树 - 那些花儿",
+	"齐秦 - 月亮代表我的心",
+	"Danko - Pump It Up (Original Mix)",
+	"V6 - Take Me Higher (带我飞得更高)(DJ Bonca金柱版)",
+	"EDM - Yasuo(亚索)",
+	"ALan - Octopus", // 同「我创建·two」
+	"XYPO、M. Fischer - We Can Be Together",
+	"RYLLZ - Nemesis",
+	"Ramin Djawadi、Tom Morello - Pacific Rim (feat. Tom Morello)", // 同「我创建·和平精英音乐合集」
+	"Vicetone、Meron Ryan - Walk Thru Fire",
+	"Lambert凌杰、十七草 - Young boss 2.0", // 同「我创建·two」
+	"Cedric Gervais、Digital Farm Animals、Dallas Austin - Touch The Sky (ANR151)", // 可能重复·B(较可能同一首)
+	"Cedric Gervais、Digital Farm Animals、Dallas Austin - Touch The Sky",
+	"邓寓君(等什么君) - 误红妆",
+	"邓寓君(等什么君) - 怎叹",
+	"Danny McCarthy - Silver Scrapes (银痕)",
+	"Two Steps From Hell、Thomas Bergersen - Never Back Down",
+	"魏琮霏 - 青石巷",
+	"THT - 葬花",
+	"ALisa - 为霜 (治愈版)",
+	"ALisa、五月的钢琴 - 海 で待っています (我在海边等你)(治愈版)",
+	"花姐 - 夜之光",
+	"张学友 - 一千个伤心的理由",
+	"周杰伦 - 七里香", // 可能重复·B(较可能同一首)
+	"王不醒 - 月老掉线", // 可能重复·B(较可能同一首)
+	"听风Xyi - 世间遗憾皆是温柔",
+	"Maker、听风Xyi - 星雨夜空",
+	"邓寓君(等什么君)、FOX胡天渝 - 踏雪",
+	"Post Malone、Ty Dolla $ign - Psycho (Clean)",
+	"威仔、格子兮 - 我知道你不爱我",
+	"高胜美 - 我是不是你最疼爱的人", // 可能重复·B(较可能同一首)
+	"半吨兄弟 - 我是不是你最疼爱的人",
+	"The Harmonics - The Other Side of Paradise",
+	"杜宣达 - 原来我从未忘记你",
+	"Herb Ohta - いつも何度でも (与你同在)(「千と千尋の神隠し」より)",
+	"代诗琪 - 揉碎夜的光",
+	"大壮 - 上了年纪的男人",
+	"莫叫姐姐 - 我们的爱输给了现实",
+	"华子、小钢炮 - 谁的人生不孤独 (两个大叔)",
+	"你们的好朋友大雨 - 情结",
+	"杨小壮 - 最后的人", // 可能重复·B(较可能同一首)
+	"杨小壮 - 最后的人 (DJ阿卓、DJ阿龙版)",
+	"川井憲次 - 潇湘子",
+	"崔伟立 - 情火", // 可能重复·B(较可能同一首)
+	"孙艺琪 - 情火",
+	"Alan Walker、JOP - OK",
+	"张晓棠 - 新送情郎",
+	"叶里 - 人间惊鸿客",
+	"傅如乔 - 微微",
+	"Alan Walker - The Spectre", // 可能重复·B(较可能同一首)
+	"Ray-X - Dancin",
+	"Ray-X - The Spectre",
+	"邓岳章 - 情意结", // 可能重复·B(较可能同一首)
+	"陈慧娴 - 情意结",
+	"邓岳章 - 情意结 (DJ R7版)",
+	"王优秀 - 想某人", // 可能重复·B(较可能同一首)
+	"王优秀 - 想某人 (DJ舞曲版)",
+	"黄静美 - 愿你",
+	"贺一航 - 入了我的心丢了我的魂",
+	"Lana Del Rey、Cedric Gervais - Summertime Sadness (remix：Cedric Gervais)",
+	"白小白 - 最美情侣",
+	"方大同 - 特别的人",
+	"胡夏 - 那些年", // 可能重复·B(较可能同一首)
+	"小洲 - 爱都爱了", // 可能重复·B(较可能同一首)
+	"小洲 - 爱都爱了 (DJ德朋版)",
+	"Hoàng Thùy Linh - See Tình (遇见挚爱)(Speed Up Version)", // 同「我创建·two」
+	"李盈盈、小蓓蕾组合 - 人类呀爱我吧",
+	"J Balvin、Willy William、Hugel - Mi Gente (remix：Hugel)",
+	"阿悠悠 - 念旧",
+	"宗次郎 - 故郷の原風景 (故乡的原风景)",
+	"张晓棠 - 苏幕遮",
+	"Zyboy忠宇 - 堕",
+	"LBI利比（时柏尘） - 小城夏天",
+	"pro - 等不来花开", // 可能重复·B(较可能同一首)
+	"豆包 - 作酒",
+	"88rising、Rich Brian - History (Explicit)",
+	"ycccc - 满天星辰不及你",
+	"梦然 - 是你", // 可能重复·C(可能同一首)
+	"yihuik苡慧 - 麦浪",
+	"SING女团 - 寄明月",
+	"Nieem - Streets (7秒DJ版片段)",
+	"王若熙 - 怎随天下 (DJ名龙版)",
+	"娜美 - 醉仙美",
+	"海伦 - 游京", // 可能重复·B(较可能同一首)
+	"小猫多鱼 - Hello friend (电竞专用版)",
+	"苏谭谭 - 醉过多少回",
+	"Charlie Puth、Selena Gomez - We Don't Talk Anymore (feat. Selena Gomez)",
+	"5媚娘 - 夜深了", // 可能重复·B(较可能同一首)
+	"i先生 - 满心欢喜 (Remix)",
+	"者思范 - 我爱你有始有终 (34秒片段)",
+	"腾金涛 - 斯芬克斯",
+	"周杰伦 - 龙卷风",
+	"赵海洋 - 秋的思念 (钢琴曲)", // 同「我创建·。」
+	"告五人 - 给你一瓶魔法药水",
+	"Copy、BT07-PZ - 晚风", // 可能重复·C(可能同一首)
+	"Copy、BT07-PZ - 晚风 (网友改编)",
+	"梦歆冉 - 伤心的酒吧 (伤感女声DJ版)",
+	"大星 - 你是我的人 (DJ版)",
+	"程响 - 等你归来",
+	"July - Beyond the Memory",
+	"带泪的鱼(戴丽丽) - 爱逝枷锁",
+	"Deep East Music - Old Threads",
+	"Mission Impossible - Mission： Impossible Theme",
+	"Deep East Music - High Brow Low Down",
+	"Kevin MacLeod - Fluffing a Duck",
+	"李豪、虞姬、小可 - despair (bootleg)",
+	"阿YueYue、螃蟹 - 다시 너를 (再次见到你)", // 可能重复·B(较可能同一首)
+	"芒果布丁 - NINEELIE (合奏版)",
+	"TFBOYS - 大梦想家",
+	"3LAU、Ninja - Game Time",
+	"烟嗓 - 南墙",
+	"唐云歌 - 降E大调夜曲  肖邦",
+	"陈奕迅 - 爱情转移", // 可能重复·B(较可能同一首)
+	"小金点点 - 回忆复习指南",
+	"许嵩、孙涛 - 书香年华",
+	"郭静 - 心墙", // 可能重复·B(较可能同一首)
+	"林俊杰 - 心墙",
+	"Reverb - Trepte (Explicit)",
+	"柯柯柯啊 - 旧梦一场 (男生版)",
+	"曾抖抖 - 平凡日子里的挣扎",
+	"云汐 - 故事还长",
+	"Shakira、Freshlyground - Waka Waka (Esto es Africa)",
+	"MI.YAO - Light particle E",
+	"袁树雄 - 早安隆回", // 可能重复·B(较可能同一首)
+	"袁树雄 - 早安隆回 (DJ沈念版)",
+	"袁树雄 - 早安隆回 (DJ京仔版)",
+	"M爷、马帅帅、DJ潇洒先生 - The Minimal Beat (DJ版)", // 可能重复·C(可能同一首)
+	"Strong R. - The Minimal Beat",
+	"YANYSMUSIC - Snoop Catt",
+	"D1ofAquavibe - The Party Troll",
+	"梦柯 - 曾经的王", // 可能重复·B(较可能同一首)
+	"神马乐团 - 爱河",
+	"千百顺 - 很任性",
+	"小瑞、斌Sir - 最强EA7 (DJ版)",
+	"小瑞 - EA7最火硬曲 (DJ版)",
+	"1个球 - 大雨还在下", // 可能重复·B(较可能同一首)
+	"1个球 - 大雨还在下 (DJ阿卓、DJ阿龙版)",
+	"Mediks - Come Back Down (Original Mix)",
+	"JJD - Aeon",
+	"Steerner、Martell - Sky (Radio Edit)", // 同「我创建·默认收藏、和平精英音乐合集」
+	"Tungevaag - Wicked Wonderland", // 同「我创建·默认收藏」
+	"RT - Umbrella (Remix)", // 可能重复·B(较可能同一首)
+	"Savior - Umbrella (remix)",
+	"5 Seconds of Summer - Teeth", // 可能重复·B(较可能同一首)·同「我创建·默认收藏」
+	"Raven & Kreyn、RudeLies、Nino Lucarelli - This Far (RudeLies Remix)",
+	"Lazer Boomerang - Time to Pretend",
+	"古羽 - 她的眼睛会唱歌",
+	"董昱昆 - 我想",
+	"张碧晨 - 不要忘记我爱你",
+	"闻人听書_ - 一笑江湖", // 可能重复·B(较可能同一首)
+	"薄荷er - 想想念念",
+	"Jori King - Fatal Love",
+	"葛漂亮 - 烟雨唱扬州 (女版)",
+	"枫叶 - 白了否冷",
+	"李莹小熊 - 飞云之下 (女声版)",
+	"陈雪凝 - 没有人心疼我",
+	"季彦霖、箱子 - 你根本不懂",
+	"承桓 - 我会等", // 可能重复·B(较可能同一首)
+	"杉和、小青蛙组合 - 子莫格尼",
+	"程响 - 人间烟火",
+	"迟里乌布、Morerare - 簇拥烈日的花",
+	"张杰 - 星星 (Live)",
+	"李玉刚 - 清明上河图",
+	"毛阿敏 - 天之大",
+	"袁小朵 - 那个夏天",
+	"苏星婕 - 听悲伤的情歌",
+	"梨笑笑 - 山茶花读不懂白玫瑰", // 可能重复·C(可能同一首)
+	"梅朵 - 总以为来日方长",
+	"半吨兄弟、王小草 - 想把我唱给你听", // 可能重复·B(较可能同一首)
+	"Radion 6 - Lightning",
+	"张小健 - 三两三",
+	"中铁十四局隧道公司 - 篇章-2022届新学员", // 可能重复·B(较可能同一首)
+	"Mae Stephens - If We Ever Broke Up",
+	"Michael Jackson - Dangerous",
+	"Dxrk ダーク - RAVE (锐舞)",
+	"The Piano Guys - Rolling in the Deep",
+	"半吨兄弟 - 最美的伤口", // 同「我创建·two」
+	"甄秀儀 - 千里共嬋娟",
+	"米雅 - 太多",
+	"添儿呗 - 烟火人间",
+	"海伦 - 游山恋",
+	"金南玲 - 逆流成河 (典藏版)", // 可能重复·B(较可能同一首)
+	"谢军 - 那一夜", // 可能重复·B(较可能同一首)·同「我创建·默认收藏」
+	"彭佳慧 - 相见恨晚",
+	"BOSS HAN - You混搭 (DJ版)",
+	"七音盒 - 炸山姑娘",
+	"潇潇潇潇如 - 病变 (女生版)",
+	"鹿晗、邓超、李晨 - 超级英雄 (Live in Shanghai)",
+	"欧阳朵 - 失去才懂",
+	"华莎 - 마리아 (14秒片段)",
+	"F.I.R.飞儿乐团、彭佳慧 - 心之火", // 可能重复·C(可能同一首)·同「我创建·花千骨」
+	"香香 - 猪之歌",
+	"SPYAIR - Rage of Dust",
+	"David Guetta、Afrojack、Bebe Rexha、Nicki Minaj - Hey Mama (feat. Nicki Minaj, Bebe Rexha & Afrojack)(DJ LBR Remix)",
+	"Nora En Pure - Lake Arrowhead (箭头湖)(Original Mix)",
+	"冷漠 - 伤心城市", // 可能重复·B(较可能同一首)
+	"周杰伦 - 听妈妈的话",
+	"T-Pain、Ne-Yo - Turn All the Lights On", // 同「我创建·默认收藏」
+	"Thomas Bergersen - Victory (网友改编)",
+	"大壮 - 我们不一样 (Radio Edit)(DJ小鱼儿版)",
+	"任然 - 无人之岛", // 可能重复·B(较可能同一首)
+	"邓岳章 - 无人之岛",
+	"鸣小明 - 无人之岛",
+	"欢子 - 心痛2009",
+	"黄霄雲 - 星辰大海",
+	"林俊杰 - 一千年以后",
+	"张北北 - 拥抱你离去",
+	"周冰倩 - 真的好想你",
+	"Deepain - 身骑白马", // 可能重复·B(较可能同一首)
+	"林忆莲 - 为你我受冷风吹", // 可能重复·B(较可能同一首)
+	"大壮 - 为你我受冷风吹",
+	"李翊君 - 风中的承诺",
+	"张学友 - 我不在乎等多久",
+	"童安格 - 灯",
+	"杨沛宜 - 左手右手", // 可能重复·B(较可能同一首)·同「我创建·动画片」
+	"Rompasso - Angetenar (Radio Edit)",
+	"柯柯柯啊 - 画离弦 (柯柯版)",
+	"코드 쿤스트、李遐怡 - O (Feat. 이하이)",
+	"杨琦 - 想 (DJ女生版)",
+	"Brandy - (Everything I Do) I Do It for You",
+	"聂思诗 - 一起吹过晚风的街",
+	"郑鱼 - 无归期",
+	"关心 - 提笔忘情",
+	"王忻辰 - 时间沦陷",
+	"盖君炎 - 我想要",
+	"王靖雯 - 忘了没有", // 可能重复·B(较可能同一首)
+	"柯柯柯啊 - 樱花树下的约定", // 可能重复·B(较可能同一首)
+	"邓寓君(等什么君) - 天下", // 可能重复·B(较可能同一首)
+	"Raim & Artur、Adil、Artur、RaiM - Simpa", // 同「我创建·和平精英音乐合集」
+	"Dan Farber - Don't Touch (DJMix)",
+	"刘家纬、272 - Love Is Gone", // 可能重复·B(较可能同一首)
+	"SLANDER、Dylan Matthew - Love Is Gone",
+	"Spada、Anna Leyne - Catchfire (Sun Sun Sun) (EDX's Miami Sunset Remix)",
+	"MayPiano - Illusionary Daytime (幻昼)(钢琴版)",
+	"纯音乐 - 溯 (钢琴版)",
+	"Avicii、Nicholas Furlong - The Nights",
+	"Orchestra、Maksim、jeff wayne - Main Theme (出埃及记)(Arr. Bateman)",
+	"Shawn Mendes - Stitches", // 可能重复·C(可能同一首)
+	"马有才 - Stitches (DJ版)",
+	"Kenny G - Jasmine Flower",
+	"咖菲 - 风雨飘洒",
+	"DiESi - 時代を越える想い (穿越时空的思念)(remix：DiESi)",
+	"Lightscape - Collapsing World (崩溃的世界)(Original Mix)", // 同「我创建·和平精英音乐合集」
+	"安卿尘 - 难以启齿的柔弱 (烟嗓版)",
+	"The Kid LAROI、Justin Bieber - STAY (Clean)", // 可能重复·B(较可能同一首)·同「我创建·。」
+	"The Kid LAROI、Justin Bieber - STAY (Explicit)",
+	"Wiz Khalifa、Charlie Puth - See You Again",
+	"闫永强 - The Spectre (幽魂)(唢呐演奏版)(Live)",
+	"SHAUN、Conor Maynard、Sam Feldt - Way Back Home (Sam Feldt Edit)",
+	"SHAUN - Way Back Home",
+	"笑白Ermy、White Wolf Tracks - 战曲 Battle Epic Song", // 同「我创建·two」
+	"久石让 - Summer (菊次郎的夏天)", // 可能重复·B(较可能同一首)
+	"饭碗的彼岸 - 風の住む街 (风居住的街道)(Piano Ver.)",
+	"徐佳莹 - 我一直都在这里", // 同「我创建·熊出没」
+	"王建荣 - 公虾米", // 可能重复·B(较可能同一首)·同「我创建·改编/鬼畜/片段/DJ」
+	"何鹏、金久哲 - 嗑儿 (DJ何鹏版)", // 同「我创建·改编/鬼畜/片段/DJ」
+	"猫有饼 - 38度6 (41秒吃鸡版片段)", // 同「我创建·改编/鬼畜/片段/DJ」
+	"馒头 - 穷的响叮当", // 可能重复·B(较可能同一首)·同「我创建·改编/鬼畜/片段/DJ」
+	"抽象带篮子 - 野心千万种 (Original Mix)", // 同「我创建·改编/鬼畜/片段/DJ」
+	"杨钰莹 - 轻轻地告诉你", // 同「我创建·儿歌」
+	"自信的阿呆 - Rumors", // 同「我创建·改编/鬼畜/片段/DJ」
+	"宋瑞、竭容生 - 三条腿的蛤蟆找不着,两条腿的女人多的是", // 同「我创建·改编/鬼畜/片段/DJ」
+	"精彩轩迪 - 山前山后各有哀愁", // 同「我创建·改编/鬼畜/片段/DJ」
+	"杨硕哥哥 - 生僻字 (完整电晕版)", // 同「我创建·改编/鬼畜/片段/DJ」
+	"R7 - 桃花运 (DJR7版)", // 同「我创建·改编/鬼畜/片段/DJ」
+	"新地、卢克 - 我不是刘德华", // 同「我创建·改编/鬼畜/片段/DJ」
+	"花儿乐队 - 嘻唰唰", // 可能重复·B(较可能同一首)·同「我创建·儿歌」
+	"颜一 - 心酸", // 可能重复·B(较可能同一首)·同「我创建·改编/鬼畜/片段/DJ」
+	"ALisa - 星茶会 (治愈版)",
+	"许美静 - 阳光总在风雨后", // 同「我创建·儿歌」
+	"Heaven J - 鱿鱼游戏 (123木头人)", // 同「我创建·改编/鬼畜/片段/DJ」
+	"全球音乐吧 - 13年前的这首歌要是放到现在,依旧是不可超越的神曲,太洗脑!", // 同「我创建·改编/鬼畜/片段/DJ」
+	"李文踹 - 38度6 (烧烤版)", // 同「我创建·改编/鬼畜/片段/DJ」
+	"豆包 - 太想念", // 可能重复·B(较可能同一首)
+	"豆包 - 太想念 (DJ阿卓、DJ阿龙版)",
+	"阿吉野马 - Зая",
+	"锋锋 - 佛罗里达州最硬的男人", // 同「我创建·two、改编/鬼畜/片段/DJ」
+	"桃沢樱 - DJDJ我要上头了",
+	"The Score - Born For This",
+	"my darkest days - Save Yourself (Album Version)",
+	"FlicFlac、Beatrich - So High",
+	"Capital Kings、Unknown、Hollyn - All Good",
+	"Panic! At the Disco - High Hopes",
+	"Valley Of Wolves - Lions Inside",
+	"Tommee Profitt、Jung Youth - Only One King",
+	"Oh The Larceny - Incredible",
+	"Imagine Dragons - Demons",
+	"Daughtry - Ghost Of Me",
+	"Tyron Hapi、Bianca - Lost Control (feat. Bianca)", // 同「我创建·默认收藏」
+	"Zayde Wølf - Cold-Blooded",
+	"Simple Plan - Last One Standing", // 同「我创建·QQ飞车音乐合集哈」
+	"Black Veil Brides - In the End", // 可能重复·B(较可能同一首)
+	"Matilda - Illusion",
+	"Gavin DeGraw - Fire", // 同「我创建·默认收藏」
+	"Zayde Wølf - Hustler",
+	"Fall Out Boy - Centuries",
+	"Oh The Larceny - Man on a Mission",
+	"Rachel Platten - Fight Song",
+	"Kygo、Sasha Alex Sloan - I'll Wait",
+	"Zayde Wølf - Strike a Match",
+	"Within Temptation 诱惑本质 - Mercy Mirror",
+	"Danny Avila - End Of The Night (Explicit)", // 同「我创建·默认收藏」
+	"Mesto、Brielle Von Hugel - Chances (feat. Brielle Von Hugel)", // 同「我创建·默认收藏」
+	"张禾禾 - 逃之夭夭 (DJheap九天版)",
+	"郑源 - 难道爱一个人有错吗",
+	"泽亦龙 - EDM (DJ打碟版)",
+	"纯音乐 - 诡异恐怖音效", // 同「我创建·改编/鬼畜/片段/DJ」
+	"平生青涯 - 醉里",
+	"郑伊健 - 心如刀割",
+	"小猫多鱼 - 祝你生日快乐", // 同「我创建·two、改编/鬼畜/片段/DJ」
+	"金莎 - 爱的魔法",
+	"安苏羽 - 人走茶凉",
+	"Yes - Roundabout",
+	"宝藏挖掘机 - 《梦见我们相遇》索菲亚：真的再见到你，再次拥抱你在怀里 (长音频)", // 同「我创建·改编/鬼畜/片段/DJ」
+	"5媚娘 - 拥抱星河万里", // 同「我创建·改编/鬼畜/片段/DJ」
+	"7宇 - 7宇版小毛驴一起摇", // 同「我创建·改编/鬼畜/片段/DJ」
+	"仇远旭 - 一格格 (粤语女版)", // 同「我创建·改编/鬼畜/片段/DJ」
+	"周杰伦 - 我是如此相信",
+	"小小奶黄包 - Samsara (0.8×)", // 同「我创建·改编/鬼畜/片段/DJ」
+	"DJ花神经 - 世间万物 (DJ版)", // 同「我创建·。」
+	"就是南方凯 - 问心",
+	"季彦霖 - 选择失忆",
+	"今晚打老虎 - 触电",
+	"久石让 - Mad Summer",
+	"Imagine Dragons、Lil Wayne - Believer", // 可能重复·B(较可能同一首)
+	"Home Free - Sea Shanty Medley", // 同「我创建·two」
+	"HINA - ID",
+	"HENRY刘宪华、圭贤、泰民 - Trap (Korean Ver.)",
+	"伯爵Johnny、唐伯虎Annie - 伯虎说 (feat.唐伯虎Annie)",
+	"AGA - Wonderful U (Demo Version)",
+	"馒头 - おどるポンポコリン", // 同「我创建·改编/鬼畜/片段/DJ」
+	"牟凡 - 爱的哲学",
+	"洛先生 - 影子说",
+	"林子祥 - 成吉思汗",
+	"林俊杰、金莎 - 期待爱",
+	"林俊杰 - 裹着心的光",
+	"李飘飘 - 寂寞烟火 (治愈版)",
+	"李巍V仔 - 守护着我的光",
+	"Phúc Du、King Kudo - Anh không làm gì đâu a thề (我发誓什么都不做)(DJ版)",
+	"柯柯柯啊 - 姑娘在远方",
+	"柯柯柯啊 - 大海 (柯柯吉他版)",
+	"Jacob Tillberg、DEAF KEV - Fade Away (Deaf Kev Remix)",
+	"鞠婧祎 - 叹云兮", // 可能重复·B(较可能同一首)
+	"金渔 - 伪善者",
+	"金婷婷 - 风吹麦浪", // 可能重复·B(较可能同一首)
+	"The Tech Thieves - Fake",
+	"苏天伦 - Sober",
+	"胜屿 - 我们说好的", // 可能重复·B(较可能同一首)
+	"矢野立美 - 远き呼び声の彼方へ (那来自远方的呼唤)(＜M-41,M-62A＞)",
+	"Really Slow Motion - Deadwood Main (枯木)(纯音乐)",
+	"Rauf & Faik - Колыбельная (摇篮曲)(Kolybel'naja)", // 可能重复·B(较可能同一首)
+	"Ramin Djawadi - 存亡之战 (派崔克·史坦普混音)",
+	"Rag'n'Bone Man - Skin",
+	"杨千嬅、任贤齐 - 花好月圆夜",
+	"秦晨阳 - 毕业那天", // 可能重复·B(较可能同一首)
+	"彭小胖 - 缺憾", // 可能重复·B(较可能同一首)·同「我创建·。」
+	"Oh The Larceny - This Is It",
+	"Nora En Pure - Lake Arrowhead (Radio Mix)",
+	"NextRO - Anatomy (Original Mix)",
+	"Universal Idol、VodKe、HSHK、Pnan、贰皮 - Italia e voi (双枪说)", // 同「我创建·two」
+	"Matteo - Panama (巴拿马)",
+	"Martin Garrix、Clinton Kane、Alle Farben - Drown (feat. Clinton Kane)(Alle Farben Remix)",
+	"XXXTentacion - NUMB", // 可能重复·C(可能同一首)
+	"许嵩 - 千百度",
+	"许嵩 - 江湖",
+	"萧亚轩 - 遗失的心跳", // 可能重复·B(较可能同一首)
+	"小皮皮爱习题 - Upupu",
+	"兮沐 - 黄昏之时 (钢琴曲)",
+	"Will Armex、Katy M - You and I (feat. Katy M)",
+	"王靖雯 - 善变", // 可能重复·B(较可能同一首)
+	"王恩信Est、二胖u - 飞",
+	"王忻辰、苏星婕 - 清空",
+	"王子健 - 循迹",
+	"陈每文、熊健萍、陈帆等 - 雨花石 (电视连续剧《红红的雨花石》主题歌)",
+	"我是小力气 - 一格格", // 可能重复·B(较可能同一首)
+	"Slow_77 - 一格格 (Live)",
+	"Valentin - A Little Story (小故事)",
+	"Ugress - Undead Funeral March",
+	"Tungevaag、Raaban、Luana Kiara - Bad Boy (feat. Luana Kiara)",
+	"Two Steps From Hell、Thomas Bergersen、Merethe Soltvedt - El Dorado (Dubstep Remix)",
+	"张泽熙 - 那个女孩", // 可能重复·B(较可能同一首)
+	"周慧敏 - 最爱", // 可能重复·B(较可能同一首)
+	"于梓贝 - 最爱",
+	"阳山伟伟 - 她的微笑 (Original Mix)",
+	"远方 - 她只是经过", // 可能重复·C(可能同一首)
+	"郁可唯 - 远方",
+	"烟(许佳豪) - 再见我的女孩",
+	"坠. - 关键词 (Live)",
+	"煜臣 - 王者荣耀 (一人我饮酒醉李白鬼畜)",
+	"迪总 - 江归江山归山 (57秒DJ版｜片段)", // 同「我创建·改编/鬼畜/片段/DJ」
+	"网络歌手 - Laxed (14秒片段)",
+	"旺仔小乔 - 我还是 (20秒片段)", // 同「我创建·改编/鬼畜/片段/DJ」
+	"刘大壮 - 我不是你的宋冬野 (30秒Live片段)",
+	"霍宝库 - 谁不曾拥有梦想",
+	"贺敬轩 - 毕业季",
+	"灰澈 - 星茶会",
+	"浩然H.R - 年少的你啊",
+	"Geoff Zanelli - Beyond My Beloved Horizon (From ＂Pirates of the Caribbean： Dead Men Tell No Tales＂／Score)",
+	"DJ铁柱 - 我们的歌 (18秒0.8x片段)",
+	"24KGoldn、iann dior - Mood (Explicit)", // 同「我创建·。」
+	"布袋寅泰 - BATTLE WITHOUT HONOR OR HUMANITY (无差别格斗)", // 同「我创建·two」
+	"冰冰超人 - 八年的爱", // 可能重复·B(较可能同一首)
+	"Alan Walker、Iselin Solheim - Sing Me to Sleep",
+	"宋谦泽、明洋 - MELANCHOLY (Remix)", // 可能重复·B(较可能同一首)
+	"付汶昊、蔡萝莉 - Middle Of The Night (DJ环绕版)",
+	"雷军、Mr.Lemon - Are You OK", // 同「我创建·改编/鬼畜/片段/DJ」
+	"Immediate Music - Electric Romeo", // 可能重复·B(较可能同一首)·同「我创建·默认收藏」
+	"Hans Zimmer - Cornfield Chase (原野追逐)", // 同「我创建·默认收藏」
+	"盗哥 - 耍猴专用BGM (唢呐版)",
+	"王小帅 - 最近",
+	"睡不醒的觉o - 白山茶 (温柔女生版)",
+	"KOKIA - ありがとう… (谢谢…)",
+	"林俊杰 - 爱不会绝迹", // 可能重复·B(较可能同一首)·同「我创建·动画片」
+	"Jessie J - Flashlight (From ＂Pitch Perfect 2＂ Soundtrack)", // 同「我创建·动画片」
+	"梅尼耶 - The Riddle (口哨版)", // 同「我创建·改编/鬼畜/片段/DJ」
+	"萍爷 - Как вы哦NO哦NO", // 同「我创建·改编/鬼畜/片段/DJ」
+	"e中人 - 江南Style (我爸刚弄死他)", // 同「我创建·改编/鬼畜/片段/DJ」
+	"6诗人 - 卡布奇诺", // 可能重复·B(较可能同一首)·同「我创建·改编/鬼畜/片段/DJ、。」
+	"李少白 - 你男朋友很差", // 同「我创建·改编/鬼畜/片段/DJ」
+	"小智慧 - 世俗总要男人无惧无畏 (Remix)", // 同「我创建·改编/鬼畜/片段/DJ」
+	"张雪峰 - 一人我饮酒醉 (考研版)", // 同「我创建·改编/鬼畜/片段/DJ」
+	"Richard Clayderman - La Cumparcita", // 同「我创建·熊出没」
+	"熊出没. - Tricks And Traps", // 可能重复·C(可能同一首)·同「我创建·熊出没」
+	"枯木逢春 - 这一生关于你的风景",
+	"Vicetone、Kat Nestel - Angels (Extended Mix)",
+	"刘增瞳 - 多想留在你身边",
+	"懒大王 - 姑娘别哭泣 (懒羊羊版)",
+	"VIVI - 开心往前飞", // 同「我创建·儿歌」
+	"周杰伦 - 兰亭序", // 可能重复·B(较可能同一首)
+	"王十三 - 兰亭序",
+	"林迏浪、h333 - 还是会想你",
+	"王心凌 - 梦的光点", // 可能重复·B(较可能同一首)·同「我创建·动画片」
+	"张学友 - 你好毒",
+	"罗家英 - Only You", // 可能重复·B(较可能同一首)
+	"就是南方凯 - 离别开出花",
+	"雨帆 - 荒 (我曾爱过一个人竹笛纯享版)",
+	"Crx7 - 梦的边境",
+	"杨秉音 - 大黑天",
+	"橘子海 - 夏日漱石 (Summer Cozy Rock)",
+	"纯音乐 - 倩女幽魂", // 可能重复·B(较可能同一首)·同「我创建·。」
+	"刘惜君 - 倩女幽魂",
+	"张国荣 - 倩女幽魂",
+	"张连春 - 掀起你的盖头来",
+	"海来阿木 - 西楼儿女", // 可能重复·B(较可能同一首)
+	"容祖儿 - 抱抱",
+	"吴泓君 - 采槟榔",
+	"曾心梅 - 娜奴娃的探戈",
+	"陈毅、精彩轩迪 - 够爱 (男嗓版)",
+	"王乐蔚 - 孤独的船",
+	"洛先生 - 只要有你", // 可能重复·B(较可能同一首)
+	"小阿枫 - 只要有你",
+	"抠抠 - 星光就在前方",
+	"齐豫 - 橄榄树",
+	"家家 - 命运", // 可能重复·B(较可能同一首)
+	"魏佳艺 - 我来人间一趟", // 可能重复·B(较可能同一首)
+	"魏佳艺 - 我来人间一趟 (DJ默涵版)",
+	"于冬然 - 其实都没有", // 可能重复·B(较可能同一首)
+	"于冬然 - 其实都没有 (DJ铁柱版)",
+	"宝藏挖掘机 - 《囍》：没有这歌可怎么活啊",
+	"张雨生 - 我的未来不是梦",
+	"赵雷 - 我们的时光",
+	"姜育恒 - 再回首",
+	"王佳杨 - 遗憾",
+	"王逗逗 - 小甜心",
+	"张碧晨 - 笼", // 可能重复·B(较可能同一首)
+	"DJ婷姐、小李吖、虞姬(12) - 说三两句晚安",
+	"张叶蕾 - 还是分开",
+	"张韶涵 - 有形的翅膀",
+	"苏芮 - 酒矸倘卖无",
+	"海生 - 情一动心就痛",
+	"王以太、刘至佳 - 危险派对",
+	"冷漠 - 一路向北",
+	"良久哦 - 烟花易冷 (良久哦0.7X变速版)",
+	"蒙面哥 - 一亿个伤心",
+	"moumoon - Sunshine Girl",
+	"周传雄 - 青花",
+	"怪阿姨 - 放纵L", // 可能重复·B(较可能同一首)
+	"Z.YAO中药 - 与我无关",
+	"谢宇伦 - 夜半", // 可能重复·B(较可能同一首)
+	"VINAI - Parade",
+	"Pure Morning - L2",
+	"小炎同学 - 天下的乌鸦一般黑",
+	"郑钧 - 私奔",
+	"梁博 - 出现又离开 (Live)",
+	"曲婉婷 - Jar Of Love (Album Version)",
+	"曲婉婷 - 最好的安排",
+	"吸猫大师 - 《zhurek 中文翻唱》：有点好听~很难不喜欢",
+	"ADAM - Zhurek",
+	"Justin Bieber、Ludacris - Baby", // 同「我创建·QQ飞车音乐合集哈」
+	"阿桑 - 一直很安静", // 可能重复·B(较可能同一首)
+	"陈奕迅 - 富士山下", // 可能重复·B(较可能同一首)
+	"潘成（皮卡潘） - 白鸽乌鸦相爱的戏码", // 可能重复·B(较可能同一首)
+	"李荣浩 - 不将就", // 可能重复·B(较可能同一首)
+	"蓝波 - 一起闯荡",
+	"许慧欣 - 七月七日晴",
+	"张杰 - 听",
+	"林俊杰 - 不为谁而作的歌",
+	"陈柏宇 - 你瞒我瞒",
+	"孙丽丽 - 蛋黄的长裙蓬松的头发",
+	"Nathan Evans - Wellerman (Sea Shanty ／ Karaoke Version)",
+	"李文杰 - 杀死比尔", // 可能重复·B(较可能同一首)·同「我创建·two」
+	"萨顶顶 - 自由行走的花",
+	"毛不易 - 如果有一天我变得很有钱 (Live)",
+	"八音盒 - Sacred Play Secret Place (DJ版)",
+	"弹棉花的小花 - 再见青春 (释怀版)",
+	"王樾安 - 会开花的云", // 可能重复·B(较可能同一首)
+	"泡芙芙Scarlett - 芦苇飞",
+	"唐伯虎Annie - 落 (花开花落日升日没)",
+	"伍佰 & China Blue - 突然的自我 (Live)",
+	"番番、韩圣 - 芦苇飞 (说唱版)", // 同「我创建·默认收藏」
+	"费戚戚 - 风催雨 (节奏版)",
+	"Vnriet - Let Me Put (Reset House)",
+	"Wonder Girls - Nobody (Korean Version)", // 同「我创建·QQ飞车音乐合集哈」
+	"略略略 - 鸳鸯戏 (吉他版)", // 可能重复·C(可能同一首)
+	"Zella Day - East of Eden",
+	"洪真英 - 산다는 건 (Cheer Up)",
+	"野菊花 - 걱정말아요 그대 (你不要担心)",
+	"螃蟹真疼、DJ野马 - 兰多卡兰多摇 (DJ版)", // 同「我创建·two」
+	"王富贵 - 生而平凡", // 可能重复·B(较可能同一首)
+	"王富贵 - 生而平凡 (DJ京仔版)",
+	"王富贵、R7 - 生而平凡 (DJ版)",
+	"虎二 - 窗", // 可能重复·B(较可能同一首)
+	"小阿枫 - 我要找到你", // 可能重复·B(较可能同一首)
+	"怪阿姨 - 羡慕风羡慕雨",
+	"冬日暖阳 - 寻常岁月诗", // 可能重复·B(较可能同一首)
+	"张震岳、大渊(顽童MJ116) - 迷途羔羊",
+	"方天雷 - 依兰爱情故事",
+	"四千金 - 打锣打鼓", // 可能重复·B(较可能同一首)
+	"에일리 (AILEE) - HEAVEN (Original Version)",
 ]
 
 // 获取一下当前网址，好从当前网址获取lrc文件    应用于getLrc()和songs[]的音乐列表
@@ -2819,733 +3543,6 @@ songs.push(
 	"左宏元、张慧清 - 渡情", // 可能重复·B(较可能同一首)
 )
 
-// 我喜欢歌单·酷狗（共 2353 首：与上方列表重复 877 首已跳过、下载成功并入 498 首、以下 731 首暂无法下载） 
-// 这份歌单直接合并到主数组songs里，也是没有用push的哪里，直接放在后面
-songs.push(
-	"邓寓君(等什么君) - 叹郁孤",
-	"晓龙、苏妤 - 七滴相思泪",
-	"Thomas Greenberg - The Right Path", // 可能重复·B(较可能同一首)
-	"凯大大 - The Right Path",
-	"陆树铭 - 一壶老酒", // 可能重复·B(较可能同一首)
-	"誓言 - 求佛", // 可能重复·B(较可能同一首)
-	"誓言 - 求佛 (DJ默涵版)",
-	"汪峰 - 勇敢的心",
-	"曾春年 - 最幸福的人",
-	"S.H.E - 中国话",
-	"张含韵 - 想唱就唱",
-	"孙子涵、李潇潇 - 全世界宣布爱你",
-	"兰雨 - 最后一次的温柔", // 可能重复·B(较可能同一首)
-	"甜瓜儿不是呆瓜 - 最后一次的温柔",
-	"花僮 - 笑纳",
-	"徐泽（要不要买菜） - 下山",
-	"程响 - 世界这么大还是遇见你",
-	"杨胖雨 - 情深深雨濛濛",
-	"庄心妍 - 再见只是陌生人", // 可能重复·C(可能同一首)
-	"邓寓君(等什么君) - 笑看",
-	"林俊杰 - 醉赤壁", // 可能重复·B(较可能同一首)
-	"en (王翊恩) - 云水谣",
-	"王媛渊 - 三妻四妾", // 可能重复·B(较可能同一首)
-	"贺一航 - 我又想你了",
-	"Acreix - Visions",
-	"王雨笙 - Here we are again",
-	"Peter Roe - One Love",
-	"吴埈成 - Sad Run",
-	"Era - The Mass (Surround Sound)", // 可能重复·B(较可能同一首)
-	"Else - Paris (巴黎)", // 同「我创建·。」
-	"悠悠琴韵 - Theme Of Exodus (出埃及记)(钢琴版)",
-	"华莎 - 마리아 (María) (玛利亚)", // 同「我创建·two」
-	"李荣浩 - 年少有为", // 可能重复·B(较可能同一首)
-	"张靓颖 - 我的梦",
-	"深海鱼子酱 - 千千万万",
-	"凤飞飞 - 追梦人", // 可能重复·B(较可能同一首)
-	"Martin Garrix、Troye Sivan - There For You", // 同「我创建·和平精英音乐合集」
-	"尚士达 - 生而为人", // 可能重复·B(较可能同一首)
-	"小星星Aurora - 坠落星空",
-	"杨栋梁、夏婉安 - 我的心在海对面",
-	"Superluckyqi - 直觉",
-	"王贰浪 - 人间城",
-	"王铮亮 - 时间都去哪儿了", // 同「我创建·默认收藏」
-	"井迪 - 失控",
-	"徐梓淳 - 嫌晚",
-	"薛之谦 - 天外来物", // 可能重复·B(较可能同一首)
-	"yihuik苡慧 - 银河与星斗",
-	"不是花火呀 - 陨落", // 可能重复·C(可能同一首)
-	"杨博然 - 所有",
-	"陈子晴 - 陪你看星星",
-	"姚六一 - 雾里", // 可能重复·C(可能同一首)
-	"不是花火呀 - Ring Ring Ring",
-	"Lost Frequencies、Janieck - Reality",
-	"秋裤大叔 - 一晃就老了", // 可能重复·B(较可能同一首)
-	"Cadmium、Harley Bird、Rival - Seasons",
-	"国风新语、浮生梦、汐音社 - 探窗",
-	"Burak Yeter、Danelle Sandoval - Tuesday (Original Mix)",
-	"久石让 - The Rain",
-	"井胧、井迪 - 骁",
-	"程响 - 时光洪流",
-	"羽肿 - Windy Hill (风之谷)",
-	"阿南亮子 - Refrain",
-	"Reynard Silva - The Way I Still Love You",
-	"刀郎 - 花儿为什么这样红 (2016音乐大师课第二季第6期现场)",
-	"Dropgun、Kaleena Zanders - Nothing New (feat. Kaleena Zanders)(Explicit)",
-	"JVLA - Such a Whore",
-	"INNDRIVE - Oriente",
-	"凯撒 - Sugar Crash (DJ Kaisa)", // 可能重复·C(可能同一首)
-	"DJ凯撒 - Lone Ranger (DJ Kaisa)", // 同「我创建·two」
-	"Sia - Unstoppable", // 可能重复·B(较可能同一首)
-	"The Score - Unstoppable",
-	"Mr FijiWiji、Laura Brehm、AgNo3 - Pure Sunlight", // 同「我创建·和平精英音乐合集」
-	"Feint、Laura Brehm - We Won't Be Alone",
-	"EXO - 지나갈 테니 (Been Through)",
-	"DAISHI DANCE、Cécile Corbel - Take Me Hand", // 可能重复·B(较可能同一首)
-	"DJ Project、Giulia - Nu (Original Mix)",
-	"Bobby Capri - Rather Be (Pri Mix)",
-	"Regard - Ride It",
-	"蓝心羽 - 星辰不坠落",
-	"丢火车乐队 - 晚安", // 可能重复·B(较可能同一首)
-	"买辣椒也用券 - 起风了", // 可能重复·B(较可能同一首)
-	"程响 - 千里共婵娟",
-	"邰正宵 - 千纸鹤",
-	"薛之谦 - 我害怕",
-	"凤凰传奇 - 心驰神往",
-	"白小白 - 最后我们没在一起 (DJ伟伟Mix)(DJ阳山伟伟版)",
-	"鹿晗 - 致爱 Your Song",
-	"王琪 - 站着等你三千年",
-	"尚文婷 - 做你的猫",
-	"鹿晗 - 时间停了 (The Moment)(Live)",
-	"程响 - 新娘不是我",
-	"王靖雯 - 爱，存在",
-	"零一九零贰 - 忘川彼岸", // 可能重复·B(较可能同一首)
-	"韩可可 - 迷失在梦中",
-	"王雨桐 - 太阳", // 可能重复·B(较可能同一首)
-	"TheMix多语种乐团 - Lemon (九种语言版)",
-	"邓寓君(等什么君) - 同舟",
-	"Hayley Westenra - Scarborough Fair",
-	"乔艳艳 - 谁",
-	"大张伟 - 我在诗里看到了你",
-	"Germán Gastón Álvarez y La Chueca - We Will Rock You (EnVivo(Explicit))",
-	"张杰 - 仰望星空",
-	"GALA - 追梦赤子心",
-	"July - Somewhere", // 同「我创建·。」
-	"Hans Zimmer、Lisa Gerrard - Now We Are Free (Maximus Mix)",
-	"李玉刚 - 万疆",
-	"胡期皓 - 小时光",
-	"杨千嬅 - 野孩子",
-	"杨胖雨 - 这就是爱吗",
-	"Cascada - Miracle (DJ BOSS HAN版)",
-	"Escala - Requiem For A Tower",
-	"凤凰传奇 - 奢香夫人", // 可能重复·B(较可能同一首)
-	"阿语 - 奢香夫人 (DJ版)",
-	"凤凰传奇 - 奢香夫人 (DJ版)",
-	"葛顺 - 夜的钢琴曲五",
-	"王富贵 - 情字最大 (DJheap九天版)",
-	"宋孟君 - 失眠的夜 (DJ版)", // 可能重复·C(可能同一首)
-	"宋孟君 - 失眠的夜",
-	"王搏 - 穷叉叉",
-	"鹏鹏音乐、付豪 - 夜夜夜漫长",
-	"傅梦彤 - 星陨",
-	"程响 - 四季予你",
-	"海来阿木 - 烟雨人间", // 可能重复·B(较可能同一首)
-	"海来阿木 - 烟雨人间 (DJ沈念版)",
-	"高胜美 - 一帘幽梦",
-	"庾澄庆 - 情非得已", // 可能重复·B(较可能同一首)
-	"小蓝背心 - 我怕来者不是你",
-	"张学友 - 吻别",
-	"七叔（叶泽浩） - 燕无歇", // 可能重复·B(较可能同一首)
-	"回小仙 - 醒不来的梦",
-	"邓丽君 - 小城故事",
-	"赵海洋 - 夜空的寂静 (钢琴曲)",
-	"刘思涵 - 走在冷风中", // 可能重复·B(较可能同一首)
-	"庄学忠 - 中华功夫", // 可能重复·B(较可能同一首)·同「我创建·two」
-	"张韶涵 - 破茧", // 可能重复·B(较可能同一首)
-	"庄心妍 - 为情所伤", // 可能重复·B(较可能同一首)
-	"半吨兄弟 - 为情所伤",
-	"半吨兄弟 - 为情所伤 (DJ沈念版)",
-	"贺一航 - 请先说你好",
-	"李玖哲 - 想太多",
-	"七叔（叶泽浩） - 踏山河", // 可能重复·B(较可能同一首)
-	"半阳 - 一曲相思",
-	"李袁杰、李俊佑 - 醉千年",
-	"逃跑计划 - 夜空中最亮的星",
-	"邱永传 - 十二年",
-	"邱永传 - 十一年",
-	"Ice Paper - 心如止水",
-	"姜鹏 - 赢在江湖", // 可能重复·C(可能同一首)
-	"齐晨 - 咱们结婚吧",
-	"陈慧娴 - 千千阕歌",
-	"潘安邦 - 外婆的澎湖湾", // 可能重复·B(较可能同一首)
-	"卓依婷 - 外婆的澎湖湾",
-	"小志 - 当世界美好与你环环相扣",
-	"周杰伦 - 夜曲",
-	"阿米 - 一个深爱的女孩",
-	"张靓颖 - 如果这就是爱情",
-	"夹子道 - 死心塌地",
-	"李晓杰 - 朋友的酒",
-	"温岚 - 夏天的风", // 可能重复·B(较可能同一首)
-	"Uu (刘梦妤) - 夏天的风",
-	"Die - 月亮不睡你不睡", // 可能重复·C(可能同一首)
-	"朴树 - 平凡之路",
-	"半阳 - 我的将军啊", // 可能重复·B(较可能同一首)
-	"岑宁儿 - 追光者", // 可能重复·C(可能同一首)
-	"汪苏泷 - 追光者 (Live)",
-	"周笔畅 - 最美的期待",
-	"小阿枫 - 醉倾城", // 可能重复·B(较可能同一首)·同「我创建·two」
-	"小阿枫 - 醉倾城 (DJ名龙版)",
-	"阿YueYue - 云与海",
-	"王忻辰、苏星婕 - 去年花开",
-	"郑源 - 为爱停留",
-	"张靓颖 - 天下无双",
-	"许佳慧 - 预谋",
-	"海来阿木 - 五十年以后", // 可能重复·B(较可能同一首)
-	"海来阿木 - 五十年以后 (DJ沈念版)",
-	"蒋雪儿Snow.J - 谁在意我流下的泪",
-	"郑亦辰 - 相思成灾",
-	"庄心妍 - 以后的以后", // 可能重复·B(较可能同一首)
-	"黄龄、Tăng Duy Tân - 叹",
-	"残雪 - 弃佛入魔", // 可能重复·B(较可能同一首)
-	"闻人听書_ - 虞兮叹", // 可能重复·B(较可能同一首)
-	"张小九 - 余香", // 可能重复·B(较可能同一首)
-	"李哈哈 - 再也不会遇见第二个她",
-	"Deep East Music - Sunny Jim",
-	"李春波 - 小芳",
-	"姜玉阳 - 痛彻心扉", // 可能重复·B(较可能同一首)
-	"汪苏泷 - 一笑倾城",
-	"李克勤 - 月半小夜曲", // 可能重复·B(较可能同一首)
-	"王晴 - 月半小夜曲",
-	"六哲、贺敬轩 - 让全世界知道我爱你",
-	"黑Girl - 123木头人",
-	"2Someone - Star Unkind (Lanfranchi & Farina Radio)(Radio Edit)",
-	"房东的猫 - New Boy",
-	"刘钧 - 听闻远方有你", // 可能重复·B(较可能同一首)
-	"朴树 - 那些花儿",
-	"齐秦 - 月亮代表我的心",
-	"Danko - Pump It Up (Original Mix)",
-	"V6 - Take Me Higher (带我飞得更高)(DJ Bonca金柱版)",
-	"EDM - Yasuo(亚索)",
-	"ALan - Octopus", // 同「我创建·two」
-	"XYPO、M. Fischer - We Can Be Together",
-	"RYLLZ - Nemesis",
-	"Ramin Djawadi、Tom Morello - Pacific Rim (feat. Tom Morello)", // 同「我创建·和平精英音乐合集」
-	"Vicetone、Meron Ryan - Walk Thru Fire",
-	"Lambert凌杰、十七草 - Young boss 2.0", // 同「我创建·two」
-	"Cedric Gervais、Digital Farm Animals、Dallas Austin - Touch The Sky (ANR151)", // 可能重复·B(较可能同一首)
-	"Cedric Gervais、Digital Farm Animals、Dallas Austin - Touch The Sky",
-	"邓寓君(等什么君) - 误红妆",
-	"邓寓君(等什么君) - 怎叹",
-	"Danny McCarthy - Silver Scrapes (银痕)",
-	"Two Steps From Hell、Thomas Bergersen - Never Back Down",
-	"魏琮霏 - 青石巷",
-	"THT - 葬花",
-	"ALisa - 为霜 (治愈版)",
-	"ALisa、五月的钢琴 - 海 で待っています (我在海边等你)(治愈版)",
-	"花姐 - 夜之光",
-	"张学友 - 一千个伤心的理由",
-	"周杰伦 - 七里香", // 可能重复·B(较可能同一首)
-	"王不醒 - 月老掉线", // 可能重复·B(较可能同一首)
-	"听风Xyi - 世间遗憾皆是温柔",
-	"Maker、听风Xyi - 星雨夜空",
-	"邓寓君(等什么君)、FOX胡天渝 - 踏雪",
-	"Post Malone、Ty Dolla $ign - Psycho (Clean)",
-	"威仔、格子兮 - 我知道你不爱我",
-	"高胜美 - 我是不是你最疼爱的人", // 可能重复·B(较可能同一首)
-	"半吨兄弟 - 我是不是你最疼爱的人",
-	"The Harmonics - The Other Side of Paradise",
-	"杜宣达 - 原来我从未忘记你",
-	"Herb Ohta - いつも何度でも (与你同在)(「千と千尋の神隠し」より)",
-	"代诗琪 - 揉碎夜的光",
-	"大壮 - 上了年纪的男人",
-	"莫叫姐姐 - 我们的爱输给了现实",
-	"华子、小钢炮 - 谁的人生不孤独 (两个大叔)",
-	"你们的好朋友大雨 - 情结",
-	"杨小壮 - 最后的人", // 可能重复·B(较可能同一首)
-	"杨小壮 - 最后的人 (DJ阿卓、DJ阿龙版)",
-	"川井憲次 - 潇湘子",
-	"崔伟立 - 情火", // 可能重复·B(较可能同一首)
-	"孙艺琪 - 情火",
-	"Alan Walker、JOP - OK",
-	"张晓棠 - 新送情郎",
-	"叶里 - 人间惊鸿客",
-	"傅如乔 - 微微",
-	"Alan Walker - The Spectre", // 可能重复·B(较可能同一首)
-	"Ray-X - Dancin",
-	"Ray-X - The Spectre",
-	"邓岳章 - 情意结", // 可能重复·B(较可能同一首)
-	"陈慧娴 - 情意结",
-	"邓岳章 - 情意结 (DJ R7版)",
-	"王优秀 - 想某人", // 可能重复·B(较可能同一首)
-	"王优秀 - 想某人 (DJ舞曲版)",
-	"黄静美 - 愿你",
-	"贺一航 - 入了我的心丢了我的魂",
-	"Lana Del Rey、Cedric Gervais - Summertime Sadness (remix：Cedric Gervais)",
-	"白小白 - 最美情侣",
-	"方大同 - 特别的人",
-	"胡夏 - 那些年", // 可能重复·B(较可能同一首)
-	"小洲 - 爱都爱了", // 可能重复·B(较可能同一首)
-	"小洲 - 爱都爱了 (DJ德朋版)",
-	"Hoàng Thùy Linh - See Tình (遇见挚爱)(Speed Up Version)", // 同「我创建·two」
-	"李盈盈、小蓓蕾组合 - 人类呀爱我吧",
-	"J Balvin、Willy William、Hugel - Mi Gente (remix：Hugel)",
-	"阿悠悠 - 念旧",
-	"宗次郎 - 故郷の原風景 (故乡的原风景)",
-	"张晓棠 - 苏幕遮",
-	"Zyboy忠宇 - 堕",
-	"LBI利比（时柏尘） - 小城夏天",
-	"pro - 等不来花开", // 可能重复·B(较可能同一首)
-	"豆包 - 作酒",
-	"88rising、Rich Brian - History (Explicit)",
-	"ycccc - 满天星辰不及你",
-	"梦然 - 是你", // 可能重复·C(可能同一首)
-	"yihuik苡慧 - 麦浪",
-	"SING女团 - 寄明月",
-	"Nieem - Streets (7秒DJ版片段)",
-	"王若熙 - 怎随天下 (DJ名龙版)",
-	"娜美 - 醉仙美",
-	"海伦 - 游京", // 可能重复·B(较可能同一首)
-	"小猫多鱼 - Hello friend (电竞专用版)",
-	"苏谭谭 - 醉过多少回",
-	"Charlie Puth、Selena Gomez - We Don't Talk Anymore (feat. Selena Gomez)",
-	"5媚娘 - 夜深了", // 可能重复·B(较可能同一首)
-	"i先生 - 满心欢喜 (Remix)",
-	"者思范 - 我爱你有始有终 (34秒片段)",
-	"腾金涛 - 斯芬克斯",
-	"周杰伦 - 龙卷风",
-	"赵海洋 - 秋的思念 (钢琴曲)", // 同「我创建·。」
-	"告五人 - 给你一瓶魔法药水",
-	"Copy、BT07-PZ - 晚风", // 可能重复·C(可能同一首)
-	"Copy、BT07-PZ - 晚风 (网友改编)",
-	"梦歆冉 - 伤心的酒吧 (伤感女声DJ版)",
-	"大星 - 你是我的人 (DJ版)",
-	"程响 - 等你归来",
-	"July - Beyond the Memory",
-	"带泪的鱼(戴丽丽) - 爱逝枷锁",
-	"Deep East Music - Old Threads",
-	"Mission Impossible - Mission： Impossible Theme",
-	"Deep East Music - High Brow Low Down",
-	"Kevin MacLeod - Fluffing a Duck",
-	"李豪、虞姬、小可 - despair (bootleg)",
-	"阿YueYue、螃蟹 - 다시 너를 (再次见到你)", // 可能重复·B(较可能同一首)
-	"芒果布丁 - NINEELIE (合奏版)",
-	"TFBOYS - 大梦想家",
-	"3LAU、Ninja - Game Time",
-	"烟嗓 - 南墙",
-	"唐云歌 - 降E大调夜曲  肖邦",
-	"陈奕迅 - 爱情转移", // 可能重复·B(较可能同一首)
-	"小金点点 - 回忆复习指南",
-	"许嵩、孙涛 - 书香年华",
-	"郭静 - 心墙", // 可能重复·B(较可能同一首)
-	"林俊杰 - 心墙",
-	"Reverb - Trepte (Explicit)",
-	"柯柯柯啊 - 旧梦一场 (男生版)",
-	"曾抖抖 - 平凡日子里的挣扎",
-	"云汐 - 故事还长",
-	"Shakira、Freshlyground - Waka Waka (Esto es Africa)",
-	"MI.YAO - Light particle E",
-	"袁树雄 - 早安隆回", // 可能重复·B(较可能同一首)
-	"袁树雄 - 早安隆回 (DJ沈念版)",
-	"袁树雄 - 早安隆回 (DJ京仔版)",
-	"M爷、马帅帅、DJ潇洒先生 - The Minimal Beat (DJ版)", // 可能重复·C(可能同一首)
-	"Strong R. - The Minimal Beat",
-	"YANYSMUSIC - Snoop Catt",
-	"D1ofAquavibe - The Party Troll",
-	"梦柯 - 曾经的王", // 可能重复·B(较可能同一首)
-	"神马乐团 - 爱河",
-	"千百顺 - 很任性",
-	"小瑞、斌Sir - 最强EA7 (DJ版)",
-	"小瑞 - EA7最火硬曲 (DJ版)",
-	"1个球 - 大雨还在下", // 可能重复·B(较可能同一首)
-	"1个球 - 大雨还在下 (DJ阿卓、DJ阿龙版)",
-	"Mediks - Come Back Down (Original Mix)",
-	"JJD - Aeon",
-	"Steerner、Martell - Sky (Radio Edit)", // 同「我创建·默认收藏、和平精英音乐合集」
-	"Tungevaag - Wicked Wonderland", // 同「我创建·默认收藏」
-	"RT - Umbrella (Remix)", // 可能重复·B(较可能同一首)
-	"Savior - Umbrella (remix)",
-	"5 Seconds of Summer - Teeth", // 可能重复·B(较可能同一首)·同「我创建·默认收藏」
-	"Raven & Kreyn、RudeLies、Nino Lucarelli - This Far (RudeLies Remix)",
-	"Lazer Boomerang - Time to Pretend",
-	"古羽 - 她的眼睛会唱歌",
-	"董昱昆 - 我想",
-	"张碧晨 - 不要忘记我爱你",
-	"闻人听書_ - 一笑江湖", // 可能重复·B(较可能同一首)
-	"薄荷er - 想想念念",
-	"Jori King - Fatal Love",
-	"葛漂亮 - 烟雨唱扬州 (女版)",
-	"枫叶 - 白了否冷",
-	"李莹小熊 - 飞云之下 (女声版)",
-	"陈雪凝 - 没有人心疼我",
-	"季彦霖、箱子 - 你根本不懂",
-	"承桓 - 我会等", // 可能重复·B(较可能同一首)
-	"杉和、小青蛙组合 - 子莫格尼",
-	"程响 - 人间烟火",
-	"迟里乌布、Morerare - 簇拥烈日的花",
-	"张杰 - 星星 (Live)",
-	"李玉刚 - 清明上河图",
-	"毛阿敏 - 天之大",
-	"袁小朵 - 那个夏天",
-	"苏星婕 - 听悲伤的情歌",
-	"梨笑笑 - 山茶花读不懂白玫瑰", // 可能重复·C(可能同一首)
-	"梅朵 - 总以为来日方长",
-	"半吨兄弟、王小草 - 想把我唱给你听", // 可能重复·B(较可能同一首)
-	"Radion 6 - Lightning",
-	"张小健 - 三两三",
-	"中铁十四局隧道公司 - 篇章-2022届新学员", // 可能重复·B(较可能同一首)
-	"Mae Stephens - If We Ever Broke Up",
-	"Michael Jackson - Dangerous",
-	"Dxrk ダーク - RAVE (锐舞)",
-	"The Piano Guys - Rolling in the Deep",
-	"半吨兄弟 - 最美的伤口", // 同「我创建·two」
-	"甄秀儀 - 千里共嬋娟",
-	"米雅 - 太多",
-	"添儿呗 - 烟火人间",
-	"海伦 - 游山恋",
-	"金南玲 - 逆流成河 (典藏版)", // 可能重复·B(较可能同一首)
-	"谢军 - 那一夜", // 可能重复·B(较可能同一首)·同「我创建·默认收藏」
-	"彭佳慧 - 相见恨晚",
-	"BOSS HAN - You混搭 (DJ版)",
-	"七音盒 - 炸山姑娘",
-	"潇潇潇潇如 - 病变 (女生版)",
-	"鹿晗、邓超、李晨 - 超级英雄 (Live in Shanghai)",
-	"欧阳朵 - 失去才懂",
-	"华莎 - 마리아 (14秒片段)",
-	"F.I.R.飞儿乐团、彭佳慧 - 心之火", // 可能重复·C(可能同一首)·同「我创建·花千骨」
-	"香香 - 猪之歌",
-	"SPYAIR - Rage of Dust",
-	"David Guetta、Afrojack、Bebe Rexha、Nicki Minaj - Hey Mama (feat. Nicki Minaj, Bebe Rexha & Afrojack)(DJ LBR Remix)",
-	"Nora En Pure - Lake Arrowhead (箭头湖)(Original Mix)",
-	"冷漠 - 伤心城市", // 可能重复·B(较可能同一首)
-	"周杰伦 - 听妈妈的话",
-	"T-Pain、Ne-Yo - Turn All the Lights On", // 同「我创建·默认收藏」
-	"Thomas Bergersen - Victory (网友改编)",
-	"大壮 - 我们不一样 (Radio Edit)(DJ小鱼儿版)",
-	"任然 - 无人之岛", // 可能重复·B(较可能同一首)
-	"邓岳章 - 无人之岛",
-	"鸣小明 - 无人之岛",
-	"欢子 - 心痛2009",
-	"黄霄雲 - 星辰大海",
-	"林俊杰 - 一千年以后",
-	"张北北 - 拥抱你离去",
-	"周冰倩 - 真的好想你",
-	"Deepain - 身骑白马", // 可能重复·B(较可能同一首)
-	"林忆莲 - 为你我受冷风吹", // 可能重复·B(较可能同一首)
-	"大壮 - 为你我受冷风吹",
-	"李翊君 - 风中的承诺",
-	"张学友 - 我不在乎等多久",
-	"童安格 - 灯",
-	"杨沛宜 - 左手右手", // 可能重复·B(较可能同一首)·同「我创建·动画片」
-	"Rompasso - Angetenar (Radio Edit)",
-	"柯柯柯啊 - 画离弦 (柯柯版)",
-	"코드 쿤스트、李遐怡 - O (Feat. 이하이)",
-	"杨琦 - 想 (DJ女生版)",
-	"Brandy - (Everything I Do) I Do It for You",
-	"聂思诗 - 一起吹过晚风的街",
-	"郑鱼 - 无归期",
-	"关心 - 提笔忘情",
-	"王忻辰 - 时间沦陷",
-	"盖君炎 - 我想要",
-	"王靖雯 - 忘了没有", // 可能重复·B(较可能同一首)
-	"柯柯柯啊 - 樱花树下的约定", // 可能重复·B(较可能同一首)
-	"邓寓君(等什么君) - 天下", // 可能重复·B(较可能同一首)
-	"Raim & Artur、Adil、Artur、RaiM - Simpa", // 同「我创建·和平精英音乐合集」
-	"Dan Farber - Don't Touch (DJMix)",
-	"刘家纬、272 - Love Is Gone", // 可能重复·B(较可能同一首)
-	"SLANDER、Dylan Matthew - Love Is Gone",
-	"Spada、Anna Leyne - Catchfire (Sun Sun Sun) (EDX's Miami Sunset Remix)",
-	"MayPiano - Illusionary Daytime (幻昼)(钢琴版)",
-	"纯音乐 - 溯 (钢琴版)",
-	"Avicii、Nicholas Furlong - The Nights",
-	"Orchestra、Maksim、jeff wayne - Main Theme (出埃及记)(Arr. Bateman)",
-	"Shawn Mendes - Stitches", // 可能重复·C(可能同一首)
-	"马有才 - Stitches (DJ版)",
-	"Kenny G - Jasmine Flower",
-	"咖菲 - 风雨飘洒",
-	"DiESi - 時代を越える想い (穿越时空的思念)(remix：DiESi)",
-	"Lightscape - Collapsing World (崩溃的世界)(Original Mix)", // 同「我创建·和平精英音乐合集」
-	"安卿尘 - 难以启齿的柔弱 (烟嗓版)",
-	"The Kid LAROI、Justin Bieber - STAY (Clean)", // 可能重复·B(较可能同一首)·同「我创建·。」
-	"The Kid LAROI、Justin Bieber - STAY (Explicit)",
-	"Wiz Khalifa、Charlie Puth - See You Again",
-	"闫永强 - The Spectre (幽魂)(唢呐演奏版)(Live)",
-	"SHAUN、Conor Maynard、Sam Feldt - Way Back Home (Sam Feldt Edit)",
-	"SHAUN - Way Back Home",
-	"笑白Ermy、White Wolf Tracks - 战曲 Battle Epic Song", // 同「我创建·two」
-	"久石让 - Summer (菊次郎的夏天)", // 可能重复·B(较可能同一首)
-	"饭碗的彼岸 - 風の住む街 (风居住的街道)(Piano Ver.)",
-	"徐佳莹 - 我一直都在这里", // 同「我创建·熊出没」
-	"王建荣 - 公虾米", // 可能重复·B(较可能同一首)·同「我创建·改编/鬼畜/片段/DJ」
-	"何鹏、金久哲 - 嗑儿 (DJ何鹏版)", // 同「我创建·改编/鬼畜/片段/DJ」
-	"猫有饼 - 38度6 (41秒吃鸡版片段)", // 同「我创建·改编/鬼畜/片段/DJ」
-	"馒头 - 穷的响叮当", // 可能重复·B(较可能同一首)·同「我创建·改编/鬼畜/片段/DJ」
-	"抽象带篮子 - 野心千万种 (Original Mix)", // 同「我创建·改编/鬼畜/片段/DJ」
-	"杨钰莹 - 轻轻地告诉你", // 同「我创建·儿歌」
-	"自信的阿呆 - Rumors", // 同「我创建·改编/鬼畜/片段/DJ」
-	"宋瑞、竭容生 - 三条腿的蛤蟆找不着,两条腿的女人多的是", // 同「我创建·改编/鬼畜/片段/DJ」
-	"精彩轩迪 - 山前山后各有哀愁", // 同「我创建·改编/鬼畜/片段/DJ」
-	"杨硕哥哥 - 生僻字 (完整电晕版)", // 同「我创建·改编/鬼畜/片段/DJ」
-	"R7 - 桃花运 (DJR7版)", // 同「我创建·改编/鬼畜/片段/DJ」
-	"新地、卢克 - 我不是刘德华", // 同「我创建·改编/鬼畜/片段/DJ」
-	"花儿乐队 - 嘻唰唰", // 可能重复·B(较可能同一首)·同「我创建·儿歌」
-	"颜一 - 心酸", // 可能重复·B(较可能同一首)·同「我创建·改编/鬼畜/片段/DJ」
-	"ALisa - 星茶会 (治愈版)",
-	"许美静 - 阳光总在风雨后", // 同「我创建·儿歌」
-	"Heaven J - 鱿鱼游戏 (123木头人)", // 同「我创建·改编/鬼畜/片段/DJ」
-	"全球音乐吧 - 13年前的这首歌要是放到现在,依旧是不可超越的神曲,太洗脑!", // 同「我创建·改编/鬼畜/片段/DJ」
-	"李文踹 - 38度6 (烧烤版)", // 同「我创建·改编/鬼畜/片段/DJ」
-	"豆包 - 太想念", // 可能重复·B(较可能同一首)
-	"豆包 - 太想念 (DJ阿卓、DJ阿龙版)",
-	"阿吉野马 - Зая",
-	"锋锋 - 佛罗里达州最硬的男人", // 同「我创建·two、改编/鬼畜/片段/DJ」
-	"桃沢樱 - DJDJ我要上头了",
-	"The Score - Born For This",
-	"my darkest days - Save Yourself (Album Version)",
-	"FlicFlac、Beatrich - So High",
-	"Capital Kings、Unknown、Hollyn - All Good",
-	"Panic! At the Disco - High Hopes",
-	"Valley Of Wolves - Lions Inside",
-	"Tommee Profitt、Jung Youth - Only One King",
-	"Oh The Larceny - Incredible",
-	"Imagine Dragons - Demons",
-	"Daughtry - Ghost Of Me",
-	"Tyron Hapi、Bianca - Lost Control (feat. Bianca)", // 同「我创建·默认收藏」
-	"Zayde Wølf - Cold-Blooded",
-	"Simple Plan - Last One Standing", // 同「我创建·QQ飞车音乐合集哈」
-	"Black Veil Brides - In the End", // 可能重复·B(较可能同一首)
-	"Matilda - Illusion",
-	"Gavin DeGraw - Fire", // 同「我创建·默认收藏」
-	"Zayde Wølf - Hustler",
-	"Fall Out Boy - Centuries",
-	"Oh The Larceny - Man on a Mission",
-	"Rachel Platten - Fight Song",
-	"Kygo、Sasha Alex Sloan - I'll Wait",
-	"Zayde Wølf - Strike a Match",
-	"Within Temptation 诱惑本质 - Mercy Mirror",
-	"Danny Avila - End Of The Night (Explicit)", // 同「我创建·默认收藏」
-	"Mesto、Brielle Von Hugel - Chances (feat. Brielle Von Hugel)", // 同「我创建·默认收藏」
-	"张禾禾 - 逃之夭夭 (DJheap九天版)",
-	"郑源 - 难道爱一个人有错吗",
-	"泽亦龙 - EDM (DJ打碟版)",
-	"纯音乐 - 诡异恐怖音效", // 同「我创建·改编/鬼畜/片段/DJ」
-	"平生青涯 - 醉里",
-	"郑伊健 - 心如刀割",
-	"小猫多鱼 - 祝你生日快乐", // 同「我创建·two、改编/鬼畜/片段/DJ」
-	"金莎 - 爱的魔法",
-	"安苏羽 - 人走茶凉",
-	"Yes - Roundabout",
-	"宝藏挖掘机 - 《梦见我们相遇》索菲亚：真的再见到你，再次拥抱你在怀里 (长音频)", // 同「我创建·改编/鬼畜/片段/DJ」
-	"5媚娘 - 拥抱星河万里", // 同「我创建·改编/鬼畜/片段/DJ」
-	"7宇 - 7宇版小毛驴一起摇", // 同「我创建·改编/鬼畜/片段/DJ」
-	"仇远旭 - 一格格 (粤语女版)", // 同「我创建·改编/鬼畜/片段/DJ」
-	"周杰伦 - 我是如此相信",
-	"小小奶黄包 - Samsara (0.8×)", // 同「我创建·改编/鬼畜/片段/DJ」
-	"DJ花神经 - 世间万物 (DJ版)", // 同「我创建·。」
-	"就是南方凯 - 问心",
-	"季彦霖 - 选择失忆",
-	"今晚打老虎 - 触电",
-	"久石让 - Mad Summer",
-	"Imagine Dragons、Lil Wayne - Believer", // 可能重复·B(较可能同一首)
-	"Home Free - Sea Shanty Medley", // 同「我创建·two」
-	"HINA - ID",
-	"HENRY刘宪华、圭贤、泰民 - Trap (Korean Ver.)",
-	"伯爵Johnny、唐伯虎Annie - 伯虎说 (feat.唐伯虎Annie)",
-	"AGA - Wonderful U (Demo Version)",
-	"馒头 - おどるポンポコリン", // 同「我创建·改编/鬼畜/片段/DJ」
-	"牟凡 - 爱的哲学",
-	"洛先生 - 影子说",
-	"林子祥 - 成吉思汗",
-	"林俊杰、金莎 - 期待爱",
-	"林俊杰 - 裹着心的光",
-	"李飘飘 - 寂寞烟火 (治愈版)",
-	"李巍V仔 - 守护着我的光",
-	"Phúc Du、King Kudo - Anh không làm gì đâu a thề (我发誓什么都不做)(DJ版)",
-	"柯柯柯啊 - 姑娘在远方",
-	"柯柯柯啊 - 大海 (柯柯吉他版)",
-	"Jacob Tillberg、DEAF KEV - Fade Away (Deaf Kev Remix)",
-	"鞠婧祎 - 叹云兮", // 可能重复·B(较可能同一首)
-	"金渔 - 伪善者",
-	"金婷婷 - 风吹麦浪", // 可能重复·B(较可能同一首)
-	"The Tech Thieves - Fake",
-	"苏天伦 - Sober",
-	"胜屿 - 我们说好的", // 可能重复·B(较可能同一首)
-	"矢野立美 - 远き呼び声の彼方へ (那来自远方的呼唤)(＜M-41,M-62A＞)",
-	"Really Slow Motion - Deadwood Main (枯木)(纯音乐)",
-	"Rauf & Faik - Колыбельная (摇篮曲)(Kolybel'naja)", // 可能重复·B(较可能同一首)
-	"Ramin Djawadi - 存亡之战 (派崔克·史坦普混音)",
-	"Rag'n'Bone Man - Skin",
-	"杨千嬅、任贤齐 - 花好月圆夜",
-	"秦晨阳 - 毕业那天", // 可能重复·B(较可能同一首)
-	"彭小胖 - 缺憾", // 可能重复·B(较可能同一首)·同「我创建·。」
-	"Oh The Larceny - This Is It",
-	"Nora En Pure - Lake Arrowhead (Radio Mix)",
-	"NextRO - Anatomy (Original Mix)",
-	"Universal Idol、VodKe、HSHK、Pnan、贰皮 - Italia e voi (双枪说)", // 同「我创建·two」
-	"Matteo - Panama (巴拿马)",
-	"Martin Garrix、Clinton Kane、Alle Farben - Drown (feat. Clinton Kane)(Alle Farben Remix)",
-	"XXXTentacion - NUMB", // 可能重复·C(可能同一首)
-	"许嵩 - 千百度",
-	"许嵩 - 江湖",
-	"萧亚轩 - 遗失的心跳", // 可能重复·B(较可能同一首)
-	"小皮皮爱习题 - Upupu",
-	"兮沐 - 黄昏之时 (钢琴曲)",
-	"Will Armex、Katy M - You and I (feat. Katy M)",
-	"王靖雯 - 善变", // 可能重复·B(较可能同一首)
-	"王恩信Est、二胖u - 飞",
-	"王忻辰、苏星婕 - 清空",
-	"王子健 - 循迹",
-	"陈每文、熊健萍、陈帆等 - 雨花石 (电视连续剧《红红的雨花石》主题歌)",
-	"我是小力气 - 一格格", // 可能重复·B(较可能同一首)
-	"Slow_77 - 一格格 (Live)",
-	"Valentin - A Little Story (小故事)",
-	"Ugress - Undead Funeral March",
-	"Tungevaag、Raaban、Luana Kiara - Bad Boy (feat. Luana Kiara)",
-	"Two Steps From Hell、Thomas Bergersen、Merethe Soltvedt - El Dorado (Dubstep Remix)",
-	"张泽熙 - 那个女孩", // 可能重复·B(较可能同一首)
-	"周慧敏 - 最爱", // 可能重复·B(较可能同一首)
-	"于梓贝 - 最爱",
-	"阳山伟伟 - 她的微笑 (Original Mix)",
-	"远方 - 她只是经过", // 可能重复·C(可能同一首)
-	"郁可唯 - 远方",
-	"烟(许佳豪) - 再见我的女孩",
-	"坠. - 关键词 (Live)",
-	"煜臣 - 王者荣耀 (一人我饮酒醉李白鬼畜)",
-	"迪总 - 江归江山归山 (57秒DJ版｜片段)", // 同「我创建·改编/鬼畜/片段/DJ」
-	"网络歌手 - Laxed (14秒片段)",
-	"旺仔小乔 - 我还是 (20秒片段)", // 同「我创建·改编/鬼畜/片段/DJ」
-	"刘大壮 - 我不是你的宋冬野 (30秒Live片段)",
-	"霍宝库 - 谁不曾拥有梦想",
-	"贺敬轩 - 毕业季",
-	"灰澈 - 星茶会",
-	"浩然H.R - 年少的你啊",
-	"Geoff Zanelli - Beyond My Beloved Horizon (From ＂Pirates of the Caribbean： Dead Men Tell No Tales＂／Score)",
-	"DJ铁柱 - 我们的歌 (18秒0.8x片段)",
-	"24KGoldn、iann dior - Mood (Explicit)", // 同「我创建·。」
-	"布袋寅泰 - BATTLE WITHOUT HONOR OR HUMANITY (无差别格斗)", // 同「我创建·two」
-	"冰冰超人 - 八年的爱", // 可能重复·B(较可能同一首)
-	"Alan Walker、Iselin Solheim - Sing Me to Sleep",
-	"宋谦泽、明洋 - MELANCHOLY (Remix)", // 可能重复·B(较可能同一首)
-	"付汶昊、蔡萝莉 - Middle Of The Night (DJ环绕版)",
-	"雷军、Mr.Lemon - Are You OK", // 同「我创建·改编/鬼畜/片段/DJ」
-	"Immediate Music - Electric Romeo", // 可能重复·B(较可能同一首)·同「我创建·默认收藏」
-	"Hans Zimmer - Cornfield Chase (原野追逐)", // 同「我创建·默认收藏」
-	"盗哥 - 耍猴专用BGM (唢呐版)",
-	"王小帅 - 最近",
-	"睡不醒的觉o - 白山茶 (温柔女生版)",
-	"KOKIA - ありがとう… (谢谢…)",
-	"林俊杰 - 爱不会绝迹", // 可能重复·B(较可能同一首)·同「我创建·动画片」
-	"Jessie J - Flashlight (From ＂Pitch Perfect 2＂ Soundtrack)", // 同「我创建·动画片」
-	"梅尼耶 - The Riddle (口哨版)", // 同「我创建·改编/鬼畜/片段/DJ」
-	"萍爷 - Как вы哦NO哦NO", // 同「我创建·改编/鬼畜/片段/DJ」
-	"e中人 - 江南Style (我爸刚弄死他)", // 同「我创建·改编/鬼畜/片段/DJ」
-	"6诗人 - 卡布奇诺", // 可能重复·B(较可能同一首)·同「我创建·改编/鬼畜/片段/DJ、。」
-	"李少白 - 你男朋友很差", // 同「我创建·改编/鬼畜/片段/DJ」
-	"小智慧 - 世俗总要男人无惧无畏 (Remix)", // 同「我创建·改编/鬼畜/片段/DJ」
-	"张雪峰 - 一人我饮酒醉 (考研版)", // 同「我创建·改编/鬼畜/片段/DJ」
-	"Richard Clayderman - La Cumparcita", // 同「我创建·熊出没」
-	"熊出没. - Tricks And Traps", // 可能重复·C(可能同一首)·同「我创建·熊出没」
-	"枯木逢春 - 这一生关于你的风景",
-	"Vicetone、Kat Nestel - Angels (Extended Mix)",
-	"刘增瞳 - 多想留在你身边",
-	"懒大王 - 姑娘别哭泣 (懒羊羊版)",
-	"VIVI - 开心往前飞", // 同「我创建·儿歌」
-	"周杰伦 - 兰亭序", // 可能重复·B(较可能同一首)
-	"王十三 - 兰亭序",
-	"林迏浪、h333 - 还是会想你",
-	"王心凌 - 梦的光点", // 可能重复·B(较可能同一首)·同「我创建·动画片」
-	"张学友 - 你好毒",
-	"罗家英 - Only You", // 可能重复·B(较可能同一首)
-	"就是南方凯 - 离别开出花",
-	"雨帆 - 荒 (我曾爱过一个人竹笛纯享版)",
-	"Crx7 - 梦的边境",
-	"杨秉音 - 大黑天",
-	"橘子海 - 夏日漱石 (Summer Cozy Rock)",
-	"纯音乐 - 倩女幽魂", // 可能重复·B(较可能同一首)·同「我创建·。」
-	"刘惜君 - 倩女幽魂",
-	"张国荣 - 倩女幽魂",
-	"张连春 - 掀起你的盖头来",
-	"海来阿木 - 西楼儿女", // 可能重复·B(较可能同一首)
-	"容祖儿 - 抱抱",
-	"吴泓君 - 采槟榔",
-	"曾心梅 - 娜奴娃的探戈",
-	"陈毅、精彩轩迪 - 够爱 (男嗓版)",
-	"王乐蔚 - 孤独的船",
-	"洛先生 - 只要有你", // 可能重复·B(较可能同一首)
-	"小阿枫 - 只要有你",
-	"抠抠 - 星光就在前方",
-	"齐豫 - 橄榄树",
-	"家家 - 命运", // 可能重复·B(较可能同一首)
-	"魏佳艺 - 我来人间一趟", // 可能重复·B(较可能同一首)
-	"魏佳艺 - 我来人间一趟 (DJ默涵版)",
-	"于冬然 - 其实都没有", // 可能重复·B(较可能同一首)
-	"于冬然 - 其实都没有 (DJ铁柱版)",
-	"宝藏挖掘机 - 《囍》：没有这歌可怎么活啊",
-	"张雨生 - 我的未来不是梦",
-	"赵雷 - 我们的时光",
-	"姜育恒 - 再回首",
-	"王佳杨 - 遗憾",
-	"王逗逗 - 小甜心",
-	"张碧晨 - 笼", // 可能重复·B(较可能同一首)
-	"DJ婷姐、小李吖、虞姬(12) - 说三两句晚安",
-	"张叶蕾 - 还是分开",
-	"张韶涵 - 有形的翅膀",
-	"苏芮 - 酒矸倘卖无",
-	"海生 - 情一动心就痛",
-	"王以太、刘至佳 - 危险派对",
-	"冷漠 - 一路向北",
-	"良久哦 - 烟花易冷 (良久哦0.7X变速版)",
-	"蒙面哥 - 一亿个伤心",
-	"moumoon - Sunshine Girl",
-	"周传雄 - 青花",
-	"怪阿姨 - 放纵L", // 可能重复·B(较可能同一首)
-	"Z.YAO中药 - 与我无关",
-	"谢宇伦 - 夜半", // 可能重复·B(较可能同一首)
-	"VINAI - Parade",
-	"Pure Morning - L2",
-	"小炎同学 - 天下的乌鸦一般黑",
-	"郑钧 - 私奔",
-	"梁博 - 出现又离开 (Live)",
-	"曲婉婷 - Jar Of Love (Album Version)",
-	"曲婉婷 - 最好的安排",
-	"吸猫大师 - 《zhurek 中文翻唱》：有点好听~很难不喜欢",
-	"ADAM - Zhurek",
-	"Justin Bieber、Ludacris - Baby", // 同「我创建·QQ飞车音乐合集哈」
-	"阿桑 - 一直很安静", // 可能重复·B(较可能同一首)
-	"陈奕迅 - 富士山下", // 可能重复·B(较可能同一首)
-	"潘成（皮卡潘） - 白鸽乌鸦相爱的戏码", // 可能重复·B(较可能同一首)
-	"李荣浩 - 不将就", // 可能重复·B(较可能同一首)
-	"蓝波 - 一起闯荡",
-	"许慧欣 - 七月七日晴",
-	"张杰 - 听",
-	"林俊杰 - 不为谁而作的歌",
-	"陈柏宇 - 你瞒我瞒",
-	"孙丽丽 - 蛋黄的长裙蓬松的头发",
-	"Nathan Evans - Wellerman (Sea Shanty ／ Karaoke Version)",
-	"李文杰 - 杀死比尔", // 可能重复·B(较可能同一首)·同「我创建·two」
-	"萨顶顶 - 自由行走的花",
-	"毛不易 - 如果有一天我变得很有钱 (Live)",
-	"八音盒 - Sacred Play Secret Place (DJ版)",
-	"弹棉花的小花 - 再见青春 (释怀版)",
-	"王樾安 - 会开花的云", // 可能重复·B(较可能同一首)
-	"泡芙芙Scarlett - 芦苇飞",
-	"唐伯虎Annie - 落 (花开花落日升日没)",
-	"伍佰 & China Blue - 突然的自我 (Live)",
-	"番番、韩圣 - 芦苇飞 (说唱版)", // 同「我创建·默认收藏」
-	"费戚戚 - 风催雨 (节奏版)",
-	"Vnriet - Let Me Put (Reset House)",
-	"Wonder Girls - Nobody (Korean Version)", // 同「我创建·QQ飞车音乐合集哈」
-	"略略略 - 鸳鸯戏 (吉他版)", // 可能重复·C(可能同一首)
-	"Zella Day - East of Eden",
-	"洪真英 - 산다는 건 (Cheer Up)",
-	"野菊花 - 걱정말아요 그대 (你不要担心)",
-	"螃蟹真疼、DJ野马 - 兰多卡兰多摇 (DJ版)", // 同「我创建·two」
-	"王富贵 - 生而平凡", // 可能重复·B(较可能同一首)
-	"王富贵 - 生而平凡 (DJ京仔版)",
-	"王富贵、R7 - 生而平凡 (DJ版)",
-	"虎二 - 窗", // 可能重复·B(较可能同一首)
-	"小阿枫 - 我要找到你", // 可能重复·B(较可能同一首)
-	"怪阿姨 - 羡慕风羡慕雨",
-	"冬日暖阳 - 寻常岁月诗", // 可能重复·B(较可能同一首)
-	"张震岳、大渊(顽童MJ116) - 迷途羔羊",
-	"方天雷 - 依兰爱情故事",
-	"四千金 - 打锣打鼓", // 可能重复·B(较可能同一首)
-	"에일리 (AILEE) - HEAVEN (Original Version)",
-)
 
 // 我创建的歌单·酷狗：
 // 默认收藏（921首）
