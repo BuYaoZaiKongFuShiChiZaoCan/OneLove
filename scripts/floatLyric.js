@@ -209,18 +209,11 @@
 			if (typeof nextSong === 'function') nextSong();
 		});
 		root.querySelector('.fl-play-btn').addEventListener('click', function () {
-			// 和主界面按钮一致的判断：MV 正在加载时点一下就直接播音频，不必点两次
-			if (audio.paused && typeof mvIsLoading === 'function' && mvIsLoading()) {
-				playSong(true);
-				return;
-			}
+			// 和主界面播放按钮一致：只控制音乐。
+			// playSong(true) 不把播放交给 MV，出声的是音频，并顺手暂停正在播的视频（避免双声）；
+			// MV 自己的播放/暂停交给 video 原生控件。
 			if (audio.paused) {
-				if (typeof mvIsPlaying === 'function' && mvIsPlaying()) {
-					// MV 在出声：音频是暂停的，点一下应该暂停视频
-					if (window.audioMvVideo1) window.audioMvVideo1.pause();
-					return;
-				}
-				playSong();
+				playSong(true);
 			} else {
 				pauseSong();
 			}

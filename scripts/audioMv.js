@@ -596,16 +596,13 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 	 * 没有任何提示的话，界面看着正常，完全判断不出是在加载还是坏了。
 	 * autoplay=false 是页面初始化那一次，用户还没点播放，不该先摆一个加载提示。
 	 * showLoading 内部有「本首已经出过声就不提示」的闸门，视频播放中拖进度条不会盖住歌词。
+	 *
+	 * 注意这里**不要**顺手把底部播放按钮改成「暂停」外观：那个按钮只表示「音乐（音频）在不在响」，
+	 * MV 在播时音频是暂停的，按钮就该显示「播放」，点一下 → playSong(true) 播音频并暂停视频。
+	 * 原来在这里 setPlayUI(true)，MV 正在播时点一下只会去暂停一个本来就没响的音频，
+	 * 按钮变了、画面照动，看起来就是「按了没反应」。
 	 */
-	if (autoplay) {
-		showLoading('mv');
-		/**
-		 * 加载过程中按钮显示「暂停」（播放中外观）：用户按一次就直接播音频
-		 * （audio.js 的 playBtn.onclick 会走 playSong(true)），
-		 * 不会出现「先按一次暂停、再点一次才出声」。
-		 */
-		if (typeof setPlayUI === 'function') setPlayUI(true);
-	}
+	if (autoplay) showLoading('mv');
 	// 视频起不来时的音频兜底：只有「确实不能播放」才让音乐响。
 	// 还在加载阶段（readyState 不够）不插音频——视频在转圈、音乐先响会很怪；
 	// autoplay=false（页面初始化那次）也不插，否则一进页面就自动出声

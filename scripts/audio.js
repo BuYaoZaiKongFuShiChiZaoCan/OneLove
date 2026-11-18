@@ -1051,29 +1051,22 @@ function setProgress(e) {
 // 事件监听
 // 1.播放歌曲
 playBtn.onclick = function () {
+	/**
+	 * 这个按钮只控制「音乐」。
+	 *
+	 * 原来这里是不带参数的 playSong()：MV 一就绪，playSong 开头的 resumeMvIfNeeded()
+	 * 就把这次播放交给了视频 —— 于是按钮实际变成了 MV 的播放开关：
+	 * 视频在放时点一下只暂停画面、音频始终不出声，再点一下又去把视频拉回来。
+	 *
+	 * 现在固定走 playSong(true)：不把播放交给视频，由音频出声；
+	 * playSong(true) 内部会把正在播的 MV 暂停掉（避免视频、音频同时响）。
+	 * 视频自己的播放/暂停全交给 video 元素的原生控件，这个按钮不参与。
+	 */
 	if (!musicContainer.classList.contains('play')) {
-		playSong();
+		playSong(true);
 		return;
 	}
-	/**
-	 * 此时按钮显示「暂停」（播放中外观），但音频并没有在响。分两种：
-	 * ① MV 还在加载（还没出声）→ 点一次就直接播音频，不要先按一次暂停、再点一次才播放；
-	 * ② MV 已经在放 → 这一下就是「暂停」，真的把视频停掉（原来只暂停了本来就没在响的音频，
-	 *    按钮变了、画面还在动）。
-	 */
-	if (audio.paused && typeof mvIsLoading === 'function') {
-		if (mvIsLoading()) {
-			playSong(true);
-			return;
-		}
-		if (typeof mvIsPlaying === 'function' && mvIsPlaying()) {
-			// 先停画面，再统一播放器状态（音频本来就没在响，pauseSong 只负责外观和播放意图）。
-			// 只调 pauseSong 的话画面照动，只 pause 视频的话按钮不会变回「播放」。
-			window.audioMvVideo1.pause();
-			pauseSong();
-			return;
-		}
-	}
+	// 显示「暂停」= 有声音在响（只可能是音频；MV 在播时按钮由 video.onplay 改回「播放」）
 	pauseSong();
 }
 // 2.切换歌曲
