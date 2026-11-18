@@ -15,7 +15,7 @@ const posterLuYou = './music/mv/poster/'
  */
 let mvList = [
 	{
-		id: "浮夸-陈奕迅",
+		id: "陈奕迅 - 浮夸",
 		type: "video/mp4",
 		title: "【𝟖𝐊_𝟔𝟎𝐅𝐏𝐒】《浮夸》2010DUO演唱会 现场版",
 		srcLocalhost: "./music/mv/浮夸-陈奕迅.mp4",
@@ -37,7 +37,7 @@ let mvList = [
 		desc: "We Will Rock You"
 	},
 	{
-		id: "Wellerman-NathanEvans(Sea_Shanty)",
+		id: "Nathan Evans - Wellerman (Sea Shanty)",
 		type: "video/mp4",
 		title: "Wellerman-NathanEvans(Sea_Shanty)",
 		srcLocalhost: "./music/mv/Wellerman-NathanEvans(Sea_Shanty).mp4",
@@ -49,7 +49,7 @@ let mvList = [
 		desc: "《Wellerman》是新西兰民谣，最早由新西兰的捕鲸船员在19世纪40年代创作。歌曲讲述了捕鲸船员们在海上等待补给船“Wellerman”到来的故事。"
 	},
 	{
-		id: "留什么给你(Live)-孙楠",
+		id: "孙楠 - 留什么给你(Live)",
 		type: "video/mp4",
 		title: "《留什么给你》",
 		srcLocalhost: "./music/mv/留什么给你-2.mp4",
@@ -67,7 +67,7 @@ let mvList = [
 		desc: "《人世间》主题曲"
 	},
 	{
-		id: "花间",
+		id: "七分可可 - 花间",
 		type: "video/mp4",
 		title: "《花间》 《忘了算了》",
 		srcLocalhost: "./music/mv/花间.mp4",
@@ -89,7 +89,7 @@ let mvList = [
 		desc: "帅气逼人组合Haha Hihi Huhu Heheh"
 	},
 	{
-		id: "柳爽-漠河舞厅",
+		id: "柳爽 - 漠河舞厅",
 		type: "video/mp4",
 		title: "【4K_60FPS】漠河舞厅MV—柳爽(致敬最爱的人逝去)(2020)(AI_高清修复).31936217997",
 		srcLocalhost: "./music/mv/柳爽-漠河舞厅.mp4",
@@ -107,7 +107,7 @@ let mvList = [
 		desc: "林宥嘉《说谎》神级现场!别以为你有多难忘,更何况那又不算伤!.906081558"
 	},
 	{
-		id: "童话镇-陈一发儿",
+		id: "陈一发儿 - 童话镇",
 		type: "video/mp4",
 		title: "童话镇MV—陈一发儿",
 		srcLocalhost: "./music/mv/童话镇-陈一发儿.mp4",
@@ -116,7 +116,7 @@ let mvList = [
 		desc: "童话镇MV—陈一发儿 #这么多年依然很喜欢童话镇 总有一条蜿蜒在童话镇里七彩的河 # 暗杠 # 童话镇 # 童话镇清唱 # 是臆想还是幻觉我分不清  https://v.douyin.com/LELkr1fhC_w/"
 	},
 	{
-		id: "周杰伦-蒲公英的约定",
+		id: "周杰伦 - 蒲公英的约定",
 		type: "video/mp4",
 		title: "蒲公英哪有什么约定 风一吹就散了 -周杰伦-蒲公英的约定",
 		srcLocalhost: "./music/mv/周杰伦 - 蒲公英的约定.mp4",
@@ -134,7 +134,7 @@ let mvList = [
 		desc: "《Salvatore》#欧美音乐 #LanaDelRey 打雷姐"
 	},
 	{
-		id: "欢乐地跳吧",
+		id: "新疆美丽公主组合 - 欢乐地跳吧",
 		type: "video/mp4",
 		title: "《欢乐地跳吧》舞蹈完整版来啦",
 		srcLocalhost: "./music/mv/新疆美丽公主组合 - 欢乐地跳吧.mp4",
@@ -154,7 +154,7 @@ let mvList = [
 		desc: "【4K60FPS_Hi-Res】张杰《他不懂》MV顶级修复___歌的名字是他不懂,其实是我不懂"
 	},
 	{
-		id: "毛不易-借",
+		id: "毛不易 - 借",
 		type: "video/mp4",
 		title: "[4K60FPS_Hi_Res] 毛不易《借》MV全网最高画质修复",
 		srcLocalhost: "./music/mv/毛不易-借.mp4",
@@ -163,7 +163,7 @@ let mvList = [
 		desc: "【4K60FPS_Hi-Res】毛不易《借》MV全网最高音画质修复___被这风吹散的人说他爱的不深,被这雨淋湿的人说他不会冷"
 	},
 	{
-		id: "毛不易-消愁",
+		id: "毛不易 - 消愁",
 		type: "video/mp4",
 		title: "[4K60FPS_Hi_Res] 毛不易《消愁》动态歌词MV修复",
 		srcLocalhost: "./music/mv/毛不易-消愁.mp4",
@@ -172,7 +172,7 @@ let mvList = [
 		desc: "【4K60FPS_Hi-Res】毛不易《消愁》动态歌词MV修复___一杯敬我爹,一杯敬我娘,曾是他们的希望,如今活成这球样……"
 	},
 	{
-		id: "苏打绿-我好想你",
+		id: "苏打绿 - 我好想你",
 		type: "video/mp4",
 		title: "[4K60FPS_Hi_Res] 苏打绿《我好想你》顶级修复",
 		srcLocalhost: "./music/mv/苏打绿-我好想你.mp4",
@@ -190,7 +190,7 @@ let mvList = [
 		desc: "【4K60FPS_Hi-Res】薛之谦《我好像在哪见过你》___人们把难言的爱都埋进青春里!.29125510367"
 	},
 	{
-		id: "薛之谦-木偶人",
+		id: "薛之谦 - 木偶人",
 		type: "video/mp4",
 		title: "【4K60FPS_Hi-Res】薛之谦《木偶人》顶级修复___没有人能变成木偶人,无非是在感情里逃避过程_!!!.30497506817",
 		srcLocalhost: "./music/mv/薛之谦-木偶人.mp4",
@@ -208,7 +208,7 @@ let mvList = [
 		desc: "【4K60FPS_Hi-Res】许飞《父亲写的散文诗》___父亲是个农民,他没有散文诗,没有日记,只有一双布满老茧的手跟写满沧桑的脸庞!.32751423434"
 	},
 	{
-		id: "恋人-李荣浩",
+		id: "李荣浩 - 恋人",
 		type: "video/mp4",
 		title: "《恋人》MV",
 		srcLocalhost: "./music/mv/恋人-李荣浩.mp4",
@@ -217,7 +217,7 @@ let mvList = [
 		desc: "李荣浩⑧专5单《恋人》MV_现已正式上线.恋人mv正式上线.1602014297"
 	},
 	{
-		id: "Despacito",
+		id: "J.Fla - Despacito",
 		type: "video/mp4",
 		title: "汽车版Despacito",
 		srcLocalhost: "./music/mv/汽车版Despacito.mp4",
@@ -257,7 +257,7 @@ let mvList = [
 		srcNetwork: "https://www.douyin.com/video/7612282046111673467"
 	},
 	{
-		id: "戴羽彤-来迟",
+		id: "戴羽彤 - 来迟",
 		type: "video/mp4",
 		title: "戴羽彤-来迟_MV_4K_CD音质",
 		srcLocalhost: "./music/mv/戴羽彤-来迟.mp4",
@@ -266,7 +266,7 @@ let mvList = [
 		desc: "来迟是戴羽彤的一首歌曲，由卡文填词，三珊谱曲，筱明编曲，一寸光年团队制作。歌词表达了一种错过爱情的悲哀和后悔，反复唱出“我这一次终究还是来得太迟”。"
 	},
 	{
-		id: "精忠报国-洪屠刚",
+		id: "屠洪刚 - 精忠报国",
 		type: "video/mp4",
 		title: "【精忠报国】洪屠刚",
 		srcLocalhost: "./music/mv/屠洪刚 - 精忠报国.mp4",
@@ -285,7 +285,7 @@ let mvList = [
 		desc: "《别怕我伤心》是由李宗盛作词并作曲，张信哲演唱的歌曲，收录于张信哲1994年6月1日发行的专辑《等待》中。"
 	},
 	{
-		id: "精卫-30年前，50年后",
+		id: "30年前，50年后 - 精卫",
 		type: "video/mp4",
 		title: "精卫",
 		srcLocalhost: "./music/mv/精卫-30年前，50年后.mp4",
@@ -301,7 +301,7 @@ let mvList = [
 		desc: "【4K臻藏】萧敬腾《怎么说我不爱你》_你怎么知道我不爱你,我就是太爱你了!.1524443052"
 	},
 	{
-		id: "胡彦斌-你要的全拿走",
+		id: "胡彦斌 - 你要的全拿走",
 		type: "video/mp4",
 		title: "【胡彦斌】你要的全拿走",
 		srcLocalhost: "./music/mv/胡彦斌-你要的全拿走.mp4",
@@ -319,7 +319,7 @@ let mvList = [
 		desc: "《说了再见》是周杰伦演唱的一首流行歌曲，收录于他2010年发行的专辑《跨时代》中。 这首歌由周杰伦作曲，古小力和黄凌嘉共同作词，钟兴民负责编曲。 这首歌也是李连杰主演的电影《海洋天堂》的主题曲。 这首歌的歌词描述了在雨中天亮后，主人公面对失去所爱之人的痛苦，试图放下过去，却发现再也无法与对方相见。 歌词中充满了对失去的微笑、幸福时光的怀念以及对再次拥抱和陪伴的渴望。"
 	},
 	{
-		id: "童话镇-苗疆少女",
+		id: "苗疆少女 - 童话镇",
 		type: "video/mp4",
 		title: "童话镇-苗疆少女",
 		srcLocalhost: "./music/mv/童话镇-苗疆少女.mp4",
@@ -364,7 +364,7 @@ let mvList = [
 		desc: "清华大学 90 年校庆，李健与校友合唱《蝴蝶花》《同桌的你》"
 	},
 	{
-		id: "体面-于文文",
+		id: "于文文 - 体面",
 		type: "video/mp4",
 		title: "《前任3：再见前任》电影插曲 体面-于文文",
 		srcLocalhost: "./music/mv/体面-于文文.mp4",
@@ -373,7 +373,7 @@ let mvList = [
 		desc: "《体面》由于文文作曲并演唱，唐恬作词，郑楠编曲，单曲于2017年12月25日发行，是电影《前任3：再见前任》的插曲。 后收录在于文文于2018年11月7日发行的专辑《尚未界定》中。 2018年4月8日，该曲获第23届华鼎奖中国电影最佳歌曲奖；8月29日，该歌曲获得华人歌曲音乐盛典年度金曲；12月18日，获得Billboard Radio China 2018年度华语十大金曲。"
 	},
 	{
-		id: "说散就散-袁娅维TIA RAY",
+		id: "袁娅维TIA RAY - 说散就散",
 		type: "video/mp4",
 		title: "《前任3：再见前任》电影插曲 《说散就散》",
 		srcLocalhost: "./music/mv/说散就散-袁娅维TIA RAY.mp4",
@@ -382,7 +382,7 @@ let mvList = [
 		desc: "袁娅维献声电影《前任3：再见前任》「灵魂新锋」TIA袁娅维再度为爱献声，剖心演绎最催人泪下版《说散就散》。电影「前任3：再见前任」主题曲《说散就散》洒脱上线"
 	},
 	{
-		id: "挪威的森林-伍佰",
+		id: "伍佰 - 挪威的森林",
 		type: "video/mp4",
 		title: "挪威的森林 伍佰",
 		srcLocalhost: "./music/mv/挪威的森林-伍佰.mp4",
@@ -391,7 +391,7 @@ let mvList = [
 		desc: "《挪威的森林》是由伍佰创作词曲并演唱的流行摇滚歌曲，由伍佰与China Blue乐队共同编曲，收录在伍佰&China Blue于1996年6月18日发行的专辑《爱情的尽头》中 。创作灵感来源于日本作家村上春树出版的同名长篇小说《挪威的森林》，是伍佰有感而发创作出的歌曲。伍佰音乐生涯中传唱度最高的音乐作品。"
 	},
 	{
-		id: "坟草钢木",
+		id: "未知歌手 - 坟草钢木",
 		type: "video/mp4",
 		title: "坟草钢木",
 		srcLocalhost: "./music/mv/坟草钢木.mp4",
@@ -400,7 +400,7 @@ let mvList = [
 		desc: "《坟草钢木》"
 	},
 	{
-		id: "孙楠-拯救",
+		id: "孙楠 - 拯救",
 		type: "video/mp4",
 		title: "【最高音质】孙楠《拯救》MV_1080P_60FPS_(CD音轨)",
 		srcLocalhost: "./music/mv/孙楠-拯救.mp4",
@@ -418,7 +418,7 @@ let mvList = [
 		desc: "《曹操》是林俊杰演唱的摇滚歌曲，由林秋离作词，林俊杰作曲，Kenn C编曲，收录在林俊杰于2006年2月17日发行的同名专辑《曹操》中。"
 	},
 	{
-		id: "林忆莲-至少还有你",
+		id: "林忆莲 - 至少还有你",
 		type: "video/mp4",
 		title: "《至少还有你》林忆莲 官方MV",
 		srcLocalhost: "./music/mv/林忆莲-至少还有你.mp4",
@@ -427,7 +427,7 @@ let mvList = [
 		desc: `《至少还有你》是由林夕作词，Davy Chan（陈匡荣）作曲，刘志远编曲，林忆莲演唱的歌曲，收录于林忆莲2000年1月18日发行的专辑《林忆莲"s》中。该曲是电影《安娜与国王》的中文主题曲。《至少还有你》的歌词，写的是两个人相爱的感受。该曲是一首预言歌，也是唱给生命中的另一条伏线；是聪明的选择，也是一种相互信任的态度。2001年，该曲获得首届华语流行乐传媒大奖。2010年，该曲获得港台十年十大金曲。`
 	},
 	{
-		id: "李克勤-护花使者",
+		id: "李克勤 - 护花使者",
 		type: "video/mp4",
 		title: "李克勤-护花使者",
 		srcLocalhost: "./music/mv/李克勤-护花使者.mp4",
@@ -610,12 +610,30 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 	// 还在加载阶段（readyState 不够）不插音频——视频在转圈、音乐先响会很怪；
 	// autoplay=false（页面初始化那次）也不插，否则一进页面就自动出声
 	let mvFallbackUsed = false;
+	/**
+	 * 彻底清空 MV 面板：视频 + 标题 + 播放源按钮 + 描述。
+	 *
+	 * ⚠️ 原来出错时只做了 `this.remove()`：视频没了，但 h3 标题、`playSourceButtonContainer`、
+	 * p 描述还留在 #audioMvPanel 里 —— 这就是「视频没加载成功，默认播放源按钮和下面的描述还在」。
+	 * 而唯一的清空点 updateVideo() 第一行是 `querySelector('#audioMvVideo1')`，取不到就直接 return，
+	 * 视频已经被 remove 掉了，于是切歌时永远清不掉；下一首有 MV 时 audioMvmain 又 append 一套新的，
+	 * 旧的标题/按钮/描述就一层层积下来（「下一次加载视频依旧有残留」）。
+	 */
+	function clearMvPanel() {
+		const stale = document.querySelector('#audioMvVideo1');
+		if (stale && stale.isConnected) stale.remove();
+		window.audioMvVideo1 = null;
+		if (audioMv) audioMv.textContent = '';
+	}
 	function fallbackToAudio() {
 		if (mvFallbackUsed) return;
 		mvFallbackUsed = true;
 		// 标死「这首的 MV 播不了」：不然 playSong 里的 resumeMvIfNeeded 又去 play 视频，
 		// 和这里互相调用，来回不止
 		mvAbandoned = true;
+		// 已经判定播不了：面板一起收掉，别留一个永远转圈的 video 和一排按钮在页面上
+		stopZeroBufWatch();
+		clearMvPanel();
 		playSong();
 	}
 	/**
@@ -655,6 +673,7 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 				 * 一停就再也等不到 60 秒了（第一版就是这么失效的）。
 				 */
 				mvFallbackUsed = false;
+				tanChuang('MV 加载超时，已切换音频', 2500);
 				fallbackToAudio();
 				return;
 			}
@@ -662,16 +681,30 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 		};
 		mvZeroBufTimer = setTimeout(tick, 4000);
 	}
+	/**
+	 * MV 出错时说清是哪一类问题，别让人以为「视频就是加载几秒自己跳了」。
+	 * MediaError：1 中断 / 2 网络 / 3 解码 / 4 源不支持（线上绝大多数是没上传 → 404）
+	 */
+	function mvErrorText(code) {
+		switch (code) {
+			case 1: return 'MV 播放被中断，已切换音频';
+			case 2: return 'MV 网络中断，已切换音频';
+			case 3: return 'MV 解码失败，已切换音频';
+			case 4: return 'MV 未收录，已切换音频';
+			default: return 'MV 加载失败，已切换音频';
+		}
+	}
 	// MV 文件不存在 / 解码失败：移除播放器，让音频顶上
 	video.onerror = function () {
 		// 已经被切歌清掉的旧 video：迟到的 error 不能去动全局引用，否则会把新 MV 的引用清空
 		if (!this.isConnected) return;
 		stopZeroBufWatch();
 		mvAbandoned = true;   // 这首的 MV 坏了，playSong 别再抢回来
-		this.remove();
-		window.audioMvVideo1 = null;
+		// 清掉整个面板（视频 + 标题 + 播放源按钮 + 描述），不能只 remove 视频
+		clearMvPanel();
 		if (autoplay) {// 页面初始化那次（autoplay=false）不自动出声
 			mvFallbackUsed = false;// 视频中途失败也算「不能播放」，允许音频顶上
+			tanChuang(mvErrorText(this.error ? this.error.code : 0), 2500);
 			fallbackToAudio();
 		}
 	};
@@ -895,7 +928,12 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 // 更新video元素
 function updateVideo() {
 	let video = document.querySelector("#audioMvVideo1");
-	if (!video) return;
+	if (!video) {
+		// 没有 video 元素也必须把面板收干净：上一首的 video 可能是被 onerror / 兜底移除的，
+		// 那样的残留（标题、播放源按钮、描述）如果不在切歌时清掉，会一直堆到下一首的 MV 上
+		if (audioMv && audioMv.textContent !== "") audioMv.textContent = "";
+		return;
+	}
 	// 歌名里可能带 % 之类的字符，decodeURIComponent 会抛错并中断整个切歌回调
 	// （回调一断，后面的播放/暂停判断全都不执行，表现为切歌后没反应）
 	let srcDecoded = video.src;

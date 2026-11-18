@@ -1986,15 +1986,37 @@ footer div:nth-of-type(2) a img#gaIcon {
 }
 
 /* 弹窗的样式 */
+/* ⚠️ z-index 必须够高：dialog 是用 show()（非模态）打开的，**不会**进顶层（top layer），
+   层级只按 z-index 排。原来没写 z-index，页面里 z-index:1000/10000 的元素（头像下拉、
+   最大化播放器、MV 面板）都能把它盖住 —— 用户反馈的「提示被遮挡」就是这个原因。 */
 #tanChuangDiaLog {
-    padding: 10px;
-    background: #00bfff;
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 2147483000;
+    margin: 0;
+    padding: 12px 20px;
+    max-width: min(78vw, 420px);
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
+    background: rgba(24, 24, 28, 0.9);
+    color: #fff;
+    font-size: 14px;
+    line-height: 1.5;
+    letter-spacing: 0.3px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    /* 提示只是提示，不该挡住下面的点击 */
+    pointer-events: none;
+    animation: tanChuangIn 0.18s ease-out;
+}
+
+@keyframes tanChuangIn {
+    from { opacity: 0; transform: translate(-50%, -50%) scale(0.94); }
+    to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 
 

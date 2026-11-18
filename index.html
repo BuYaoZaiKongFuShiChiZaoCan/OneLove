@@ -263,12 +263,12 @@
 							<dt>
 								<div class="title">官方工具</div>
 								<div class="content">
-									<a href="./pages/cinema/index.html">观影院</a>
-									<a href="./pages/lrcLyricMaker/lrcLyricMaker.html">Lrc歌词制作</a>
+									<a href="./Pages/cinema/index.html">观影院</a>
+									<a href="./Pages/lrcLyricMaker/lrcLyricMaker.html">Lrc歌词制作</a>
 									<a href="http://lriswww.gitee.io/l-ai-ji/">简爱</a>
 									<a href="http://qaiji.gitee.io/school-yearbook/">同学录</a>
-									<a href="./pages/videoParser.html">视频解析</a>
-									<a href="./pages/htmlStyleGenerator.html">HTML样式生成器（开发中）</a>
+									<a href="./Pages/videoParser.html">视频解析</a>
+									<a href="./Pages/htmlStyleGenerator.html">HTML样式生成器（开发中）</a>
 									<a href="JavaScript:;">[拍摄]证件照</a>
 									<a href="JavaScript:;">音频转文字（开发中）</a>
 									<a href="JavaScript:;">音乐解密</a>
@@ -783,7 +783,9 @@
 				<h2>雅言</h2>
 				<!-- 引入动画库 -->
 				<!-- <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.9"></script> -->
-				<script src="./scripts/typed/node_modules/typed.js/dist/typed.umd.js"></script>
+				<!-- ⚠️ 不要改回 scripts/typed/node_modules/... ：wrangler 部署 Cloudflare Pages 时会
+				     跳过一切 node_modules 目录，线上取不到就 404 → Typed 未定义 → 雅言整块空白。 -->
+				<script src="./scripts/typed/typed.umd.js"></script>
 				<div id="typedText">
 					<div class="element"></div>
 				</div>
@@ -797,7 +799,7 @@
 			</script>
 			<div id="cbFive">
 				<h2>我</h2>
-				<iframe src="./pages/Tools/loveMeDailySign/index.html" frameborder="0"></iframe><!-- scrolling="no" -->
+				<iframe src="./Pages/Tools/loveMeDailySign/index.html" frameborder="0"></iframe><!-- scrolling="no" -->
 			</div>
 		</div>
 	</main>
@@ -826,14 +828,14 @@
 			</a>
 			<a href="http://beian.miit.gov.cn/publish/query/indexFirst.action">陇ICP备12345678号</a>
 			<span>&copy;2019~<span id="footerYear">2021</span> 壹比零</span>
-			<a href="./pages/GiveMoneyIncentives.html">赞赏</a>
-			<a href="./pages/About/About.html" data-src="./pages/QFQ/personalResume.html">关于我</a>
-			<a href="./pages/contactMe.html">
+			<a href="./Pages/GiveMoneyIncentives.html">赞赏</a>
+			<a href="./Pages/About/About.html" data-src="./Pages/QFQ/personalResume.html">关于我</a>
+			<a href="./Pages/contactMe.html">
 				<!-- <img src="./images/footer/客服中心.png" alt=""> -->
 				联系我们
 			</a>
-			<a href="./pages/About/About.html#lastUpdate">历史更新</a>
-			<a href="./pages/About/About.html#特别鸣谢">特别鸣谢</a>
+			<a href="./Pages/About/About.html#lastUpdate">历史更新</a>
+			<a href="./Pages/About/About.html#特别鸣谢">特别鸣谢</a>
 			<a href="JavaScript:;" content="无障碍">
 				<img src="./images/footer/无障碍.png" alt="" />
 				<img src="./images/footer/残疾人辅助工具.png" alt="" title="无障碍优化" />

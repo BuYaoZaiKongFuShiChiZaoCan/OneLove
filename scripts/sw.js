@@ -70,15 +70,32 @@ self.addEventListener('install', function () {
   self.skipWaiting();
 });
 self.addEventListener('activate', function (event) {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil((async () => {
+    await self.clients.claim();
+    /**
+     * v1 的音视频桶里可能存着半截文件（见下面 MEDIA_CACHE 的注释），
+     * 升级后直接删掉，别让「第一次能播、第二次自动跳」的旧条目继续生效。
+     */
+    for (const old of ['ql:media-v1', 'ql:media-video-v1']) {
+      try { await caches.delete(old); } catch (e) { }
+    }
+  })());
 });
 self.addEventListener('message', function (event) {
   if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 // ============ 音频 / 视频缓存 ============
-const MEDIA_CACHE = 'ql:media-v1';
-const VIDEO_CACHE = 'ql:media-video-v1';
+/**
+ * 2026-11-17 缓存桶升到 v2：
+ * v1 里可能存着**不完整**的文件（旧写法是后台 `fetch(key)` 另下一整份再 cache.put，
+ * 用户在下载途中切歌/关页面时，这条流会被打断，Chromium 有可能把半截内容落盘）。
+ * 下次播放命中这种条目，切片出来的 Content-Range 说有一整首、实际字节数不够，
+ * 播放器解到一半就 error → 自动跳下一首，正好是「第一次能播、第二次自动跳」。
+ * 换桶名等于把这些可疑条目一次性丢掉（缓存本来就是可丢的），不用逐条校验。
+ */
+const MEDIA_CACHE = 'ql:media-v2';
+const VIDEO_CACHE = 'ql:media-video-v2';
 /** 最多缓存多少首。平均一首 3-6MB，120 首约 400-700MB。
  *  再多会逼近浏览器给本站的配额，Chrome 在磁盘紧张时会**整个源一起清空**，反而全丢。 */
 const MEDIA_MAX = 120;
@@ -87,7 +104,6 @@ const MEDIA_MAX = 120;
 const VIDEO_MAX = 6;
 /** 体积安全阀：超过就不进缓存（线上 MV 已全部 ≤25MiB，只是防止以后塞大文件进来） */
 const VIDEO_MAX_BYTES = 30 * 1024 * 1024;
-const MEDIA_PATH = /\/music\/(?:mv\/)?[^/]+\.(?:mp3|mp4)$/i;
 
 async function trimCache(cacheName, max) {
   const cache = await caches.open(cacheName);
@@ -114,28 +130,66 @@ async function mediaHandler({ request, event }) {
     try {
       return await workbox.rangeRequests.createPartialResponse(request, hit);
     } catch (err) {
-      // Range 头解析不了就整份给，播放器照样能播
-      return hit;
+      /**
+       * 切片失败**不能**把整份 200 丢给一个 Range 请求：
+       * 播放器会以为「服务器不支持 Range」，而且拿到的字节和它请求的区间对不上，
+       * 表现就是这首怎么都起不来。缓存条目不可用就删掉，走网络（CF 会回整份 200，正常播）。
+       */
+      try { await cache.delete(key); } catch (e) { }
+      return fetch(request);
     }
   }
 
   const res = await fetch(request);
 
-  // 后台补一份完整文件；不阻塞这次播放（所以首次播放 MV 还是不能拖，第二次起可以）
+  /**
+   * 后台补缓存。两种来源，区别很大：
+   *
+   * ① res.status === 200：服务器**不认 Range**，这次已经把整份给了播放器（Cloudflare Pages 就是这样，
+   *    任何 Range 请求都回 200 整份）。那就把这份 body 复制一份存起来 —— 零额外流量。
+   *    ⚠️ 旧写法在这里又 `fetch(key)` 下一整份，等于同一首歌每次首播都下两遍：
+   *    慢网下播放器拿到的带宽被砍半，首播迟迟起不来，是很直接的「加载几秒就跳」诱因之一。
+   *
+   * ② res.status === 206：服务器支持 Range（Netlify 是这样），这次只回了片段，
+   *    想支持拖动就得另外补一份完整的，这时才真的需要再下一遍。
+   *
+   * 写入前先把 body 完整读成 Blob 再 put：中途被打断（用户切歌/关页面）时 blob() 会失败，
+   * 于是**不会**留下半截缓存 —— 半截条目正是「第一次能播、第二次自动跳」的来源。
+   */
   const job = (async () => {
     if (inflight.has(key.url)) return;
     inflight.add(key.url);
     try {
-      const full = await fetch(key); // 无 Range → 200 整份
-      if (!full || full.status !== 200) return;
-      if (cacheName === VIDEO_CACHE) {
-        const len = Number(full.headers.get('content-length') || 0);
-        if (len > VIDEO_MAX_BYTES) return;
+      if (res.status === 200) {
+        const len = Number(res.headers.get('content-length') || 0);
+        if (cacheName === VIDEO_CACHE && len > VIDEO_MAX_BYTES) return;
+        const blob = await res.clone().blob();   // 完整拿到才继续；被中断会抛
+        if (!blob || !blob.size) return;
+        const headers = new Headers(res.headers);
+        // 已经是解码后的字节，别把原来的 content-encoding 带给缓存
+        headers.delete('content-encoding');
+        headers.delete('transfer-encoding');
+        headers.set('content-length', String(blob.size));
+        await cache.put(key, new Response(blob, { status: 200, statusText: 'OK', headers }));
+        await trimCache(cacheName, max);
+      } else {
+        const full = await fetch(key); // 206：无 Range 再取一次整份
+        if (!full || full.status !== 200) return;
+        if (cacheName === VIDEO_CACHE) {
+          const len = Number(full.headers.get('content-length') || 0);
+          if (len > VIDEO_MAX_BYTES) return;
+        }
+        const blob = await full.blob();
+        if (!blob || !blob.size) return;
+        const headers = new Headers(full.headers);
+        headers.delete('content-encoding');
+        headers.delete('transfer-encoding');
+        headers.set('content-length', String(blob.size));
+        await cache.put(key, new Response(blob, { status: 200, statusText: 'OK', headers }));
+        await trimCache(cacheName, max);
       }
-      await cache.put(key, full);
-      await trimCache(cacheName, max);
     } catch (err) {
-      // 网络问题就算了，下次播放再试
+      // 网络问题 / 下载中途被打断：什么都不存，下次播放再试
     } finally {
       inflight.delete(key.url);
     }
@@ -145,11 +199,18 @@ async function mediaHandler({ request, event }) {
   return res;
 }
 
-// 只接管本站的音频/视频：MV 里有些条目是抖音外链，跨域 opaque 响应存进 Cache 会失败
+/**
+ * 只接管**播放器发出的**音视频请求：destination 是 audio / video。
+ *
+ * ⚠️ 2026-11-17 改动：原来还按 URL 兜底匹配 /music/*.mp3，结果 scripts/id3.js 里
+ * 「只读文件头拿封面/歌词」的那次普通 fetch（destination 为空）也被接管了，
+ * 而旧版接管后会在后台额外下一整份 —— 每切一首歌就白白多下一次 4MB 左右，
+ * 慢网下把带宽吃光，后面的歌迟迟缓冲不出来，看着就像「加载几秒自动跳」。
+ */
 workbox.routing.registerRoute(
   ({ request, url }) =>
     url.origin === self.location.origin &&
-    (request.destination === 'audio' || request.destination === 'video' || MEDIA_PATH.test(url.pathname)),
+    (request.destination === 'audio' || request.destination === 'video'),
   mediaHandler
 );
 

@@ -313,10 +313,27 @@ function stopAfterErrors() {
 	});
 }
 
+/**
+ * 音频出错时给出**具体原因**的短提示。
+ * 原来出错只静默跳下一首，用户完全不知道自己遇到的是什么问题：
+ * 是文件没上传（404）、网络断了、还是文件本身解不开。
+ * 用 audio.error.code（MediaError）分四类，一句话说清。
+ */
+function musicErrorText(code) {
+	switch (code) {
+		case 1: return '播放被中断，已跳到下一首';      // MEDIA_ERR_ABORTED
+		case 2: return '网络中断，已跳到下一首';        // MEDIA_ERR_NETWORK
+		case 3: return '音频解码失败，已跳到下一首';    // MEDIA_ERR_DECODE
+		case 4: return '音频不存在或格式不支持，已跳到下一首'; // MEDIA_ERR_SRC_NOT_SUPPORTED（多为 404）
+		default: return '音频加载失败，已跳到下一首';
+	}
+}
+
 // 音乐加载错误
 function MusicError() {
 	errorCount++;
 	clearTimeout(mErrTimeout);
+	tanChuang(musicErrorText(audio.error ? audio.error.code : 0), 2500);
 	// 连败到上限：停下来（不再无限往后跳）
 	if (errorCount >= MAX_ERR) {
 		stopAfterErrors();
