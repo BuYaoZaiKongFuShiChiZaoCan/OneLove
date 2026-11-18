@@ -301,7 +301,7 @@ let songs = [
 	"孙燕姿 - 我怀念的",
 	"蔡健雅 - 越来越不懂",
 	"DJ马哥 - C哩C哩", // 可能重复·A(高度相似)
-	"Gamper & Dadoni、Ember Island - Creep", // 可能重复·B(较可能同一首)
+	"Gamper & Dadoni、Ember Island - Creep",
 	"老妖-985声工场 - Creep",
 	"Mike Zhou - The Dawn (亡灵序曲完美钢琴版)",
 	"乌兰图雅、师鹏、沙溢、胡可、云朵、云飞 - 歌舞：点赞新时代 (Live)", // 同「我创建·Yy」
@@ -1216,7 +1216,6 @@ let songs = [
 	"王强 - 秋天不回来", // 同「我创建·默认收藏」
 	"王韵壹 - 今生感谢你",
 	"韦康 - Breathe",
-	"未知歌手 - only look at me (降调0.9x)", // 可能重复·B(较可能同一首)
 	"网络歌手 - only look at me (降调0.9x)",
 	"未知歌手 - 两只老虎", // 可能重复·B(较可能同一首)
 	"魏小然 - 让我做你的眼睛", // 可能重复·B(较可能同一首)
@@ -1434,8 +1433,7 @@ let songs = [
 	"Otokaze - 夏恋", // 同「我创建·默认收藏」
 	"十三叔 - X8飞曲 (麻木版)", // 同「我创建·two」
 	"Cindy兔子 - 入戏太深 (女生版)",
-	"邓寓君(等什么君) - 春庭雪", // 可能重复·B(较可能同一首)
-	"等什么君(邓寓君) - 春庭雪",
+	"邓寓君(等什么君) - 春庭雪",
 	"隔壁老樊_樊凯杰 - 多想在平庸的生活拥抱你 (Live)", // 可能重复·B(较可能同一首)
 	"隔壁老樊 - 多想在平庸的生活拥抱你 (Live)",
 	"宝石Gem、陈伟霆 - 野狼Disco (feat.陈伟霆)", // 同「我创建·two」
@@ -7382,7 +7380,6 @@ songs.push(
 	"Athletics - III",
 	"Ava Max - Sweet but Psycho",
 	"姜鹏 - 江湖大道",
-	"Gamper & Dadoni - Creep", // 可能重复·B(较可能同一首)·同「Gamper & Dadoni、Ember Island - Creep」
 	"Charlie Puth - Attention",
 	"Maria - 友谊之光",
 	"布袋寅泰 - 新・仁義なき戦いのテーマ (无荣耀之战)",
