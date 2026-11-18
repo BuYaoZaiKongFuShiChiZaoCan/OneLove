@@ -215,24 +215,19 @@ audio.addEventListener('play', function () {
 });
 
 /**
- * 真正的暂停（含播完、出错停下）→ 显示暂停图标。
- * 切歌时改 src 派发的是 emptied 而不是 pause，所以这里不会把「马上要播的新歌」误标成暂停。
+ * 判断用 playIntent（「还想不想听」），不用 mvIsPlaying()：
+ * ① MV 已经出声 → 音频被我们主动暂停，用户仍想听（playIntent 仍是 true）→ 按钮保持「暂停」图标，
+ *    这才是他要的「点 video 的播放，音乐暂停、播放器按钮状态同步」；
+ * ② MV 还在加载（还没出声、mvIsPlaying() 为 false）→ 同样保持「暂停」图标，
+ *    点一下就直接播音频（见 playBtn.onclick 用 audio.paused 判断，一次点击即出声）；
+ * ③ 用户自己按了暂停 → pauseSong() 会先把 playIntent 清成 false，走到下面显示「播放」。
+ * pauseSong(false) 是「声音改由视频出」的内部暂停，不清 playIntent。
  */
 audio.addEventListener('pause', function () {
 	// 没声音了封面就停（播完也一样，所以要放在下面的 ended 判断之前）
 	setCoverSpin(false);
 	if (audio.ended) return;
-	/**
-	 * 有 MV 的歌：音频被暂停是「声音改由视频出」，不是用户按了暂停。
-	 * MV 正在出声时，播放器整体仍然是播放中，按钮必须保持暂停图标。
-	 * （audio.pause() 的 pause 事件是异步派发的，可能在 video.onplay 里补的 setPlayUI(true)
-	 *   之后才到达，所以这里也要拦一次，否则会被它改回播放图标。）
-	 */
-	if (typeof mvIsPlaying === 'function' && mvIsPlaying()) {
-		setPlayUI(true);
-		return;
-	}
-	setPlayUI(false);
+	setPlayUI(!!playIntent);
 });
 
 /**
@@ -1061,12 +1056,17 @@ playBtn.onclick = function () {
 	 * 现在固定走 playSong(true)：不把播放交给视频，由音频出声；
 	 * playSong(true) 内部会把正在播的 MV 暂停掉（避免视频、音频同时响）。
 	 * 视频自己的播放/暂停全交给 video 元素的原生控件，这个按钮不参与。
+	 *
+	 * ⚠️ 判断依据是「音频在不在响」（audio.paused），**不是按钮上的图标 / .play 类**。
+	 * 用图标判断的老写法：MV 正在加载、或视频因故停住了但图标还是「暂停」时，
+	 * 第一下点到的是 pauseSong()（暂停一个本来就没响的音频，画面没变化），
+	 * 必须再点一下才出声 —— 用户说的「很反人类、要点两次」就是这个。
+	 * 现在音频在响就暂停，否则一律直接播音频，任何状态下都只点一次。
 	 */
-	if (!musicContainer.classList.contains('play')) {
+	if (audio.paused) {
 		playSong(true);
 		return;
 	}
-	// 显示「暂停」= 有声音在响（只可能是音频；MV 在播时按钮由 video.onplay 改回「播放」）
 	pauseSong();
 }
 // 2.切换歌曲

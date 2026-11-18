@@ -1989,6 +1989,9 @@ footer div:nth-of-type(2) a img#gaIcon {
 /* ⚠️ z-index 必须够高：dialog 是用 show()（非模态）打开的，**不会**进顶层（top layer），
    层级只按 z-index 排。原来没写 z-index，页面里 z-index:1000/10000 的元素（头像下拉、
    最大化播放器、MV 面板）都能把它盖住 —— 用户反馈的「提示被遮挡」就是这个原因。 */
+/* 配色直接照搬播放器卡片（.music-container）：纯白底 + 15px 圆角 + 青色柔光投影，
+   文字用页面正文的 #333。之前是淡蓝底 + 灰蓝字 + 双层新拟态阴影，
+   单独看还行，但页面里没有任何一处是那个样子，所以会显得「两套 UI」。 */
 #tanChuangDiaLog {
     position: fixed;
     top: 50%;
@@ -1996,19 +1999,19 @@ footer div:nth-of-type(2) a img#gaIcon {
     transform: translate(-50%, -50%);
     z-index: 2147483000;
     margin: 0;
-    padding: 12px 20px;
+    padding: 11px 22px;
     max-width: min(78vw, 420px);
     border: none;
-    border-radius: 12px;
-    background: rgba(24, 24, 28, 0.9);
-    color: #fff;
+    /* 与 .music-container 同圆角 */
+    border-radius: 15px;
+    background: #fff;
+    color: #333;
     font-size: 14px;
-    line-height: 1.5;
-    letter-spacing: 0.3px;
+    line-height: 1.6;
+    letter-spacing: 0.4px;
     text-align: center;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    /* 播放器卡片那套青色柔光，只是小一号：提示要像页面里「浮起来的一张卡」 */
+    box-shadow: 0 8px 18px 0 rgb(8 182 212 / 30%);
     /* 提示只是提示，不该挡住下面的点击 */
     pointer-events: none;
     animation: tanChuangIn 0.18s ease-out;
