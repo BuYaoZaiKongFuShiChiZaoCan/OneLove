@@ -1989,9 +1989,16 @@ footer div:nth-of-type(2) a img#gaIcon {
 /* ⚠️ z-index 必须够高：dialog 是用 show()（非模态）打开的，**不会**进顶层（top layer），
    层级只按 z-index 排。原来没写 z-index，页面里 z-index:1000/10000 的元素（头像下拉、
    最大化播放器、MV 面板）都能把它盖住 —— 用户反馈的「提示被遮挡」就是这个原因。 */
-/* 配色直接照搬播放器卡片（.music-container）：纯白底 + 15px 圆角 + 青色柔光投影，
-   文字用页面正文的 #333。之前是淡蓝底 + 灰蓝字 + 双层新拟态阴影，
-   单独看还行，但页面里没有任何一处是那个样子，所以会显得「两套 UI」。 */
+
+/* ---- 提示条配色（单强调色系统，不是随手挑色）----
+   页面本身只有两个色相：中性浅底 --bgc(#F8FAFE) 和青色强调色（播放器卡片投影用的
+   rgb(8 182 212)，即 #08B6D4）。所以提示条也只允许出现「中性 + 一个强调色」：
+     · surface：强调色 4% 混白 → #F4FCFE，比纯白卡片深一档，白底上也能分出边界；
+     · ink：中性墨色 #1E2A32，在 #F4FCFE 上对比 ≈ 14.5:1（AAA 标准 7:1 的两倍）；
+     · border：强调色 18% 的极细描边，代替重边框，白色卡片上不至于糊成一片；
+     · elevation：双层投影（1px 贴地 + 8px 环境），比单层投影更接近真实光照，
+       颜色带一点强调色（22%），和页面卡片的青色柔光同族。
+   —— 这样提示条是「页面配色里长出来的」，而不是另一套 UI。 */
 #tanChuangDiaLog {
     position: fixed;
     top: 50%;
@@ -2001,17 +2008,16 @@ footer div:nth-of-type(2) a img#gaIcon {
     margin: 0;
     padding: 11px 22px;
     max-width: min(78vw, 420px);
-    border: none;
-    /* 与 .music-container 同圆角 */
-    border-radius: 15px;
-    background: #fff;
-    color: #333;
+    border: 1px solid rgb(8 182 212 / 18%);
+    border-radius: 15px;               /* 与 .music-container 同一圆角 */
+    background: #f4fcfe;               /* 强调色 4% 混白 */
+    color: #1e2a32;                    /* 中性墨色，14.5:1 */
     font-size: 14px;
+    font-weight: 500;
     line-height: 1.6;
     letter-spacing: 0.4px;
     text-align: center;
-    /* 播放器卡片那套青色柔光，只是小一号：提示要像页面里「浮起来的一张卡」 */
-    box-shadow: 0 8px 18px 0 rgb(8 182 212 / 30%);
+    box-shadow: 0 1px 2px 0 rgb(30 42 50 / 6%), 0 8px 20px 0 rgb(8 182 212 / 22%);
     /* 提示只是提示，不该挡住下面的点击 */
     pointer-events: none;
     animation: tanChuangIn 0.18s ease-out;

@@ -215,19 +215,16 @@ audio.addEventListener('play', function () {
 });
 
 /**
- * 判断用 playIntent（「还想不想听」），不用 mvIsPlaying()：
- * ① MV 已经出声 → 音频被我们主动暂停，用户仍想听（playIntent 仍是 true）→ 按钮保持「暂停」图标，
- *    这才是他要的「点 video 的播放，音乐暂停、播放器按钮状态同步」；
- * ② MV 还在加载（还没出声、mvIsPlaying() 为 false）→ 同样保持「暂停」图标，
- *    点一下就直接播音频（见 playBtn.onclick 用 audio.paused 判断，一次点击即出声）；
- * ③ 用户自己按了暂停 → pauseSong() 会先把 playIntent 清成 false，走到下面显示「播放」。
- * pauseSong(false) 是「声音改由视频出」的内部暂停，不清 playIntent。
+ * 播放器外观只反映「音乐（音频）在不在响」，这是用户原来那一版的口径：
+ * MV 开始播音 → audioMv.js 的 video.onplay 调 pauseSong() → 图标变「播放」；
+ * 点播放按钮 / 快捷键 → playSong() → 视频暂停、音乐出声 → 图标变「暂停」。
+ * 所以这里不需要区分「MV 接管声音」这种情况，音频一停就是「播放」图标。
  */
 audio.addEventListener('pause', function () {
 	// 没声音了封面就停（播完也一样，所以要放在下面的 ended 判断之前）
 	setCoverSpin(false);
 	if (audio.ended) return;
-	setPlayUI(!!playIntent);
+	setPlayUI(false);
 });
 
 /**
@@ -587,22 +584,22 @@ function markSoundStarted() {
 
 // 播放歌曲
 /**
- * @param {boolean} [forceAudio] 强制走音频，不把这次播放交给 MV。
- *   用在「MV 还在加载时用户点了播放按钮」——用户要的是马上听到声音，
- *   而不是继续等 MV（见 playBtn.onclick）。
+ * 播放音乐（并暂停正在播的 MV）。
+ * @param {boolean} [forceAudio] 已废弃：2026-11-19 起这个函数一律只播音频，
+ *   不再有「把播放交给 MV」的分支，参数保留只是为了不改动所有调用点。
  */
 function playSong(forceAudio) {
 	/**
-	 * 当前这首有 MV、视频还在、也没被判「播不了」→ 让 MV 接着放（从上次的位置，见 audioMv.js
-	 * 的 resumeMvIfNeeded / resumeMvPosition）。以前这里一律走音频，于是重开页面点播放，
-	 * MV 那首放的是音频，视频永远停在 0。
-	 * forceAudio=true 时跳过这一步（视频还没就绪，用户点播放就是要听音乐）。
+	 * ⚠️ 2026-11-19 恢复成用户原来的口径：**这个函数永远只管音乐**。
+	 *
+	 * 原来这里有一段 `resumeMvIfNeeded()`：MV 已就绪时把这次播放交给视频。
+	 * 结果是播放按钮 / 快捷键 / 最大化窗口按钮都变成了「MV 的播放开关」：
+	 *   · MV 在播时点一下 → 只把视频暂停，音频始终不出声；
+	 *   · MV 播不了或刚被手动暂停 → resume 又去 play 视频，看着就是「点了没反应」。
+	 * 用户明确要求回到旧版行为（参考 onelove新版迁移/scripts/audio.js:221）：
+	 * playSong() 先 pause 视频、再 play 音频，播放器状态只反映音乐。
+	 * MV 自己的播放 / 暂停全部交给 video 元素的原生控件（见 audioMv.js 的 video.onplay → pauseSong()）。
 	 */
-	if (!forceAudio && typeof resumeMvIfNeeded === 'function' && resumeMvIfNeeded()) {
-		playIntent = true;
-		setPlayUI(true);
-		return;
-	}
 
 	// 只暂停还挂在文档里的 video：被 updateVideo 清掉的那份已经 detached，
 	// 对它 pause() 会触发迟到的 onpause（退出全屏），没有任何意义
@@ -1047,24 +1044,15 @@ function setProgress(e) {
 // 1.播放歌曲
 playBtn.onclick = function () {
 	/**
-	 * 这个按钮只控制「音乐」。
+	 * 这个按钮只控制「音乐」，行为回到用户原来那一版（onelove新版迁移/scripts/audio.js:541）：
+	 *   音乐在响 → 暂停；否则 → playSong()：视频让位、音乐出声。
 	 *
-	 * 原来这里是不带参数的 playSong()：MV 一就绪，playSong 开头的 resumeMvIfNeeded()
-	 * 就把这次播放交给了视频 —— 于是按钮实际变成了 MV 的播放开关：
-	 * 视频在放时点一下只暂停画面、音频始终不出声，再点一下又去把视频拉回来。
-	 *
-	 * 现在固定走 playSong(true)：不把播放交给视频，由音频出声；
-	 * playSong(true) 内部会把正在播的 MV 暂停掉（避免视频、音频同时响）。
-	 * 视频自己的播放/暂停全交给 video 元素的原生控件，这个按钮不参与。
-	 *
-	 * ⚠️ 判断依据是「音频在不在响」（audio.paused），**不是按钮上的图标 / .play 类**。
-	 * 用图标判断的老写法：MV 正在加载、或视频因故停住了但图标还是「暂停」时，
-	 * 第一下点到的是 pauseSong()（暂停一个本来就没响的音频，画面没变化），
-	 * 必须再点一下才出声 —— 用户说的「很反人类、要点两次」就是这个。
-	 * 现在音频在响就暂停，否则一律直接播音频，任何状态下都只点一次。
+	 * 判断依据用 audio.paused（音频真实状态），不用按钮上的图标 / .play 类。
+	 * 图标一旦和真实状态错开（MV 接管声音、切歌加载中），按图标判断就会出现
+	 * 「第一下只是暂停一个没响的音频，第二下才出声」。用真实状态判断，任何情况都只点一次。
 	 */
 	if (audio.paused) {
-		playSong(true);
+		playSong();
 		return;
 	}
 	pauseSong();

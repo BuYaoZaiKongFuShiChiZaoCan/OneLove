@@ -597,16 +597,13 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 	 * autoplay=false 是页面初始化那一次，用户还没点播放，不该先摆一个加载提示。
 	 * showLoading 内部有「本首已经出过声就不提示」的闸门，视频播放中拖进度条不会盖住歌词。
 	 *
-	 * ⚠️ 这一段还有第二件事：MV 加载中，底部按钮要显示成「暂停」图标（播放中外观）。
-	 * 这是用户 2026-10-31 明确要的：「音乐加载的过程中，播放按钮设置暂停，
-	 * 这样点击后就不再是播放 MV，直接播放音乐」。
-	 * 配合 audio.js 的 playBtn.onclick（用 audio.paused 判断）：
-	 * 加载中图标是「暂停」→ 点一下 → 直接播音频，不会出现「先暂停、再点一次才出声」。
+	 * ⚠️ 这里**不要**动底部播放按钮。2026-11-19 起恢复旧口径：
+	 * 按钮只反映「音乐在不在响」，MV 加载中音乐确实没响 → 就显示「播放」图标，
+	 * 点它一下 playSong() 直接播音乐（playSong 不再把播放交给 MV），所以不会出现
+	 * 「先暂停、再点一次才出声」。之前在这里 setPlayUI(true) 会让图标和真实状态错开，
+	 * 反而让按钮 / 快捷键的判断失效。
 	 */
-	if (autoplay) {
-		showLoading('mv');
-		if (typeof setPlayUI === 'function') setPlayUI(true);
-	}
+	if (autoplay) showLoading('mv');
 	// 视频起不来时的音频兜底：只有「确实不能播放」才让音乐响。
 	// 还在加载阶段（readyState 不够）不插音频——视频在转圈、音乐先响会很怪；
 	// autoplay=false（页面初始化那次）也不插，否则一进页面就自动出声
@@ -796,12 +793,10 @@ function audioMvmain(musicInfo = findMusic(title.textContent), autoplay = true) 
 		// ⚠️ 这里原来还会把 video.currentTime 设成 localStorage.musicTime。
 		// 已经移到 loadedmetadata（见上面的 resumeMvPosition）：onplay 里做的话，
 		// 用户手动拖过进度再暂停/播放，会被拽回旧位置。
-		// 声音改由视频出，音频就此停下；但**播放器整体仍是「在播」**：
-		// 用户点 video 控件的播放时，音乐暂停、底部按钮要同步显示成「暂停」图标
-		//（再点它 → playSong(true) 播音频并把视频暂停）。pauseSong(false) 会先把它设成「播放」，
-		// 这里补回来；它不清 playIntent，所以 audio 的 pause 事件也不会把它改回去。
-		pauseSong(false);
-		setPlayUI(true);
+		// 声音改由视频出：音乐停下，底部按钮变回「播放」图标（旧版口径，见
+		// onelove新版迁移/scripts/audioMv.js:491 的 video.onplay → pauseSong()）。
+		// 之后用户点按钮 / 按快捷键 → playSong() → 视频暂停、音乐出声。
+		pauseSong();
 		// 视频最大化
 		if (video.requestFullscreen) {
 			video.requestFullscreen();
