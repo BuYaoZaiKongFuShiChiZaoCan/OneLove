@@ -230,7 +230,8 @@
 		if (!root) return;
 		var pb = root.querySelector('.fl-play-btn');
 		if (!pb) return;
-		var playing = !audio.paused || (typeof mvIsPlaying === 'function' && mvIsPlaying());
+		// 只跟音频走：MV 在播时音频是暂停的，图标就该是「播放」，与主界面按钮一致
+		var playing = !audio.paused;
 		pb.innerHTML = playing ? ICONS.pause : ICONS.play;
 	}
 

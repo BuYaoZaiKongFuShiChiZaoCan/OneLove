@@ -31,13 +31,30 @@ document.onkeydown = function (e) {    //对整个页面监听
 		return;
 	}
 	if (keyNum == 191) {//?/
-		setTimeout(() => {
-			if (musicContainer.classList.contains('play')) {
-				pauseSong();
-				tanChuang('暂停');
+		// 焦点在 MV 视频上（点了 video 控件就会聚焦到它）→ 控制视频
+		const mvVideo = document.querySelector('#audioMvVideo1');
+		if (mvVideo && document.activeElement === mvVideo) {
+			if (mvVideo.paused) {
+				const p = mvVideo.play();
+				if (p && p.catch) p.catch(() => { });
+				tanChuang('视频播放');
 			} else {
+				mvVideo.pause();
+				tanChuang('视频暂停');
+			}
+			// dialog.show() 会把焦点抢到提示弹窗上，这里还给视频，
+			// 否则下一次按 / 焦点不在 video 上，就掉回音乐分支了
+			mvVideo.focus();
+			return;
+		}
+		// 其余情况 → 只控制音乐（按音频真实状态判断，不看图标/.play 类）
+		setTimeout(() => {
+			if (audio.paused) {
 				playSong();
 				tanChuang('播放');
+			} else {
+				pauseSong();
+				tanChuang('暂停');
 			}
 		}, 50);
 		return;
