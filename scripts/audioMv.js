@@ -28,7 +28,7 @@ let mvList = [
 		// 弹幕[{time,info{text,style},{发布人,发布地点...},{弹幕点赞量、弹幕回复}}]
 	},
 	{
-		id: "We Will Rock You",
+		id: "Estudio Miami Ritmo - We Will Rock You",
 		type: "video/mp4",
 		title: "We Will Rock You",
 		srcLocalhost: "./music/mv/We Will Rock You.mp4",
@@ -58,7 +58,7 @@ let mvList = [
 		desc: "#初念 #意难平 #白月光 #意想不到的结局 留什么给你"
 	},
 	{
-		id: "《人世间》主题曲",
+		id: "雷佳 - 人世间",
 		type: "video/mp4",
 		title: "【4K_60FPS】人世间MV—雷佳《人世间》主题曲(2022)(AI_高清修复).31607557583",
 		srcLocalhost: "./music/mv/雷佳 - 人世间.mp4",
@@ -76,7 +76,7 @@ let mvList = [
 		desc: "道济不负天下人，唯独负了胭脂，这就是我写《花间》和《忘了算了》的灵感。#徐嘉良 #活佛济公 #花间 #忘了算了#胭脂"
 	},
 	{
-		id: "Haha Hihi Huhu Heheh",
+		id: "Maman Vibez - Haha Hihi Huhu Heheh",
 		type: "video/mp4",
 		title: "Haha Hihi Huhu Heheh",
 		srcLocalhost: "./music/mv/Haha Hihi Huhu Heheh.mp4",
@@ -125,7 +125,7 @@ let mvList = [
 		desc: "蒲公英哪有什么约定 风一吹就散了 -周杰伦-蒲公英的约定"
 	},
 	{
-		id: "Salvatore",
+		id: "Lana Del Rey - Salvatore",
 		type: "video/mp4",
 		title: "《Salvatore》#欧美音乐 #LanaDelRey 打雷姐",
 		srcLocalhost: "./music/mv/Lana Del Rey - Salvatore.mp4",
@@ -145,7 +145,7 @@ let mvList = [
 		desc: "《欢乐地跳吧》舞蹈 如何叫醒一个新疆人"
 	},
 	{
-		id: "张杰-他不懂",
+		id: "张杰 - 他不懂",
 		type: "video/mp4",
 		title: "[4K60FPS_Hi_Res] 张杰《他不懂》MV顶级修复",
 		srcLocalhost: "./music/mv/张杰 - 他不懂.mp4",
@@ -181,7 +181,7 @@ let mvList = [
 		desc: "【4K60FPS_Hi-Res】苏打绿《我好想你》顶级修复___明明歌词是那么的苍白无力,可伴奏又能给人无限憧憬和美好!"
 	},
 	{
-		id: "薛之谦-我好像在哪见过你",
+		id: "薛之谦 - 我好像在哪见过你",
 		type: "video/mp4",
 		title: "[4K60FPS_Hi_Res] 薛之谦《我好像在哪见过你》顶级修复",
 		srcLocalhost: "./music/mv/薛之谦 - 我好像在哪见过你.mp4",
@@ -199,7 +199,7 @@ let mvList = [
 		desc: "【4K60FPS_Hi-Res】薛之谦《木偶人》顶级修复___没有人能变成木偶人,无非是在感情里逃避过程_!!!.30497506817"
 	},
 	{
-		id: "许飞-父亲写的散文诗",
+		id: "许飞 - 父亲写的散文诗",
 		type: "video/mp4",
 		title: "【4K60FPS_Hi-Res】许飞《父亲写的散文诗》___父亲是个农民,他没有散文诗,没有日记,只有一双布满老茧的手跟写满沧桑的脸庞!.32751423434",
 		srcLocalhost: "./music/mv/许飞-父亲写的散文诗.mp4",
@@ -226,7 +226,7 @@ let mvList = [
 		desc: "Despacito"
 	},
 	{
-		id: "开始懂了-孙燕姿",
+		id: "孙燕姿 - 开始懂了",
 		type: "video/mp4",
 		title: "【4K60FPS】孫燕姿《開始懂了》顶级音画质修复___爱情只有两个结局,要么一生,要么陌生!.27241349194",
 		srcLocalhost: "./music/mv/孙燕姿 - 开始懂了.mp4",
@@ -244,7 +244,7 @@ let mvList = [
 		desc: "远山少年 已不在少 原有人陪你颠沛流离"
 	},
 	{
-		id: "小咪-我走后",
+		id: "小咪 - 我走后",
 		type: "video/mp4",
 		title: "小咪《我走后》完整版高清mv",
 		srcLocalhost: "./music/mv/小咪-我走后.mp4",
@@ -409,7 +409,7 @@ let mvList = [
 		desc: "《拯救》是孙楠演唱的歌曲，由梁芒作词，周笛作曲，收录在孙楠2002年10月1日发行的专辑《缘分的天空》中。该曲是电视剧《爱我你怕了吗》的片头曲。2003年03月28日，该歌曲获得第三届音乐风云榜“内地年度十大金曲”奖；2010年04月11日，该歌曲获得第十届音乐风云榜十年盛典“内地十年十大金曲”奖。"
 	},
 	{
-		id: "曹操-林俊杰",
+		id: "林俊杰 - 曹操",
 		type: "video/mp4",
 		title: "《曹操》林俊杰_经典MV,读三国,听曹操",
 		srcLocalhost: "./music/mv/曹操-林俊杰.mp4",
