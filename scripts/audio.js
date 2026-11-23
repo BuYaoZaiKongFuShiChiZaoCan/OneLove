@@ -721,7 +721,10 @@ const observer = new MutationObserver((mutationsList) => {
 			if (typeof updateVideo === "function") updateVideo();
 
 			// 用局部变量，别再往全局隐式赋值（原来写的是 musicinfo = findMusic(...)）
-			const musicinfo = findMusic(title.textContent);
+			// 同样要 typeof 守卫：audioMv.js 排在 audio.js 后面，网慢的时候它可能十几秒才执行完，
+			// 这期间点歌 findMusic 还没定义 —— 一抛错整个回调就断了，表现为「点了歌既不出声也不出 MV」，
+			// 等 audioMv.js 迟到加载又只做预加载（不自动播），视频框就永远停在没画面的状态
+			const musicinfo = (typeof findMusic === "function") ? findMusic(title.textContent) : null;
 			// 存在mv且在播放状态就暂停播放
 			if (suppressAutoplay) {
 				// stopAfterErrors() 探测到可播歌曲后的一次性压制：切过去但保持暂停

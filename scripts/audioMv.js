@@ -260,7 +260,6 @@ let mvList = [
 		type: "video/mp4",
 		title: "龙梅子、王强《你把爱情给了谁》现场片段",
 		srcLocalhost: "./music/mv/龙梅子、王强 - 你把爱情给了谁.mp4",
-		srcNetwork: "https://www.douyin.com/video/7612282046111673467",
 		poster: null,
 		desc: "我想问，以后，过了很久很久，你会不会想起我#ice"
 	},
@@ -386,9 +385,10 @@ let mvList = [
 		type: "video/mp4",
 		title: "《前任3：再见前任》电影插曲 《说散就散》",
 		srcLocalhost: "./music/mv/说散就散-袁娅维TIA RAY.mp4",
-		// 网易云 MV（1080p，4:02）已下到本地 music/mv/说散就散-袁娅维TIA RAY-2.mp4，
-		// 但 77MB 超 CF Pages 单文件 25MiB 上限，不能上线；画面左上角还有网易云音乐角标，
-		// 所以先不在列表里引用（挂上去线上会 404），等定了怎么处理再接。
+		// 网易云 MV（1080p / 4:02）在本地 music/mv/说散就散-袁娅维TIA RAY-2.mp4，
+		// 左上角有「网易云音乐」角标（该 IP 没有无水印版），且 77MB 超 CF Pages 单文件 25MiB，
+		// 所以这条源**只有本地能播，线上会 404**。
+		srcLocalhostTwo: "./music/mv/说散就散-袁娅维TIA RAY-2.mp4",
 		// srcNetwork: "https://music.163.com/#/mv?id=5741462",
 		poster: null,
 		desc: "袁娅维献声电影《前任3：再见前任》「灵魂新锋」TIA袁娅维再度为爱献声，剖心演绎最催人泪下版《说散就散》。电影「前任3：再见前任」主题曲《说散就散》洒脱上线"
@@ -987,8 +987,15 @@ function findMusic(id) {
 // 页面加载初始化判断有没有视频
 // 判断视频是否存在于显示的列表
 if (musicinfo = findMusic(title.textContent)) {
-	// Mv 有MV的歌曲会切换后会优先自动播放MV
-	audioMvmain(musicinfo, false);
+	/**
+	 * 这里原本固定传 false（只预加载、不出声），本意是「页面刚打开、用户还没点播放」。
+	 * 但本文件排在 audio.js 后面，网慢时要十几秒才执行完 —— 这期间用户已经点过歌、
+	 * 音乐已经在响了。此时再以「预加载」的方式建一次 MV，视频框会挂在那儿永远不动
+	 * （没有帧、也没有任何后续动作），看着就是「卡在 MV 加载」。
+	 * 所以按用户当前的播放意图决定：音乐在响 → MV 正常起播接管；音乐没响 → 保持预加载。
+	 */
+	const audioEl = document.getElementById("audio");
+	audioMvmain(musicinfo, audioEl ? !audioEl.paused : false);
 } else {
 	// tanChuang("此歌曲暂无MV");
 	// playSong(); // 默认不播放音乐
