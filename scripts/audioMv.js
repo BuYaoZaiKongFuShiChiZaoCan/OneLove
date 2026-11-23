@@ -386,8 +386,9 @@ let mvList = [
 		type: "video/mp4",
 		title: "《前任3：再见前任》电影插曲 《说散就散》",
 		srcLocalhost: "./music/mv/说散就散-袁娅维TIA RAY.mp4",
-		srcLocalhostTwo: "./music/mv/说散就散-袁娅维TIA RAY-2.mp4",
-		// 网易云 MV 已下到本地 1080p（上面第二源），网络源不再使用
+		// 网易云 MV（1080p，4:02）已下到本地 music/mv/说散就散-袁娅维TIA RAY-2.mp4，
+		// 但 77MB 超 CF Pages 单文件 25MiB 上限，不能上线；画面左上角还有网易云音乐角标，
+		// 所以先不在列表里引用（挂上去线上会 404），等定了怎么处理再接。
 		// srcNetwork: "https://music.163.com/#/mv?id=5741462",
 		poster: null,
 		desc: "袁娅维献声电影《前任3：再见前任》「灵魂新锋」TIA袁娅维再度为爱献声，剖心演绎最催人泪下版《说散就散》。电影「前任3：再见前任」主题曲《说散就散》洒脱上线"
