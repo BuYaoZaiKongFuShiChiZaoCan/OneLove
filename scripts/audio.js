@@ -182,6 +182,23 @@ let suppressVideoPauseUntil = 0;
  * 只有 playSong() 置 true、pauseSong() 置 false，用户点暂停才算真的不想播。
  */
 let playIntent = false;
+
+/**
+ * ===== 下一首预取（后台连续播放）=====
+ * 手机切到后台后，「这一首播完 → 下一首出声」这几秒空窗里没有任何媒体在播，
+ * 安卓会把页面当空闲后台页冻结/回收，于是 nextSong() 里那次 play() 永远等不到，
+ * 表现就是「后台放完一首就不动了」。
+ *
+ * 做法：距本首结束 30 秒时，用一个**隐藏的、静音的 audio 元素**把下一首播一遍。
+ *   ① 元素真的在播 → 页面不会在空窗里被当成空闲页清掉；
+ *   ② 请求的 destination 是 audio → sw.js 会把整份 mp3 存进 ql:media-v2；
+ * ended 之后 audio.src 换成下一首时直接命中 SW 缓存，空窗从「下载几秒」压到几十毫秒。
+ * 只预取一首；切歌、暂停、离开播放状态都立刻停掉，不额外占带宽和内存。
+ */
+let prefetchEl = null;      // 隐藏的预取元素
+let prefetchSong = null;    // 已经预取的是哪一首（避免重复触发）
+const PREFETCH_LEAD = 30;   // 距结束多少秒开始预取
+
 /**
  * 本首歌是否已经真正出声过。
  * 「音频加载中…」只用于「切歌后还没响」的阶段；播放中拖进度条也会派发 waiting，
@@ -343,6 +360,47 @@ function MusicError() {
 }
 audio.addEventListener('error', MusicError);
 
+/**
+ * 停掉预取：切歌、暂停、出错都调用。
+ * 元素留着复用（不重新 new，避免每次切歌都建一个解码器）。
+ */
+function stopPrefetch() {
+	if (prefetchEl && !prefetchEl.paused) {
+		try { prefetchEl.pause(); } catch (e) { }
+	}
+	prefetchSong = null;
+}
+
+/**
+ * 到点就预取下一首（由 timeupdate 每帧调一次，内部自己去重）。
+ * 不满足条件立刻返回：没在播、还没到点、省流量模式、2G 网络、已经在预取同一首。
+ */
+function maybePrefetch() {
+	if (!playIntent || audio.paused) return;
+	const d = audio.duration;
+	if (!isFinite(d) || d <= 0) return;
+	if (d - audio.currentTime > PREFETCH_LEAD) return;
+	const conn = navigator.connection;
+	if (conn && (conn.saveData || /(^|-)2g$/.test(String(conn.effectiveType || '')))) return;
+	const next = songs[(songIndex + 1) % songs.length];
+	if (!next || prefetchSong === next) return;
+	prefetchSong = next;
+	if (!prefetchEl) {
+		prefetchEl = new Audio();
+		prefetchEl.preload = 'auto';
+		/**
+		 * 必须 muted：只有静音媒体才允许在没有用户手势的情况下自动播放，
+		 * 而且静音不会抢音频焦点、不会在通知栏里多出一条「正在播放」。
+		 */
+		prefetchEl.muted = true;
+	}
+	try {
+		prefetchEl.src = `music/${next}.mp3`;
+		const p = prefetchEl.play();
+		if (p && typeof p.catch === 'function') p.catch(function () { });
+	} catch (e) { }
+}
+
 // 更新歌曲细节
 function loadSong(song) {
 	/**
@@ -362,6 +420,8 @@ function loadSong(song) {
 	setCoverSpin(false);
 	title.textContent = song;
 	audio.src = `music/${song}.mp3`;
+	// 换歌了：上一首播放期间预取的那份已经用掉（正被上面这行从 SW 缓存取），把预取元素停掉
+	stopPrefetch();
 	applyCover(song);
 	// 系统媒体控件（安卓通知栏/锁屏）的标题与封面跟着这首走
 	updateMediaSession(song);
@@ -650,6 +710,8 @@ function pauseSong(userAction) {
 	setPlayUI(false);
 	// 暂停了就没声音，封面必须停（MV 接管声音时也走这里）
 	setCoverSpin(false);
+	// 用户不想听了，预取也停掉，别在后台偷偷吃流量
+	if (userAction !== false) stopPrefetch();
 
 	audio.pause();
 }
@@ -1029,6 +1091,8 @@ function updateProgress(e) {
 	const progressPercent = (currentTime / duration) * 100
 	// 进度条
 	progress.style.width = `${progressPercent}%`
+	// 快播完了就把下一首预取进 SW 缓存（后台切歌不等下载）
+	maybePrefetch();
 }
 // 设置进度条
 function setProgress(e) {
@@ -1124,8 +1188,15 @@ function updateMediaSession(song) {
 function syncMediaSessionState() {
 	if (!("mediaSession" in navigator)) return;
 	var mvPlaying = typeof mvIsPlaying === "function" && mvIsPlaying();
+	/**
+	 * 切歌空窗（上一首 ended、下一首还在加载）也要报 playing：
+	 * 一旦报 paused，安卓会立刻撤掉通知栏那条媒体控件，页面随之丢掉「后台媒体应用」的身份，
+	 * 更容易在后台被冻结 —— 这正是「放完一首就没了」的触发点之一。
+	 * playIntent 为 false（用户自己按的暂停）时仍然是 paused，不误报。
+	 */
+	var waitingForNext = playIntent && audio.ended === false && audio.paused;
 	try {
-		navigator.mediaSession.playbackState = (mvPlaying || !audio.paused) ? 'playing' : 'paused';
+		navigator.mediaSession.playbackState = (mvPlaying || !audio.paused || waitingForNext) ? 'playing' : 'paused';
 	} catch (e) { }
 	updatePositionState();
 }
@@ -1242,3 +1313,19 @@ audio.addEventListener('timeupdate', function () { updatePositionState(); });
 // duration 这时候才有效，必须强制刷一次，否则锁屏进度条没有总时长
 audio.addEventListener('loadedmetadata', function () { updatePositionState(true); });
 audio.addEventListener('seeked', function () { updatePositionState(true); });
+
+/**
+ * 回到前台的兜底：安卓可能在后台把播放摁停（页面被冻结再恢复、系统清内存后重建媒体会话），
+ * 回到前台时如果「本来就想播」却没在响，补一次 play()。
+ * 不改变任何界面，也不改变用户意图：playIntent 为 false（自己按的暂停）时不动；
+ * MV 正在播时不动（那会儿 audio.paused 是真的 —— 声音由视频出）。
+ */
+document.addEventListener('visibilitychange', function () {
+	if (document.visibilityState !== 'visible') return;
+	if (!playIntent || !audio.paused || audio.ended) return;
+	if (!audio.currentSrc) return;
+	var mv = window.audioMvVideo1;
+	if (mv && mv.isConnected && !mv.paused) return;
+	var p = audio.play();
+	if (p && typeof p.catch === 'function') p.catch(function () { });
+});
