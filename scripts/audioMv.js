@@ -53,7 +53,7 @@ let mvList = [
 		type: "video/mp4",
 		title: "《留什么给你》",
 		srcLocalhost: "./music/mv/留什么给你-2.mp4",
-		srcNetwork: "./music/mv/留什么给你.mp4",
+		srcLocalhostTwo: "./music/mv/留什么给你.mp4",
 		poster: null,
 		desc: "#初念 #意难平 #白月光 #意想不到的结局 留什么给你"
 	},
