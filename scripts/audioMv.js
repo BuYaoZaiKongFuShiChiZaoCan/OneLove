@@ -82,12 +82,10 @@ let mvList = [
 		srcLocalhost: "./music/mv/Haha Hihi Huhu Heheh.mp4",
 		srcLocalhostTwo: "./music/mv/Haha Hihi Huhu Heheh-2.mp4",
 		srcLocalhostThree: "./music/mv/Haha Hihi Huhu Heheh-3.mp4",
-		// 原 5 个抖音短链：前 3 个作品已被删除/私密（2026-11-23 核实），后 2 个已下到上面两个本地源
+		// 原 5 个抖音短链：后 2 个已下到上面两个本地源（链接已删），前 3 个作品已被删除/私密（2026-11-23 核实）
 		// srcNetwork: "https://v.douyin.com/fYq593dt7IE/",
 		// srcNetworkTwo: "https://v.douyin.com/NCoTVdjIvMw/",
 		// srcNetworkThree: "https://v.douyin.com/vQWSZ0190xk/",
-		// srcNetworkFour: "https://v.douyin.com/oGHPNXvoouA/",
-		// srcNetworkFive: "https://v.douyin.com/p3I5EVLIWqQ/",
 		poster: null,
 		desc: "帅气逼人组合Haha Hihi Huhu Heheh"
 	},
@@ -375,8 +373,7 @@ let mvList = [
 		type: "video/mp4",
 		title: "《前任3：再见前任》电影插曲 体面-于文文",
 		srcLocalhost: "./music/mv/体面-于文文.mp4",
-		// 搜狐这条源下下来和本地文件逐字节相同（MD5 d7417a7f…），已改用本地源
-		// srcNetwork: "https://tv.sohu.com/v/dXMvMzQ2NjQwNzg3LzQyMjA0MzQ2OS5zaHRtbA==.html",
+		// 搜狐这条源下下来和本地文件逐字节相同（MD5 d7417a7f…），已改用本地源，链接已删
 		poster: null,
 		desc: "《体面》由于文文作曲并演唱，唐恬作词，郑楠编曲，单曲于2017年12月25日发行，是电影《前任3：再见前任》的插曲。 后收录在于文文于2018年11月7日发行的专辑《尚未界定》中。 2018年4月8日，该曲获第23届华鼎奖中国电影最佳歌曲奖；8月29日，该歌曲获得华人歌曲音乐盛典年度金曲；12月18日，获得Billboard Radio China 2018年度华语十大金曲。"
 	},
@@ -389,7 +386,6 @@ let mvList = [
 		// 左上角有「网易云音乐」角标（该 IP 没有无水印版），且 77MB 超 CF Pages 单文件 25MiB，
 		// 所以这条源**只有本地能播，线上会 404**。
 		srcLocalhostTwo: "./music/mv/说散就散-袁娅维TIA RAY-2.mp4",
-		// srcNetwork: "https://music.163.com/#/mv?id=5741462",
 		poster: null,
 		desc: "袁娅维献声电影《前任3：再见前任》「灵魂新锋」TIA袁娅维再度为爱献声，剖心演绎最催人泪下版《说散就散》。电影「前任3：再见前任」主题曲《说散就散》洒脱上线"
 	},
