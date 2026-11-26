@@ -1248,7 +1248,7 @@ function updateMediaSession(song) {
 }
 
 /** 切歌空窗的宽限时长：只有换源后这么久之内，才允许控件继续显示「播放中」 */
-const SWITCH_GRACE_MS = 10000;
+const SWITCH_GRACE_MS = 4000;
 var stateRecheckTimer = null;
 /** 上一次报给系统控件的状态，用来只在「在播 → 没播」的跳变时钉一次进度 */
 var lastReportedState = null;
@@ -1294,7 +1294,7 @@ function syncMediaSessionState() {
 		stateRecheckTimer = setTimeout(function () {
 			stateRecheckTimer = null;
 			syncMediaSessionState();
-		}, SWITCH_GRACE_MS + 500);
+		}, SWITCH_GRACE_MS);
 	}
 }
 
@@ -1409,6 +1409,15 @@ audio.addEventListener('playing', syncMediaSessionState);
 audio.addEventListener('pause', syncMediaSessionState);
 audio.addEventListener('ended', syncMediaSessionState);
 audio.addEventListener('timeupdate', function () { updatePositionState(); });
+/**
+ * 缓冲状态一变就重算一次控件状态。
+ * 「被外部打断的那一刻刚好还在缓冲（readyState < 3）」时会被切歌宽限当成空窗，
+ * 之后数据到了也没有任何事件去纠正 —— 实测线上就是这样一直卡在「播放中」。
+ */
+audio.addEventListener('loadeddata', syncMediaSessionState);
+audio.addEventListener('canplay', syncMediaSessionState);
+audio.addEventListener('canplaythrough', syncMediaSessionState);
+audio.addEventListener('stalled', syncMediaSessionState);
 // duration 这时候才有效，必须强制刷一次，否则锁屏进度条没有总时长
 audio.addEventListener('loadedmetadata', function () { updatePositionState(true); });
 audio.addEventListener('seeked', function () { updatePositionState(true); });
