@@ -198,6 +198,12 @@ let playIntent = false;
 let prefetchEl = null;      // 隐藏的预取元素
 let prefetchSong = null;    // 已经预取的是哪一首（避免重复触发）
 const PREFETCH_LEAD = 30;   // 距结束多少秒开始预取
+/**
+ * 最近一次切歌（loadSong）的时刻。
+ * 系统控件那个「切歌空窗仍报 playing」的宽限只在这一小段时间内成立，
+ * 否则「被来电/别的软件抢走声音而暂停」也会被当成空窗，控件一直显示在播（见 syncMediaSessionState）。
+ */
+let lastLoadAt = 0;
 
 /**
  * 本首歌是否已经真正出声过。
@@ -240,6 +246,11 @@ audio.addEventListener('play', function () {
 audio.addEventListener('pause', function () {
 	// 没声音了封面就停（播完也一样，所以要放在下面的 ended 判断之前）
 	setCoverSpin(false);
+	/**
+	 * 「已经正常播了三秒以上才停」= 真的被外部打断（来电、别的 App、拔耳机），
+	 * 这时候不能再补 play()，否则会跟对方抢音频焦点。切歌边界上的停顿 currentTime 还在 0 附近，不会误判。
+	 */
+	if (audio.currentTime > 3) stopBgPlayRetry();
 	if (audio.ended) return;
 	setPlayUI(false);
 });
@@ -401,6 +412,56 @@ function maybePrefetch() {
 	} catch (e) { }
 }
 
+/**
+ * ===== 后台切歌起播兜底 =====
+ * 用户实测：息屏放几首之后，「上一首播完 → 下一首」这一步会停住，点回页面才继续。
+ * 这一步唯一依赖的动作就是那次 `audio.play()`：有些机型/省电策略会把它挂起或直接拒掉，
+ * 而页面在后台时没有任何东西会再触发第二次。
+ *
+ * 所以只在本站**自己刚切歌**的 8 秒里、且页面在后台时补几次 play()：
+ *   · 用户手动暂停 → playIntent 为 false，不动；
+ *   · 来电 / 别的 App 抢走声音 → 那是在播了 3 秒以上才停的（见 pause 监听里 stopBgPlayRetry），
+ *     这里已经被取消，不会跟对方抢音频焦点。
+ */
+var bgPlayRetryTimer = null;
+var bgPlayRetryLeft = 0;
+const BG_RETRY_MAX = 4;        // 最多补 4 次
+const BG_RETRY_GAP = 2000;     // 每 2 秒一次
+const BG_RETRY_WINDOW = 8000;  // 只认最近 8 秒内切的那一首
+
+function stopBgPlayRetry() {
+	clearTimeout(bgPlayRetryTimer);
+	bgPlayRetryTimer = null;
+	bgPlayRetryLeft = 0;
+}
+
+function startBgPlayRetry() {
+	if (document.visibilityState !== 'hidden') return;
+	if (!playIntent) return;
+	bgPlayRetryLeft = BG_RETRY_MAX;
+	clearTimeout(bgPlayRetryTimer);
+	bgPlayRetryTimer = setTimeout(bgPlayRetryTick, BG_RETRY_GAP);
+}
+
+function bgPlayRetryTick() {
+	bgPlayRetryTimer = null;
+	if (document.visibilityState !== 'hidden') return;
+	if (!playIntent || !audio.paused) return;
+	if (audio.ended || !audio.currentSrc) return;
+	if (Date.now() - lastLoadAt > BG_RETRY_WINDOW) return;
+	if (typeof mvIsPlaying === 'function' && mvIsPlaying()) return;
+	if (bgPlayRetryLeft-- <= 0) return;
+	// 完全没拿到数据（readyState 0）说明这次加载卡死了，重新 load 一次再播
+	if (audio.readyState === 0) {
+		try { audio.load(); } catch (e) { }
+	}
+	try {
+		var p = audio.play();
+		if (p && typeof p.catch === 'function') p.catch(function () { });
+	} catch (e) { }
+	bgPlayRetryTimer = setTimeout(bgPlayRetryTick, BG_RETRY_GAP);
+}
+
 // 更新歌曲细节
 function loadSong(song) {
 	/**
@@ -420,6 +481,7 @@ function loadSong(song) {
 	setCoverSpin(false);
 	title.textContent = song;
 	audio.src = `music/${song}.mp3`;
+	lastLoadAt = Date.now();
 	// 换歌了：上一首播放期间预取的那份已经用掉（正被上面这行从 SW 缓存取），把预取元素停掉
 	stopPrefetch();
 	applyCover(song);
@@ -696,6 +758,8 @@ function playSong(forceAudio) {
 			}
 		});
 	}
+	// 后台切歌：这次 play() 万一被系统挂住/拒掉，短时间内补几次（见 startBgPlayRetry）
+	startBgPlayRetry();
 }
 
 /**
@@ -711,7 +775,10 @@ function pauseSong(userAction) {
 	// 暂停了就没声音，封面必须停（MV 接管声音时也走这里）
 	setCoverSpin(false);
 	// 用户不想听了，预取也停掉，别在后台偷偷吃流量
-	if (userAction !== false) stopPrefetch();
+	if (userAction !== false) {
+		stopPrefetch();
+		stopBgPlayRetry();
+	}
 
 	audio.pause();
 }
@@ -1180,6 +1247,12 @@ function updateMediaSession(song) {
 	}
 }
 
+/** 切歌空窗的宽限时长：只有换源后这么久之内，才允许控件继续显示「播放中」 */
+const SWITCH_GRACE_MS = 10000;
+var stateRecheckTimer = null;
+/** 上一次报给系统控件的状态，用来只在「在播 → 没播」的跳变时钉一次进度 */
+var lastReportedState = null;
+
 /**
  * 把「播放/暂停状态」同步给系统控件。
  * 状态以「谁真的在出声」为准：MV 播起来时 audio 是被内部暂停的，
@@ -1193,12 +1266,36 @@ function syncMediaSessionState() {
 	 * 一旦报 paused，安卓会立刻撤掉通知栏那条媒体控件，页面随之丢掉「后台媒体应用」的身份，
 	 * 更容易在后台被冻结 —— 这正是「放完一首就没了」的触发点之一。
 	 * playIntent 为 false（用户自己按的暂停）时仍然是 paused，不误报。
+	 *
+	 * ⚠️ 原本 `playIntent && paused && !ended` 恒成立，把三件事混成了一件（都是错的）：
+	 *   ① 别的软件/来电报音抢走声音时，安卓会把我们的播放停掉但 playIntent 不变
+	 *      → 控件一直显示「播放中」、进度条还在往前跑，实际早就没声了；
+	 *   ② 息屏切歌卡住时同样成立，用户看着像在播，其实没有。
+	 * 所以判据必须同时满足「刚换过源」和「还没缓冲到能播（readyState < 3）」：
+	 *   播放中被外部打断时 readyState 是 4，那是真的停了，立刻如实报 paused。
 	 */
-	var waitingForNext = playIntent && audio.ended === false && audio.paused;
+	var switching = playIntent && audio.ended === false && audio.paused &&
+		(Date.now() - lastLoadAt < SWITCH_GRACE_MS) && audio.readyState < 3;
+	var playing = mvPlaying || !audio.paused || switching;
 	try {
-		navigator.mediaSession.playbackState = (mvPlaying || !audio.paused || waitingForNext) ? 'playing' : 'paused';
+		navigator.mediaSession.playbackState = playing ? 'playing' : 'paused';
 	} catch (e) { }
+	/**
+	 * 从「在播」掉到「没播」的那一刻把位置钉一次：
+	 * 通知栏的进度条是按 setPositionState 里的 playbackRate 自己往前推算的，
+	 * 不钉住的话暂停后它还会继续走到歌尾（用户报的「状态变暂停了但进度条还在走」）。
+	 */
+	if (!playing && lastReportedState === 'playing') updatePositionState(true);
+	lastReportedState = playing ? 'playing' : 'paused';
 	updatePositionState();
+	// 宽限到期后重算一次：把「卡在空窗」或「被外部暂停」的状态如实改回 paused
+	clearTimeout(stateRecheckTimer);
+	if (switching) {
+		stateRecheckTimer = setTimeout(function () {
+			stateRecheckTimer = null;
+			syncMediaSessionState();
+		}, SWITCH_GRACE_MS + 500);
+	}
 }
 
 /**
@@ -1270,7 +1367,9 @@ if ("mediaSession" in navigator) {
 	navigator.mediaSession.setActionHandler("pause", function () {
 		// 处理暂停按钮事件
 		pauseSong();
-		navigator.mediaSession.playbackState = "Paused";
+		// 只能是 'none' / 'paused' / 'playing' 三个小写值，写成 "Paused" 会抛 TypeError，
+		// 通知栏就会一直停在播放中（真正改状态的是 pauseSong 里触发的 pause 事件）
+		try { navigator.mediaSession.playbackState = "paused"; } catch (e) { }
 	});
 	navigator.mediaSession.setActionHandler('previoustrack', function () {
 		// 处理上一曲按钮事件
