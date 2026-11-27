@@ -185,19 +185,26 @@ let playIntent = false;
 
 /**
  * ===== 下一首预取（后台连续播放）=====
- * 手机切到后台后，「这一首播完 → 下一首出声」这几秒空窗里没有任何媒体在播，
- * 安卓会把页面当空闲后台页冻结/回收，于是 nextSong() 里那次 play() 永远等不到，
- * 表现就是「后台放完一首就不动了」。
+ * 现象：手机切到后台，播完几首后「自动切下一首」就没声了；点回页面才继续，甚至系统控件直接消失。
  *
- * 做法：距本首结束 30 秒时，用一个**隐藏的、静音的 audio 元素**把下一首播一遍。
- *   ① 元素真的在播 → 页面不会在空窗里被当成空闲页清掉；
- *   ② 请求的 destination 是 audio → sw.js 会把整份 mp3 存进 ql:media-v2；
- * ended 之后 audio.src 换成下一首时直接命中 SW 缓存，空窗从「下载几秒」压到几十毫秒。
- * 只预取一首；切歌、暂停、离开播放状态都立刻停掉，不额外占带宽和内存。
+ * 根因（2026-11-26 实测）：Cloudflare Pages **不支持 Range**，一首歌必须整份下完才能播。
+ * 实测 3.5MB 的歌要下 31.7 秒、11.3MB 的《浮夸》要 38.7 秒。切歌那一刻如果这份数据还没到手，
+ * 页面就得从零重新下几十秒 —— 期间完全没有声音，系统就不再把它当「正在放媒体」的标签页，
+ * 冻结/回收随之而来。
+ *
+ * 做法：**提前把下一首整份下完，存成本地 blob**，切歌时 `audio.src` 直接指向这个 blob：
+ *   · 切歌不需要一个字节的网络，空窗从几十秒压到几十毫秒；
+ *   · 不依赖 sw.js（局域网 http 下没有 SW，那边同样要能秒切）。
+ * 时机：本首**整份缓冲完**（带宽空出来了，不跟正在播的这首抢网）或距结束 30 秒，先到先算。
+ * 只预取一首；切歌、暂停都立刻中止并回收 blob，不额外占带宽和内存。
  */
-let prefetchEl = null;      // 隐藏的预取元素
-let prefetchSong = null;    // 已经预取的是哪一首（避免重复触发）
-const PREFETCH_LEAD = 30;   // 距结束多少秒开始预取
+let prefetchJob = null;     // 正在下载的下一首：{song, ctl}
+let prefetchBlob = null;    // 已下好、等切歌用的下一首：{song, url}
+let prefetchSkip = null;    // 太大、不值得整份驻留内存的那首（跳过，别反复重试）
+let blobPlayingUrl = null;  // 当前 audio.src 正在用的 blob（切走之后才回收）
+const PREFETCH_LEAD = 30;   // 兜底：距结束多少秒一定要开始预取
+/** blob 是把整份文件放在内存里的，太大就不预取（曲库里最大的串烧 72MB） */
+const PREFETCH_MAX_BYTES = 20 * 1024 * 1024;
 /**
  * 最近一次切歌（loadSong）的时刻。
  * 系统控件那个「切歌空窗仍报 playing」的宽限只在这一小段时间内成立，
@@ -246,11 +253,6 @@ audio.addEventListener('play', function () {
 audio.addEventListener('pause', function () {
 	// 没声音了封面就停（播完也一样，所以要放在下面的 ended 判断之前）
 	setCoverSpin(false);
-	/**
-	 * 「已经正常播了三秒以上才停」= 真的被外部打断（来电、别的 App、拔耳机），
-	 * 这时候不能再补 play()，否则会跟对方抢音频焦点。切歌边界上的停顿 currentTime 还在 0 附近，不会误判。
-	 */
-	if (audio.currentTime > 3) stopBgPlayRetry();
 	if (audio.ended) return;
 	setPlayUI(false);
 });
@@ -373,93 +375,101 @@ audio.addEventListener('error', MusicError);
 
 /**
  * 停掉预取：切歌、暂停、出错都调用。
- * 元素留着复用（不重新 new，避免每次切歌都建一个解码器）。
+ * 正在下的那次请求直接 abort（省流量），已经下好但还没用上的 blob 立刻回收。
+ * ⚠️ 不能碰 blobPlayingUrl —— 那是当前正在播的这首，回收了音频就断了。
  */
 function stopPrefetch() {
-	if (prefetchEl && !prefetchEl.paused) {
-		try { prefetchEl.pause(); } catch (e) { }
+	if (prefetchJob) {
+		if (prefetchJob.ctl) { try { prefetchJob.ctl.abort(); } catch (e) { } }
+		prefetchJob = null;
 	}
-	prefetchSong = null;
+	if (prefetchBlob) {
+		try { URL.revokeObjectURL(prefetchBlob.url); } catch (e) { }
+		prefetchBlob = null;
+	}
+	prefetchSkip = null;
+}
+
+/**
+ * 取这一首的播放地址：预取过的用本地 blob（切歌零网络），否则回网络地址。
+ * ⚠️ 这里**只取不回收**：旧 blob 的 URL 必须等 audio.src 换过去之后再 revoke，
+ *    提前回收会让正在播的这首立刻断掉（实测切走后的那首直接停在 readyState 1 不播）。
+ */
+function takePrefetchedSrc(song) {
+	if (prefetchBlob && prefetchBlob.song === song) {
+		const url = prefetchBlob.url;
+		prefetchBlob = null;
+		return url;
+	}
+	return `music/${song}.mp3`;
+}
+
+/** audio.src 换好之后调用：回收上一个已经不再使用的 blob，并记住当前用的是哪个 */
+function releaseOldBlob(curSrc) {
+	if (blobPlayingUrl && blobPlayingUrl !== curSrc) {
+		try { URL.revokeObjectURL(blobPlayingUrl); } catch (e) { }
+		blobPlayingUrl = null;
+	}
+	if (typeof curSrc === 'string' && curSrc.slice(0, 5) === 'blob:') blobPlayingUrl = curSrc;
+}
+
+/**
+ * 把下一首整份下下来存成 blob（不播放、不建解码器）。
+ * 失败就当作没预取过，下次 timeupdate 再来一遍。
+ */
+function startPrefetch(song) {
+	const job = { song: song, ctl: (typeof AbortController === 'function') ? new AbortController() : null };
+	prefetchJob = job;
+	const opt = job.ctl ? { signal: job.ctl.signal } : undefined;
+	fetch(`music/${song}.mp3`, opt)
+		.then(function (res) {
+			if (!res || !res.ok) throw new Error('HTTP ' + (res ? res.status : 0));
+			// 太大的不往内存里放：切歌时老老实实走网络（这类文件本来也不是常见情况）
+			const len = Number(res.headers.get('content-length') || 0);
+			if (len > PREFETCH_MAX_BYTES) {
+				prefetchSkip = song;
+				throw new Error('too big');
+			}
+			return res.blob();
+		})
+		.then(function (blob) {
+			if (prefetchJob !== job) return;   // 期间已经切歌/暂停，这份不要了
+			prefetchJob = null;
+			if (!blob || !blob.size) return;
+			const url = URL.createObjectURL(blob);
+			if (prefetchBlob) { try { URL.revokeObjectURL(prefetchBlob.url); } catch (e) { } }
+			prefetchBlob = { song: song, url: url };
+		})
+		.catch(function () {
+			if (prefetchJob === job) prefetchJob = null;
+		});
 }
 
 /**
  * 到点就预取下一首（由 timeupdate 每帧调一次，内部自己去重）。
- * 不满足条件立刻返回：没在播、还没到点、省流量模式、2G 网络、已经在预取同一首。
+ * 不满足条件立刻返回：没在播、还没到点、省流量模式、2G 网络、已经备好了。
+ *
+ * 触发时机有两条，先到先算：
+ *   ① 本首**整份缓冲完**（buf 覆盖到结尾）—— 带宽空出来了，这时候备下一首不与本首抢网；
+ *   ② 兜底：距结束 PREFETCH_LEAD 秒（buffered 一直覆盖不到结尾时走这条，比如自建支持 Range 的服务器，
+ *      实测那种情况下 Chrome 会在一半多就停止预读）。
+ *
+ * ⚠️ 不能只按「缓冲余量够 60 秒」触发：实测余量够的时候本首还在断断续续地下，
+ * 两条下载互相拖，下一首反而迟迟拿不到整份数据（线上实测 60 秒一个字节都没进来）。
  */
 function maybePrefetch() {
 	if (!playIntent || audio.paused) return;
+	if (prefetchBlob || prefetchJob) return;
 	const d = audio.duration;
 	if (!isFinite(d) || d <= 0) return;
-	if (d - audio.currentTime > PREFETCH_LEAD) return;
+	const buf = audio.buffered;
+	const wholeLoaded = !!(buf && buf.length > 0 && buf.end(buf.length - 1) >= d - 1);
+	if (!wholeLoaded && d - audio.currentTime > PREFETCH_LEAD) return;
 	const conn = navigator.connection;
 	if (conn && (conn.saveData || /(^|-)2g$/.test(String(conn.effectiveType || '')))) return;
 	const next = songs[(songIndex + 1) % songs.length];
-	if (!next || prefetchSong === next) return;
-	prefetchSong = next;
-	if (!prefetchEl) {
-		prefetchEl = new Audio();
-		prefetchEl.preload = 'auto';
-		/**
-		 * 必须 muted：只有静音媒体才允许在没有用户手势的情况下自动播放，
-		 * 而且静音不会抢音频焦点、不会在通知栏里多出一条「正在播放」。
-		 */
-		prefetchEl.muted = true;
-	}
-	try {
-		prefetchEl.src = `music/${next}.mp3`;
-		const p = prefetchEl.play();
-		if (p && typeof p.catch === 'function') p.catch(function () { });
-	} catch (e) { }
-}
-
-/**
- * ===== 后台切歌起播兜底 =====
- * 用户实测：息屏放几首之后，「上一首播完 → 下一首」这一步会停住，点回页面才继续。
- * 这一步唯一依赖的动作就是那次 `audio.play()`：有些机型/省电策略会把它挂起或直接拒掉，
- * 而页面在后台时没有任何东西会再触发第二次。
- *
- * 所以只在本站**自己刚切歌**的 8 秒里、且页面在后台时补几次 play()：
- *   · 用户手动暂停 → playIntent 为 false，不动；
- *   · 来电 / 别的 App 抢走声音 → 那是在播了 3 秒以上才停的（见 pause 监听里 stopBgPlayRetry），
- *     这里已经被取消，不会跟对方抢音频焦点。
- */
-var bgPlayRetryTimer = null;
-var bgPlayRetryLeft = 0;
-const BG_RETRY_MAX = 4;        // 最多补 4 次
-const BG_RETRY_GAP = 2000;     // 每 2 秒一次
-const BG_RETRY_WINDOW = 8000;  // 只认最近 8 秒内切的那一首
-
-function stopBgPlayRetry() {
-	clearTimeout(bgPlayRetryTimer);
-	bgPlayRetryTimer = null;
-	bgPlayRetryLeft = 0;
-}
-
-function startBgPlayRetry() {
-	if (document.visibilityState !== 'hidden') return;
-	if (!playIntent) return;
-	bgPlayRetryLeft = BG_RETRY_MAX;
-	clearTimeout(bgPlayRetryTimer);
-	bgPlayRetryTimer = setTimeout(bgPlayRetryTick, BG_RETRY_GAP);
-}
-
-function bgPlayRetryTick() {
-	bgPlayRetryTimer = null;
-	if (document.visibilityState !== 'hidden') return;
-	if (!playIntent || !audio.paused) return;
-	if (audio.ended || !audio.currentSrc) return;
-	if (Date.now() - lastLoadAt > BG_RETRY_WINDOW) return;
-	if (typeof mvIsPlaying === 'function' && mvIsPlaying()) return;
-	if (bgPlayRetryLeft-- <= 0) return;
-	// 完全没拿到数据（readyState 0）说明这次加载卡死了，重新 load 一次再播
-	if (audio.readyState === 0) {
-		try { audio.load(); } catch (e) { }
-	}
-	try {
-		var p = audio.play();
-		if (p && typeof p.catch === 'function') p.catch(function () { });
-	} catch (e) { }
-	bgPlayRetryTimer = setTimeout(bgPlayRetryTick, BG_RETRY_GAP);
+	if (!next || next === prefetchSkip) return;
+	startPrefetch(next);
 }
 
 // 更新歌曲细节
@@ -480,9 +490,13 @@ function loadSong(song) {
 	// 切歌瞬间封面先停，等本首真的出声再转（上一首的旋转不能延续到这一首）
 	setCoverSpin(false);
 	title.textContent = song;
-	audio.src = `music/${song}.mp3`;
+	// 已经预取到本地就直接指向这个 blob（切歌零网络）；没预取到才用网络地址
+	audio.src = takePrefetchedSrc(song);
+	// 换源完成之后才回收上一个 blob（顺序反了会把正在播的这首弄停）
+	releaseOldBlob(audio.src);
 	lastLoadAt = Date.now();
-	// 换歌了：上一首播放期间预取的那份已经用掉（正被上面这行从 SW 缓存取），把预取元素停掉
+	// 换歌了：上一首播放期间预取的那份已经在上面的 takePrefetchedSrc 里用掉，
+	// 这里只清理「没用上的」和「下了一半的」，不会碰到正在播的那个 blob
 	stopPrefetch();
 	applyCover(song);
 	// 系统媒体控件（安卓通知栏/锁屏）的标题与封面跟着这首走
@@ -758,8 +772,6 @@ function playSong(forceAudio) {
 			}
 		});
 	}
-	// 后台切歌：这次 play() 万一被系统挂住/拒掉，短时间内补几次（见 startBgPlayRetry）
-	startBgPlayRetry();
 }
 
 /**
@@ -777,7 +789,6 @@ function pauseSong(userAction) {
 	// 用户不想听了，预取也停掉，别在后台偷偷吃流量
 	if (userAction !== false) {
 		stopPrefetch();
-		stopBgPlayRetry();
 	}
 
 	audio.pause();
